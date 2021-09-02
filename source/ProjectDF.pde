@@ -1,4 +1,6 @@
-//V5
+//V5.2
+
+String Version = "V 5.2";
 
 keyboard EYS;
 
@@ -236,6 +238,7 @@ void draw(){
     }
   }else{
     background(0);
+    text(Version,0,10);
     Menu();
   }
   if(ErrorTimer>0){

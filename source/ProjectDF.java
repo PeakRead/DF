@@ -3,6 +3,9 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
+import java.util.zip.*; 
+import java.util.*; 
+
 import java.util.HashMap; 
 import java.util.ArrayList; 
 import java.io.File; 
@@ -14,7 +17,9 @@ import java.io.IOException;
 
 public class ProjectDF extends PApplet {
 
-//V5
+//V5.2
+
+String Version = "V 5.2";
 
 keyboard EYS;
 
@@ -252,6 +257,7 @@ public void draw(){
     }
   }else{
     background(0);
+    text(Version,0,10);
     Menu();
   }
   if(ErrorTimer>0){
@@ -572,8 +578,8 @@ class Bug extends AI{
   public void math(int SID){
       if(HP<=0){kill.append(SID);return;}
       Walk(0.3f,0.5f,6);
-      Phys(W,H,true);
       Cont(W,H,35);
+      Phys(W,H,true);
       X+=VX;
       Y+=VY;
   }
@@ -610,8 +616,8 @@ class Fly extends AI{
     VY+=sin(atan2(play.Y-Y,play.X-X))*0.2f;
     VX=constrain(VX,-10,10);
     VY=constrain(VY,-10,10);
-    Phys(W,H,false);
     Cont(W,H,15);
+    Phys(W,H,false);
     X+=VX;
     Y+=VY;
   }
@@ -638,8 +644,8 @@ class Target extends AI{
   public void math(int SID){
     if(HP<=0){kill.append(SID);return;}
     Fall();
-    Phys(W,H,true);
     Cont(W,H,1);
+    Phys(W,H,true);
     X+=VX;
     Y+=VY;
     NewPartic(new SubText(X,Y,random(-1,1),random(-3,-1),60,0xffFFFFFF,"test"),true);
@@ -668,8 +674,8 @@ class Spewer extends AI{
     }
     if(HP<=0){kill.append(SID);return;}
     Fall();
-    Phys(W,H,true);
     Cont(W,H,1);
+    Phys(W,H,true);
     if(cooldown==0){
       
       NewPR(X+W,Y-H/2,cos(atan2(play.Y-Y+H/2-12,play.X+6-X-W))*6,sin(atan2(play.Y-Y+H/2-8,play.X+6-X-W))*6,0);
@@ -711,8 +717,8 @@ class testBoss extends AI{
   public void math(int SID){
     if(HP<=0){kill.append(SID);return;}
     Fall();
-    Phys(W,H,true);
     Cont(W,H,1);
+    Phys(W,H,true);
     X+=VX;
     Y+=VY;
   }
@@ -822,8 +828,8 @@ class Maze extends AI{
       cooldown--;
       if(cooldown<0){cooldown=300;attack = (int)random(0,2);}
     }
-    Phys(W,H,false);
     Cont(W,H,1);
+    Phys(W,H,false);
     X+=VX;
     Y+=VY;
   }
@@ -952,8 +958,8 @@ class Laze extends AI{
       cooldown--;
       if(cooldown<0){cooldown=300;attack = (int)random(0,2);}
     }
-    Phys(W,H,false);
     Cont(W,H,1);
+    Phys(W,H,false);
     X+=VX;
     Y+=VY;
   }
@@ -1003,8 +1009,8 @@ class Tower extends AI{
     if(dist(X,Y,play.X,play.Y)<150){
       Walk(-1,-1,1);
     }
-    Phys(W,H,true);
     Cont(W,H,45);
+    Phys(W,H,true);
     if(cooldown==0){
       float[] tmp=Enyhitscan(atan2(Ty-Y+12,Tx-X),25,true,0,-H/2);
       AddPartic(1,X,Y-H+6,tmp[0],tmp[1],40,color(255,0,0),true);
@@ -1879,6 +1885,54 @@ public int[] CB(float x1,float y1,float x2,float y2){
   for(float y=rev(minY+size,size);y<rev(maxY,size)-by+size;y+=size){
     float r = TLineToLine(0,y,1,y,x1,y1,x2,y2);
     out = concat(out,getBC(floor(r/size),floor(y/size+by)));
+  }
+  return out;
+}
+
+//BOX TOO TINY
+//ADD MORE
+
+
+
+
+//yea it unpacks everything
+//but it works
+
+public void UPDATE(){
+  saveBytes(sketchPath()+"/tmp.zip",loadBytes("https://github.com/PeakRead/DF/archive/refs/heads/main.zip"));
+  File zipfile = new File(sketchPath()+"/tmp.zip");
+  try{
+    ZipFile opener = new ZipFile(zipfile);
+    Enumeration files = opener.entries();
+    while(files.hasMoreElements()){
+      ZipEntry tmp = (ZipEntry)files.nextElement();
+      InputStream open = opener.getInputStream(tmp);
+      if(open.available()==0){continue;}
+      byte[] out = new byte[open.available()];
+      open.read(out);
+      saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),out);
+      println(tmp.getName());
+    }
+  }catch(Exception e){
+    PrintCon("sorry for that");
+    PrintCon(e.toString());
+    ErrorTimer=120;
+  }
+  launch(sketchPath()+"/ProjectDFTEST.exe");
+  exit();
+  //PrintCon(sketchPath());
+  //ErrorTimer=120;
+  
+}
+
+public String removefirst(String text){
+  String[] texts = split(text,'/');
+  String out="";
+  for(int i=1;i<texts.length;i++){
+    out+=texts[i];
+    if(i!=texts.length-1){
+      out+='/';
+    }
   }
   return out;
 }
@@ -3104,6 +3158,7 @@ public void MenuSetup() {
   menuUI = (UI[])append(menuUI, new ButtonText(20, height-160-50, 100, 40, "MAIN_MENU", "GotoTutorial", "tutorial"));
   menuUI = (UI[])append(menuUI, new ButtonText(20, height-160+50, 100, 40, "MAIN_MENU", "GotoOptions", "options"));
   menuUI = (UI[])append(menuUI, new ButtonText(20, height-160+100, 100, 40, "MAIN_MENU", "Quit", "Quit"));
+  menuUI = (UI[])append(menuUI, new ButtonText(140, height-160+100, 100, 40, "MAIN_MENU", "UPDATE", "Update"));
   
   //saves//
   

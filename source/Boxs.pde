@@ -123,3 +123,51 @@ int[] CB(float x1,float y1,float x2,float y2){
   }
   return out;
 }
+
+//BOX TOO TINY
+//ADD MORE
+
+import java.util.zip.*;
+import java.util.*;
+
+//yea it unpacks everything
+//but it works
+
+void UPDATE(){
+  saveBytes(sketchPath()+"/tmp.zip",loadBytes("https://github.com/PeakRead/DF/archive/refs/heads/main.zip"));
+  File zipfile = new File(sketchPath()+"/tmp.zip");
+  try{
+    ZipFile opener = new ZipFile(zipfile);
+    Enumeration files = opener.entries();
+    while(files.hasMoreElements()){
+      ZipEntry tmp = (ZipEntry)files.nextElement();
+      InputStream open = opener.getInputStream(tmp);
+      if(open.available()==0){continue;}
+      byte[] out = new byte[open.available()];
+      open.read(out);
+      saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),out);
+      println(tmp.getName());
+    }
+  }catch(Exception e){
+    PrintCon("sorry for that");
+    PrintCon(e.toString());
+    ErrorTimer=120;
+  }
+  launch(sketchPath()+"/ProjectDFTEST.exe");
+  exit();
+  //PrintCon(sketchPath());
+  //ErrorTimer=120;
+  
+}
+
+String removefirst(String text){
+  String[] texts = split(text,'/');
+  String out="";
+  for(int i=1;i<texts.length;i++){
+    out+=texts[i];
+    if(i!=texts.length-1){
+      out+='/';
+    }
+  }
+  return out;
+}

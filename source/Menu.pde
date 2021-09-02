@@ -23,6 +23,7 @@ void MenuSetup() {
   menuUI = (UI[])append(menuUI, new ButtonText(20, height-160-50, 100, 40, "MAIN_MENU", "GotoTutorial", "tutorial"));
   menuUI = (UI[])append(menuUI, new ButtonText(20, height-160+50, 100, 40, "MAIN_MENU", "GotoOptions", "options"));
   menuUI = (UI[])append(menuUI, new ButtonText(20, height-160+100, 100, 40, "MAIN_MENU", "Quit", "Quit"));
+  menuUI = (UI[])append(menuUI, new ButtonText(140, height-160+100, 100, 40, "MAIN_MENU", "UPDATE", "Update"));
   
   //saves//
   

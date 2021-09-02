@@ -94,8 +94,8 @@ class Bug extends AI{
   void math(int SID){
       if(HP<=0){kill.append(SID);return;}
       Walk(0.3,0.5,6);
-      Phys(W,H,true);
       Cont(W,H,35);
+      Phys(W,H,true);
       X+=VX;
       Y+=VY;
   }
@@ -132,8 +132,8 @@ class Fly extends AI{
     VY+=sin(atan2(play.Y-Y,play.X-X))*0.2;
     VX=constrain(VX,-10,10);
     VY=constrain(VY,-10,10);
-    Phys(W,H,false);
     Cont(W,H,15);
+    Phys(W,H,false);
     X+=VX;
     Y+=VY;
   }
@@ -160,8 +160,8 @@ class Target extends AI{
   void math(int SID){
     if(HP<=0){kill.append(SID);return;}
     Fall();
-    Phys(W,H,true);
     Cont(W,H,1);
+    Phys(W,H,true);
     X+=VX;
     Y+=VY;
     NewPartic(new SubText(X,Y,random(-1,1),random(-3,-1),60,#FFFFFF,"test"),true);
@@ -190,8 +190,8 @@ class Spewer extends AI{
     }
     if(HP<=0){kill.append(SID);return;}
     Fall();
-    Phys(W,H,true);
     Cont(W,H,1);
+    Phys(W,H,true);
     if(cooldown==0){
       
       NewPR(X+W,Y-H/2,cos(atan2(play.Y-Y+H/2-12,play.X+6-X-W))*6,sin(atan2(play.Y-Y+H/2-8,play.X+6-X-W))*6,0);
@@ -233,8 +233,8 @@ class testBoss extends AI{
   void math(int SID){
     if(HP<=0){kill.append(SID);return;}
     Fall();
-    Phys(W,H,true);
     Cont(W,H,1);
+    Phys(W,H,true);
     X+=VX;
     Y+=VY;
   }
@@ -344,8 +344,8 @@ class Maze extends AI{
       cooldown--;
       if(cooldown<0){cooldown=300;attack = (int)random(0,2);}
     }
-    Phys(W,H,false);
     Cont(W,H,1);
+    Phys(W,H,false);
     X+=VX;
     Y+=VY;
   }
@@ -474,8 +474,8 @@ class Laze extends AI{
       cooldown--;
       if(cooldown<0){cooldown=300;attack = (int)random(0,2);}
     }
-    Phys(W,H,false);
     Cont(W,H,1);
+    Phys(W,H,false);
     X+=VX;
     Y+=VY;
   }
@@ -525,8 +525,8 @@ class Tower extends AI{
     if(dist(X,Y,play.X,play.Y)<150){
       Walk(-1,-1,1);
     }
-    Phys(W,H,true);
     Cont(W,H,45);
+    Phys(W,H,true);
     if(cooldown==0){
       float[] tmp=Enyhitscan(atan2(Ty-Y+12,Tx-X),25,true,0,-H/2);
       AddPartic(1,X,Y-H+6,tmp[0],tmp[1],40,color(255,0,0),true);
