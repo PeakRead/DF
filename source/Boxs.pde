@@ -143,15 +143,17 @@ void UPDATE(){
       ZipEntry tmp = (ZipEntry)files.nextElement();
       InputStream open = opener.getInputStream(tmp);
       if(open.available()==0){continue;}
-      byte[] out = new byte[open.available()];
-      open.read(out);
-      saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),out);
-      println(tmp.getName());
+      byte[] shit = new byte[0];
+      while(open.available()>0){
+        byte[] out = new byte[1024];
+        int readed = open.read(out);
+        out = subset(out,0,readed);
+        shit = concat(shit,out);
+      }
+      saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),shit);
     }
   }catch(Exception e){
-    PrintCon("sorry for that");
-    PrintCon(e.toString());
-    ErrorTimer=120;
+    e.printStackTrace();
   }
   launch(sketchPath()+"/ProjectDFTEST.exe");
   exit();
