@@ -1,5 +1,4 @@
 # DF
-god the exe is broken
 
 mh what?
 
