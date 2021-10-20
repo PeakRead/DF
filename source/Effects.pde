@@ -1,5 +1,20 @@
 ArrayList<Effect> ListEffects;
 IntList Ekill;
+IntDict PartTextName;
+PImage[] PartImgs;
+
+void PartINIC(){
+  PartImgs = new PImage[0];
+  PartTextName = new IntDict(0);
+  File WATFFEA = new File(sketchPath()+"/data/Particles");
+  PartImgs = (PImage[])append(PartImgs,SloadImage("Misc/mising.png"));
+  PartTextName.add("mising.png",0);
+  for(int i=0;i<WATFFEA.list().length;i++){
+    //File tmper = new File(sketchPath()+"/data/Particles/"+WATFFEA.list()[i]);
+    PartImgs = (PImage[])append(PartImgs,SloadImage(sketchPath()+"/data/Particles/"+WATFFEA.list()[i]));
+    PartTextName.add(WATFFEA.list()[i],PartTextName.size());
+  }
+}
 
 class Line extends Effect{
   Line(float nX,float nY,float nVX,float nVY,int ntime,color nC){
@@ -26,7 +41,8 @@ class Line extends Effect{
 }
 
 class GravPoint extends Effect{
-  GravPoint(float nX,float nY,float nVX,float nVY,int ntime,color nC){
+  float gravmult=1;
+  GravPoint(float nX,float nY,float nVX,float nVY,int ntime,color nC,float gravmult){
     X=nX;
     Y=nY;
     VX=nVX;
@@ -34,12 +50,13 @@ class GravPoint extends Effect{
     time=ntime;
     Mtime=ntime;
     C=nC;
+    this.gravmult=gravmult;
   }
   void mathE(int T){
     if(time==0){
       Ekill.append(T);
     }
-    VY+=0.2;
+    VY+=0.2*gravmult;
     X+=VX;
     Y+=VY;
     time--;
@@ -189,6 +206,34 @@ class SubText extends Effect{
   }
 }
 
+class StandImg extends Effect{
+  StandImg(float nX,float nY,float nVX,float nVY,int ntime,color nC,String ImgName){
+    X=nX;
+    Y=nY;
+    VX=nVX;
+    VY=nVY;
+    time=ntime;
+    Mtime=ntime;
+    C=nC;
+    theImgID=PartTextName.get(ImgName,0);
+  }
+  int theImgID=0;
+  void mathE(int T){
+    if(time==0){
+      Ekill.append(T);
+    }
+    X+=VX;
+    Y+=VY;
+    time--;
+  }
+  void drawE(){
+    //fill(C);
+    tint(C,float(time*255)/Mtime);
+    image(PartImgs[theImgID],X,Y);
+    noTint();
+  }
+}
+
 class Effect{
   float X;
   float Y;
@@ -233,7 +278,7 @@ void AddPartic(int T,float X,float Y,float VX,float VY,int time,color C,boolean 
       ListEffects.add(new Line(X,Y,VX,VY,time,C));
     break;
     case 2:
-      ListEffects.add(new GravPoint(X,Y,VX,VY,time,C));
+      ListEffects.add(new GravPoint(X,Y,VX,VY,time,C,1));
     break;
     case 3:
       ListEffects.add(new VELLPoint(X,Y,VX,VY,time,C));

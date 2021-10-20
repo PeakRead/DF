@@ -143,6 +143,11 @@ void UPDATE(){
       ZipEntry tmp = (ZipEntry)files.nextElement();
       InputStream open = opener.getInputStream(tmp);
       if(open.available()==0){continue;}
+      switch(removefirst(tmp.getName())){
+        case "data/Misc/sav":
+        case "data/Misc/config.json":
+        continue;
+      }
       byte[] shit = new byte[0];
       while(open.available()>0){
         byte[] out = new byte[1024];
@@ -155,7 +160,7 @@ void UPDATE(){
   }catch(Exception e){
     e.printStackTrace();
   }
-  launch(sketchPath()+"/ProjectDFTEST.exe");
+  //launch(sketchPath()+"/ProjectDFTEST.exe");
   exit();
   //PrintCon(sketchPath());
   //ErrorTimer=120;

@@ -512,6 +512,79 @@ class Soul extends PRO {
   }
 }
 
+class Rock extends PRO {
+  Rock(float nX, float nY, float nVX, float nVY, int nT) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    T = nT;
+    W=8;
+    H=8;
+    timer=0;
+    cframe=0;
+  }
+  void math(int SID) {
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      return;
+    }
+    if (X>play.X-6 && X<play.X+6 && Y<play.Y && Y>play.Y-24) {
+      AThurt(16);
+      killPR.append(SID);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+    VY+=0.2;
+  }
+  void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+  }
+}
+
+class hurtbox extends PRO {
+  hurtbox(float nX, float nY, float nVX, float nVY,int hurtme) {
+    X = nX;
+    Y = nY;
+    W = nVX;
+    H = nVY;
+    ouch=hurtme;
+  }
+  int ouch=0;
+  int timer=15;
+  void math(int SID) {
+    if(timer==0){
+      killPR.append(SID);
+      return;
+    }
+    if (X>play.X-6 && X<play.X+6 && Y<play.Y && Y>play.Y-24  && timer>10) {
+      AThurt(ouch);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+    VY+=0.2;
+  }
+  void render() {
+    noStroke();
+    fill(255,timer*255/15);
+    rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
 class PRO {
   float X;
   float Y;
@@ -583,6 +656,10 @@ void expd(float x, float y, float r, int d, float f, boolean player) {
   }
 }
 
+void NewSPr(PRO newthing){
+  ListPR.add(newthing);
+}
+
 void NewPR(float X, float Y, float VX, float VY, int T) {
   switch(T) {
   case 0:
@@ -617,6 +694,9 @@ void NewPR(float X, float Y, float VX, float VY, int T) {
     break;
   case 10:
     ListPR.add(new Soul(X, Y, VX, VY, T));
+    break;
+  case 11:
+    ListPR.add(new Rock(X, Y, VX, VY, T));
     break;
   }
 }

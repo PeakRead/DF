@@ -5,7 +5,7 @@ class ANIMG{
   int timer=0;
   int frame=0;
   ANIMG(String file){
-    Frames = new PImage[0];
+    Frames = new PImage[0]; //<>//
     RFrames = new int[0];
     int[] RLOAD = new int[0];
     byte[] DATA = loadBytes(file);
@@ -144,15 +144,80 @@ class ProANIMG{
   }
 }
 
+class SelfAnim{
+  int frame=0;
+  int timer=0;
+  boolean Action=false;
+  int Acting=0;
+  int ID=0;
+  SelfAnim(){}
+  void Anim(boolean move,boolean air){
+    timer++;
+    if(timer>enANIM[ID].delay){
+      timer=0;
+      frame++;
+    }
+    if(!Action){
+      if(frame>=getM(move,air)){
+        frame=0;
+      }
+    }else{
+      if(frame>=enANIM[ID].Actions[Acting].length){
+        frame=0;
+        Action=false;
+      }
+    }
+    //println(frame);
+  }
+  void Action(int todo){
+    Action=true;
+    Acting=todo;
+    frame=0;
+  }
+  void DIMG(float X,float Y,float w,float h,boolean moveing,boolean Airborn,color C){
+    tint(C);
+    if(Action){
+      image(enANIM[ID].Actions[Acting][frame],X-w,Y-h,w*2,h);
+    }else{
+      if(Airborn){
+        image(enANIM[ID].Air[frame],X-w,Y-h,w*2,h);
+      }else if(moveing){
+        image(enANIM[ID].Move[frame],X-w,Y-h,w*2,h);
+      }else{
+        image(enANIM[ID].Stand[frame],X-w,Y-h,w*2,h);
+      }
+    }
+    noTint();
+  }
+  void EIMG(float X,float Y,float w,float h,int frame,color C){
+    tint(C);
+    image(enANIM[ID].Extras[frame],X-w/2,Y-h/2,w,h);
+    noTint();
+  }
+  int getM(boolean mov,boolean air){
+    if(air){
+      return enANIM[ID].Air.length;
+    }else if(mov){
+      return enANIM[ID].Move.length;
+    }else{
+      return enANIM[ID].Stand.length;
+    }
+  }
+}
+
 class EnANIMG{
   int delay;
   PImage[] Air;
   PImage[] Move;
   PImage[] Stand;
+  PImage[][] Actions;
+  PImage[] Extras;
   EnANIMG(String file){
     Air = new  PImage[0];
     Move = new  PImage[0];
     Stand = new  PImage[0];
+    Actions = new PImage[0][0];//Oh no
+    Extras = new PImage[0];
     byte[] DATA = loadBytes(sketchPath()+"/data/Hostiles/"+file+"/file.EAF");
     int header=0;
     delay = BgetI(DATA,header,2);
@@ -172,25 +237,20 @@ class EnANIMG{
     for(int i=0;i<U;i++){
       Stand = (PImage[])append(Stand,SloadImage("Hostiles/"+file+"/stand"+i+".png"));
     }
-  }
-  void DIMG(float X,float Y,float w,float h,int frame,boolean moveing,boolean Airborn,color C){
-    tint(C);
-    if(Airborn){
-      image(Air[frame],X-w,Y-h,w*2,h);
-    }else if(moveing){
-      image(Move[frame],X-w,Y-h,w*2,h);
-    }else{
-      image(Stand[frame],X-w,Y-h,w*2,h);
+        U = BgetI(DATA,header,2);
+    header+=2;
+    for(int i=0;i<U;i++){
+      Extras = (PImage[])append(Extras,SloadImage("Hostiles/"+file+"/extra"+i+".png"));
     }
-    noTint();
-  }
-  int getM(boolean mov,boolean air){
-    if(air){
-      return Air.length;
-    }else if(mov){
-      return Move.length;
-    }else{
-      return Stand.length;
+        U = BgetI(DATA,header,2);
+    header+=2;
+    for(int i=0;i<U;i++){
+      int UU = BgetI(DATA,header,2);
+      header+=2;
+      Actions = (PImage[][])append(Actions,new PImage[0]);
+      for(int ii=0;ii<UU;ii++){
+        Actions[i] = (PImage[])append(Actions[i],SloadImage("Hostiles/"+file+"/action"+ii+i+".png"));
+      }
     }
   }
 }

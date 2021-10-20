@@ -178,8 +178,8 @@ class Player{
         if(GetKeyBind("Player_Move_Right") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){dash(1);}
       }else{
         if(HP<=0){VY=-0.5;}
-        if(!(GetKeyBind("Player_Move_Down") | GetKeyBind("Player_Move_Up"))){VY/=2;}
-        if(!(GetKeyBind("Player_Move_Left") | GetKeyBind("Player_Move_Right"))){VX/=2;}
+        if(!(GetKeyBind("Player_Move_Down") | GetKeyBind("Player_Move_Up"))){VY/=1.4;}
+        if(!(GetKeyBind("Player_Move_Left") | GetKeyBind("Player_Move_Right"))){VX/=1.4;}
         if(GetKeyBind("Player_Move_Down") && VY<5 && HP>0 && !ConsoleUP){VY+=2.5;}
         if(GetKeyBind("Player_Move_Up") && VY>-5  && HP>0 && !ConsoleUP){VY-=2.5;}
         if(GetKeyBind("Player_Move_Left") && VX>-5  && HP>0 && !ConsoleUP){VX-=2.5;}
@@ -198,8 +198,8 @@ class Player{
       if(GetKeyBind("Player_Move_Up") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){updash();}
       if(GetKeyBind("Player_Move_Left") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){dash(-1);}
       if(GetKeyBind("Player_Move_Right") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){dash(1);}
-      if(GetKeyBind("Player_Move_Down") && HP>0 && !ConsoleUP){Ignore=true;}
     }
+    if(GetKeyBind("Player_Move_Down") && HP>0 && !ConsoleUP){Ignore=true;}
     PVY=VY;
     if(Gr){cooldownV=0;}
     Gr=false;
@@ -230,7 +230,7 @@ class Player{
     }
     frezzing=false;
     water=false;
-    if(Ignore){Checkfor();}
+    if(Ignore && !GetKeyBind("Player_Move_Down")){Checkfor();}
     coll(X-6,Y   ,X-6+VX+0.01,Y+VY+0.01);
     coll(X+6,Y   ,X+6+VX+0.01,Y+VY+0.01);
     coll(X-6,Y-24,X-6+VX+0.01,Y-24+VY+0.01);
@@ -279,8 +279,9 @@ class Player{
       }
       if(T>=0 && T<=1){
         PVector TOplayer=new PVector(play.X-(CSX[i]+CEX[i])/2,play.Y-12-(CSY[i]+CEY[i])/2);
-        PVector Normal=new PVector((CSX[i]-CEX[i]),(CSY[i]-CEY[i]));
-        if(CSX[i]>CEX[i]){Normal.rotate(-PI/2);}else{Normal.rotate(PI/2);}
+        PVector Normal=new PVector((CEX[i]-CSX[i]),(CEY[i]-CSY[i]));
+        Normal.rotate(-PI/2);
+        //if(CSX[i]>CEX[i]){Normal.rotate(-PI/2);}else{Normal.rotate(PI/2);}
         if(Normal.dot(TOplayer)<0 && CT[i]==1){
           Ignore=true;
         }
@@ -293,9 +294,10 @@ class Player{
         }
         //PVector TOplayer=atan2(play.Y-12-(CSY[i]+CEY[i])/2,play.X-(CSX[i]+CEX[i])/2);
         //PVector TOplayer=atan2(play.Y-12-(CSY[i]+CEY[i])/2,play.X-(CSX[i]+CEX[i])/2);
-        R=atan2(CSY[i]-CEY[i],CSX[i]-CEX[i]);
+        R=atan2(CSY[i]-CEY[i],CSX[i]-CEX[i])%PI;
         if(R<0){R+=PI;}
-        if(Normal.dot(TOplayer)>0 && R>-PI/4){//its a feature fuck it
+        //println(R);
+        if(Normal.dot(TOplayer)>0){//its a feature fuck it
           Gr=true;
         }
         break;

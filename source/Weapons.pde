@@ -8,6 +8,7 @@ void WeaponINIC() {
   MOAG.add(new Rocket());
   MOAG.add(new shoogun());
   MOAG.add(new devgun());
+  MOAG.add(new KILLgun());
   //ADDWeapon(-12,-4,40,10,false,"Weapons/" + "testgun.png");
   //ADDWeapon(-12,-4,0,60,false,"Weapons/" + "Railgun.png");
   //ADDWeapon(-9,-4,0,9,false,"Weapons/" + "Garant.png");
@@ -68,11 +69,11 @@ class Garant extends Weapon {
     WeapW=31;
     WeapH=6;
     SDelay=0;
-    EDelay=9;
+    EDelay=12;
     Const=false;
   }
   void FIRE() {
-    Hitscan(0, 0, play.PO, false, 8, 12,1000);
+    Hitscan(0, 0, play.PO, false, 8, 20,1000);
   }
 }
 
@@ -105,10 +106,10 @@ class shoogun extends Weapon {
   }
   void FIRE() {
     for (int i=0; i<5; i++) {
-      NewPR(play.X, play.Y-12, cos(play.PO+PI/10-PI/20*i)*10, sin(play.PO+PI/10-PI/20*i)*10, 2);
+      NewPR(play.X, play.Y-12, cos(play.PO+PI/20-PI/40*i)*10, sin(play.PO+PI/20-PI/40*i)*10, 2);
     }
     for (int i=0; i<5; i++) {
-      NewPR(play.X, play.Y-12, cos(play.PO+PI/10-PI/20*i)*8, sin(play.PO+PI/10-PI/20*i)*8, 2);
+      NewPR(play.X, play.Y-12, cos(play.PO+PI/20-PI/40*i)*8, sin(play.PO+PI/20-PI/40*i)*8, 2);
     }
     play.VX-=cos(play.PO)*8;
     play.VY-=sin(play.PO)*8;
@@ -124,12 +125,28 @@ class devgun extends Weapon {
     WeapW=19;
     WeapH=3;
     SDelay=0;
-    EDelay=25;
+    EDelay=15;
     Const=false;
   }
   void FIRE() {
     AddPartic(1,play.X, play.Y-12, play.X+mouseX-width/2, play.Y+mouseY-height/2, 40, color(255),true);
     NewAI(play.X+mouseX-width/2,play.Y+mouseY-height/2,AINames[DevGun],false);
+  }
+}
+
+class KILLgun extends Weapon {
+  KILLgun() {
+    Sprite=SloadImage("Weapons/devgun.png");
+    WeaOffx=-7;
+    WeaOffy=-2;
+    WeapW=19;
+    WeapH=3;
+    SDelay=0;
+    EDelay=15;
+    Const=false;
+  }
+  void FIRE() {
+    Hitscan(0, 0, play.PO, true, 8, 99999999,1000);
   }
 }
 

@@ -34,6 +34,9 @@ void DrawConsole(){
   rect(0,20*15,width,15);
   fill(#0000FF);
   text(ConsoleInput,0,20*15);
+  float textmax=textWidth(ConsoleInput);
+  stroke(#0000FF);
+  line(textmax,20*15,textmax,21*15);
 }
 
 String[] Confunc = {
@@ -72,6 +75,8 @@ void runConinput(){
       if(!Gaming){PrintCon("not gaming");break;}
       if(play.HP<=0){
         play.HP=100;
+        play.HD=0;
+        play.IV=60;
         PrintCon("get up!");
       }else{
         PrintCon("your not dead dumbass");

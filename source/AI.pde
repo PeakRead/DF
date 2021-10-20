@@ -5,8 +5,8 @@ int PMust=0;
 IntList BOSSHP;
 IntList BOSSID;
 
-String[] AINames={"Bug","Fly","Target","Spewer","testBoss","Maze","Laze","Maze_Boss","Laze_Boss","tower","napalm","Spirit","Guardian"};
-boolean[] Sgroun={true ,false,true    ,true    ,true      ,false ,false ,false      ,false      ,true   ,true    ,false   ,true};
+String[] AINames={"Bug","Fly","Target","Spewer","testBoss","Maze","Laze","Maze_Boss","Laze_Boss","tower","napalm","Spirit","Guardian","Crab","Piller"};
+boolean[] Sgroun={true ,false,true    ,true    ,true      ,false ,false ,false      ,false      ,true   ,true    ,false   ,true      ,true  ,true};
 
 void AIMath(){
   PMust=Must;
@@ -90,11 +90,12 @@ class Bug extends AI{
     H=14;
     HP=20;
     T=0;
+    Animr.ID=EAR.get("Bug");
   }
   void math(int SID){
       if(HP<=0){kill.append(SID);return;}
       Walk(0.3,0.5,6);
-      Cont(W,H,35);
+      Cont(W,H,25);
       Phys(W,H,true);
       X+=VX;
       Y+=VY;
@@ -110,8 +111,8 @@ class Bug extends AI{
         scale(-1,1);
         translate(-X*2,0);
       }
-       Anim(EAR.get("Bug"),true,OG>3);
-      enANIM[EAR.get("Bug")].DIMG(X,Y,W,H,frame,true,OG>3,#FFFFFF);
+      Animr.Anim(true,OG>3);
+      Animr.DIMG(X,Y,W,H,true,OG>3,#FFFFFF);
       popMatrix();
   }
 }
@@ -125,6 +126,7 @@ class Fly extends AI{
     H=12;
     HP=12;
     T=4;
+    Animr.ID=EAR.get("Fly");
   }
   void math(int SID){
     if(HP<=0){kill.append(SID);return;}
@@ -143,8 +145,8 @@ class Fly extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-     Anim(EAR.get("Fly"),false,true);
-    enANIM[EAR.get("Fly")].DIMG(X,Y,W,H,frame,false,true,#FFFFFF);
+    Animr.Anim(false,true);
+    Animr.DIMG(X,Y,W,H,false,true,#FFFFFF);
   }
 }
 
@@ -155,7 +157,8 @@ class Target extends AI{
     M=nM;
     W=6;
     H=24;
-    HP=900;
+    HP=9999;
+    Animr.ID=EAR.get("Target");
   }
   void math(int SID){
     if(HP<=0){kill.append(SID);return;}
@@ -164,12 +167,38 @@ class Target extends AI{
     Phys(W,H,true);
     X+=VX;
     Y+=VY;
-    NewPartic(new SubText(X,Y,random(-1,1),random(-3,-1),60,#FFFFFF,"test"),true);
+    NewPartic(new StandImg(X,Y,random(-12,12),random(-12,12),15,#FFFFFF,"uranium.png"),true);
   }
   void render(){
     stroke(0);
     fill(255);
     rect(X-W,Y-H,W*2,H);
+    Animr.Anim(false,false);
+    Animr.DIMG(X,Y,W,H,false,false,#FFFFFF);
+    Animr.EIMG(cos(frameCount/20.0)*32+X,sin(frameCount/20.0)*32+Y,8,8,0,#FFFFFF);
+  }
+  void HURT(int dmg)
+  {
+    if(!hurte){return;}
+    HP-=dmg;
+    Animr.Action(0);
+    for(int B=0;B<5;B++){
+      AddPartic(4,X,Y,random(-1,1),random(-8,-2),50,color(255,0,0),true);
+    }
+    if(play.regenera==0){
+      if(dist(X,Y,play.X,play.Y)<=200 && play.HP>0){
+        AddPartic(1,play.X+random(-5,5),play.Y-12+random(-5,5),X+random(-5,5),Y-H/2+random(-5,5),60,color(255,0,0),true);
+        if(play.HP+dmg/4>100){
+          play.HP=100;
+        }else{
+          play.HP+=dmg/4;
+        }
+      }
+    }else{
+      if(random(1,100)<50 && play.HP>0){
+        NewPR(X,Y-H/2,random(-5,5),random(-5,5),10);
+      }
+    }
   }
 }
 
@@ -183,6 +212,7 @@ class Spewer extends AI{
     H=24;
     HP=34;
     T=5;
+    Animr.ID=EAR.get("Spewer");
   }
   void math(int SID){
     if(dist(X,Y,play.X,play.Y)>150){
@@ -213,8 +243,8 @@ class Spewer extends AI{
         scale(-1,1);
         translate(-X*2,0);
       }
-      Anim(EAR.get("Spewer"),Gr && abs(VX)<0.5,false);
-      enANIM[EAR.get("Spewer")].DIMG(X,Y,W,H,frame,Gr && abs(VX)<0.5,false,#FFFFFF);
+      Animr.Anim(Gr && abs(VX)<0.5,false);
+      Animr.DIMG(X,Y,W,H,Gr && abs(VX)<0.5,false,#FFFFFF);
       popMatrix();
   }
 }
@@ -262,9 +292,10 @@ class Maze extends AI{
       BOSSID.append(ListAi.size());
     }else{
       HP=200;
-    }
+    };
+    Animr.ID=EAR.get("Maze");
   }
-  int cooldown = 350;
+  int cooldown = 370;
   int attack = 1;
   void math(int SID){
     if(HP<=0){
@@ -292,7 +323,7 @@ class Maze extends AI{
       VY+=0.2;
     }else{
       Gr=false;
-      if(cooldown>200){
+      if(cooldown>200 && cooldown<300){
         VX+=(play.X-X+cos((float)frameCount/20)*64)/10;
         VY+=(play.Y-Y+sin((float)frameCount/20)*64-200)/10;
         VX=VX/10*9;
@@ -342,7 +373,7 @@ class Maze extends AI{
         }
       }
       cooldown--;
-      if(cooldown<0){cooldown=300;attack = (int)random(0,2);}
+      if(cooldown<0){cooldown=370;attack = (int)random(0,2);}
     }
     Cont(W,H,1);
     Phys(W,H,false);
@@ -355,11 +386,11 @@ class Maze extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Maze"),false,true);
+    Animr.Anim(false,true);
     if(!Enraged){
-      enANIM[EAR.get("Maze")].DIMG(X,Y,W,H,frame,false,true,#FFFFFF);
+      Animr.DIMG(X,Y,W,H,false,true,#FFFFFF);
     }else{
-      enANIM[EAR.get("Maze")].DIMG(X,Y,W,H,frame,false,true,#FFAAAA);
+      Animr.DIMG(X,Y,W,H,false,true,#FFAAAA);
       stroke(255,0,0);
       noFill();
       circle(X+random(-2,2),Y-H/2+random(-2,2),36);
@@ -385,8 +416,9 @@ class Laze extends AI{
     }else{
       HP=200;
     }
+    Animr.ID=EAR.get("Laze");
   }
-  int cooldown = 300;
+  int cooldown = 420;
   int attack = 1;
   float LastPlayer = 0;
   float Tx;
@@ -417,7 +449,7 @@ class Laze extends AI{
       VY+=0.2;
     }else{
       Gr=false;
-      if(cooldown>200){
+      if(cooldown>200  && cooldown<350){
         VX+=(play.X-X+cos(-(float)frameCount/20)*64)/10;
         VY+=(play.Y-Y+sin(-(float)frameCount/20)*64-200)/10;
         VX=VX/10*9;
@@ -472,7 +504,7 @@ class Laze extends AI{
         }
       }
       cooldown--;
-      if(cooldown<0){cooldown=300;attack = (int)random(0,2);}
+      if(cooldown<0){cooldown=420;attack = (int)random(0,2);}
     }
     Cont(W,H,1);
     Phys(W,H,false);
@@ -485,11 +517,11 @@ class Laze extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Laze"),false,true);
+    Animr.Anim(false,true);
     if(!Enraged){
-      enANIM[EAR.get("Laze")].DIMG(X,Y,W,H,frame,false,true,#FFFFFF);
+      Animr.DIMG(X,Y,W,H,false,true,#FFFFFF);
     }else{
-      enANIM[EAR.get("Laze")].DIMG(X,Y,W,H,frame,false,true,#FFAAAA);
+      Animr.DIMG(X,Y,W,H,false,true,#FFAAAA);
       stroke(255,0,0);
       noFill();
       circle(X+random(-2,2),Y-H/2+random(-2,2),36);
@@ -514,6 +546,7 @@ class Tower extends AI{
     H=48;
     HP=34;
     T=3;
+    Animr.ID=EAR.get("Tower");
   }
   float Tx,Ty;
   void math(int SID){
@@ -554,8 +587,8 @@ class Tower extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Tower"),abs(VX)>2,false);
-    enANIM[EAR.get("Tower")].DIMG(X,Y,W,H,frame,abs(VX)>2,false,#FFFFFF);
+    Animr.Anim(abs(VX)>2,false);
+    Animr.DIMG(X,Y,W,H,abs(VX)>2,false,#FFFFFF);
   }
 }
 
@@ -567,6 +600,7 @@ class Napalm extends AI{
     W=8;
     H=16;
     HP=1;
+    Animr.ID=EAR.get("Tower");
   }
   void math(int SID){
     if(HP<=0){
@@ -594,8 +628,8 @@ class Napalm extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Tower"),abs(VX)>2,false);
-    enANIM[EAR.get("Tower")].DIMG(X,Y,W,H,frame,abs(VX)>2,false,#FFFFFF);
+    Animr.Anim(abs(VX)>2,false);
+    Animr.DIMG(X,Y,W,H,abs(VX)>2,false,#FFFFFF);
   }
 }
 
@@ -677,6 +711,7 @@ class Guardian extends AI{
     HP=5000;
     T=3;
     hurte=false;
+    Animr.ID=EAR.get("Guardian");
   }
   void math(int SID){
     if(intro>0 && HP>0){
@@ -718,8 +753,8 @@ class Guardian extends AI{
       NewPR(X,Y-H/2,0,0,8);
     }
     if(cooldown==0 && attack==3){
-      for(int i=0;i<20;i++){
-        NewPR(X,Y-H/2,i*PI/10,0,9);
+      for(int i=0;i<10;i++){
+        NewPR(X,Y-H/2,i*PI/5,0,9);
       }
     }
     if(cooldown==0){
@@ -737,8 +772,8 @@ class Guardian extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Guardian"),false,false);
-    enANIM[EAR.get("Guardian")].DIMG(X,Y,W,H,frame,false,false,#FFFFFF);
+    Animr.Anim(false,false);
+    Animr.DIMG(X,Y,W,H,false,false,#FFFFFF);
     if(attack == 0){
       fill(255);
     }
@@ -755,6 +790,162 @@ class Guardian extends AI{
   }
 }
 
+class Crab extends AI{
+  int cooldown=400;
+  float PX=0;
+  float PY=0;
+  Crab(float nX,float nY,boolean nM){
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=32;
+    H=48;//1600
+    HP=1000;
+    T=3;
+    Animr.ID=EAR.get("Crab");
+  }
+  void math(int SID){
+    if(HP<=0){
+      kill.append(SID);return;
+    }
+    cooldown--;
+    if(cooldown==0){
+      cooldown=400;
+      expd(PX,PY,128,30,20,true);
+      NewPartic(new Line(X,Y,X,Y-2000,60,#e8ff00),false);
+      NewPartic(new Line(PX,PY,PX,PY-2000,60,#e8ff00),false);
+    }
+    Fall();
+    if(dist(X,Y,play.X,play.Y)<128){
+      Walk(0.0,-0.6,0.0);
+    }
+    Cont(W,H,15);
+    Phys(W,H,true);
+    X+=VX;
+    Y+=VY;
+  }
+  void render(){
+    if(DebugDraw){
+      stroke(0);
+      fill(255);
+      rect(X-W,Y-H,W*2,H);
+    }
+    pushMatrix();
+    if(VX<0){
+      scale(-1,1);
+      translate(-X*2,0);
+    }
+    Animr.Anim(abs(VX)>0.3,false);
+    Animr.DIMG(X,Y,W,H,abs(VX)>0.3,false,#FFFFFF);
+    popMatrix();
+    if(cooldown<255){
+      stroke(#e8ff00,255-cooldown);
+      strokeWeight((255-cooldown)/25.5);
+      line(X,Y,X,Y-2000);
+      line(PX,PY,PX,PY-2000);
+      if(cooldown>=30){
+        PX=play.X;
+        PY=play.Y;
+      }
+      strokeWeight(1);
+    }
+  }
+}
+
+class Piller extends AI{
+  boolean Enranged=false;
+  int AngyTimer = 300;
+  Piller(float nX,float nY,boolean nM){
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=30;
+    H=30;
+    HP=200;
+    T=0;
+    Animr.ID=EAR.get("Bug");
+  }
+  void math(int SID){
+      if(HP<=0){kill.append(SID);return;}
+      if(play.Gr){
+        if(AngyTimer<300){
+          AngyTimer+=3;
+        }
+      }else{
+        AngyTimer--;
+      }
+      if(AngyTimer<=0){
+        Enranged=true;
+      }
+      if(Enranged){
+        float R=atan2(play.Y-Y-5,play.X-X);
+        for(int i=0;i<3;i++){
+          float Rand1=random(-PI/10,PI/10);
+          float Rand2=random(-2,2);
+          NewPR(X,Y-5,cos(R+Rand1)*(12+Rand2),sin(R+Rand1)*(12+Rand2),11);
+        }
+      }
+      Walk(0.5,0.7,3);
+      Cont(W,H,35);
+      Phys(W,H,true);
+      X+=VX;
+      Y+=VY;
+  }
+  void render(){
+    if(DebugDraw){
+      stroke(0);
+      fill(255);
+      rect(X-W,Y-H,W*2,H);
+      fill(0);
+      text(AngyTimer,X,Y+30);
+    }
+      pushMatrix();
+      if(VX>0){
+        scale(-1,1);
+        translate(-X*2,0);
+      }
+       Animr.Anim(true,OG>3);
+      if(Enranged){
+        Animr.DIMG(X,Y,W,H,true,OG>3,#FFAAAA);
+        stroke(255,0,0);
+        noFill();
+        circle(X+random(-2,2),Y-H/2+random(-2,2),60);
+      }else{
+        Animr.DIMG(X,Y,W,H,true,OG>3,#FFFFFF);
+      }
+      popMatrix();
+  }
+}
+
+class Nucliy extends AI{
+  //oh boy
+  Nucliy(float nX,float nY,boolean nM){
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=24;
+    H=48;
+    HP=90;
+  }
+  int Cooldown=0;
+  void math(int SID){
+    if(HP<=0){
+      kill.append(SID);
+      return;
+    }
+    Phys(W,H,true);
+    X+=VX;
+    Y+=VY;
+  }
+  void render(){
+    if(DebugDraw){
+      stroke(0);
+      fill(255);
+      rect(X-W,Y-H,W*2,H);
+    }
+  }
+}
+
 class AI{
   float Bresistance=1;
   float X;
@@ -767,8 +958,7 @@ class AI{
   int HP;
   boolean Gr;
   boolean M;
-  int frame=0;
-  int timer=0;
+  SelfAnim Animr = new SelfAnim();
   int OG=0;
   boolean Ignore;
   boolean hurte=true;
@@ -777,17 +967,6 @@ class AI{
   void math(int SID){
   }
   void render(){
-  }
-  void Anim(int EI,boolean move,boolean air){
-    timer++;
-    if(timer>enANIM[EI].delay){
-      timer=0;
-      frame++;
-    }
-    if(frame==enANIM[EI].getM(move,air)){
-      frame=0;
-    }
-    //println(frame);
   }
   void Cont(float W,float H,int dmg){
     if(X-W<=play.X+6 && X+W>=play.X-6 && Y>=play.Y-24 && Y-H<=play.Y && play.IV==0 && play.HP>0){
@@ -1029,6 +1208,12 @@ void NewAI(float X,float Y,String T,boolean M){
     break;
     case "Guardian":
       ListAi.add(new Guardian(X,Y,M));
+    break;
+    case "Crab":
+      ListAi.add(new Crab(X,Y,M));
+    break;
+    case "Piller":
+      ListAi.add(new Piller(X,Y,M));
     break;
   }
 }

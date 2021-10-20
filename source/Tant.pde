@@ -51,7 +51,7 @@ void tantmath(){
     Blurer--;
     return;
   }
-  if(Must==0 && PMust!=0 && enemyDelay>=0){
+  if(Must==0 && PMust!=0){
     waveEnd=true;
     delaytowave=60;
   }
@@ -120,11 +120,11 @@ void nextWave(){
   for(int i=0;i<ET.length;i++){
     if(ET[i].equals("air")){
       ArspawnID = append(ArspawnID,i);
-      println("air");
+      //println("air");
     }
     if(ET[i].equals("any")){
       GrspawnID = append(GrspawnID,i);
-      println("any");
+      //println("any");
     }
   }
 }

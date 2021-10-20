@@ -15,9 +15,9 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class ProjectDF extends PApplet {
+public class ProjectDFTEST extends PApplet {
 
-String Version = "V 5.3";
+String Version = "V 5.4";
 
 keyboard EYS;
 
@@ -46,6 +46,7 @@ public void setup(){
   EnemyAINIC();
   ProAINIC();
   MenuSetup();
+  PartINIC();
   Configs = new IntDict();
   
   Configs.set("DrawEffects", 1);
@@ -60,14 +61,18 @@ public void setup(){
   if(tmp!=null){
     try{
     if(tmp.getBoolean("DebugStart",false)){
-      DebugDraw=true;
+      DebugDraw=tmp.getBoolean("DebugStart");
       HWeapon=append(HWeapon,PApplet.parseByte(5));
+      curSDelay=append(curSDelay,PApplet.parseByte(0));
+      curEDelay=append(curEDelay,PApplet.parseByte(0));
+      HWeapon=append(HWeapon,PApplet.parseByte(6));
       curSDelay=append(curSDelay,PApplet.parseByte(0));
       curEDelay=append(curEDelay,PApplet.parseByte(0));
       Start(tmp.getString("DebugMap","arena_vent"));
       if(tmp.getBoolean("DebugTant",false)){
         tantactive=true;
         tantrest();
+        round=PApplet.parseInt(tmp.getInt("DebugRound",1))-1;
         nextWave();
       }
     }
@@ -308,6 +313,9 @@ public void MAINLOOP(){
       if(TT[i]==7 && random(0,100)<60){
         AddPartic(4,TX[i]+random(0,TW[i]),TY[i]+random(0,TH[i]-240),0,2,60,0xff54D5DB,true);
       }
+      if(TT[i]==8 && random(0,100)<60){
+        NewPartic(new GravPoint(TX[i]+random(0,TW[i]),TY[i]+random(120,TH[i]),0,0,240,0xff30A018,-0.2f),true);
+      }
     }
   }
   if(tantactive){
@@ -323,7 +331,7 @@ public void MAINLOOP(){
   Background.ambientLight(100, 100, 100);
   Background.directionalLight(155, 155, 155, -0.5f, 0.5f, -1);
   //Background.ambientLight(255, 255, 255);
-  Background.camera(-play.X/5,-123/ZOOMER ,-play.Y/5, -play.X/5,999, -play.Y/5, 0,0,-1);
+  Background.camera(-play.X/5,-121/ZOOMER ,-play.Y/5, -play.X/5,999, -play.Y/5, 0,0,-1);
   Background.perspective(PI/3.0f,PApplet.parseFloat(width)/PApplet.parseFloat(height),1,100000);
   Background.pushMatrix();
   //Background.scale(1,1,-1);
@@ -363,6 +371,13 @@ public void MAINLOOP(){
         float Y=CSY[i]*(u/10+0.05f)+CEY[i]*(1-u/10-0.05f);
         line(X,Y,X,Y+10);
       }
+    }
+  }
+  for(int i=0;i<TX.length;i++){
+    if(TT[i]==8){
+      stroke(0xff31DB46);
+      fill(0xff31DB46,100);
+      rect(TX[i],TY[i],TW[i],TH[i]);
     }
   }
   if(DebugDraw){
@@ -487,8 +502,8 @@ int PMust=0;
 IntList BOSSHP;
 IntList BOSSID;
 
-String[] AINames={"Bug","Fly","Target","Spewer","testBoss","Maze","Laze","Maze_Boss","Laze_Boss","tower","napalm","Spirit","Guardian"};
-boolean[] Sgroun={true ,false,true    ,true    ,true      ,false ,false ,false      ,false      ,true   ,true    ,false   ,true};
+String[] AINames={"Bug","Fly","Target","Spewer","testBoss","Maze","Laze","Maze_Boss","Laze_Boss","tower","napalm","Spirit","Guardian","Crab","Piller"};
+boolean[] Sgroun={true ,false,true    ,true    ,true      ,false ,false ,false      ,false      ,true   ,true    ,false   ,true      ,true  ,true};
 
 public void AIMath(){
   PMust=Must;
@@ -572,11 +587,12 @@ class Bug extends AI{
     H=14;
     HP=20;
     T=0;
+    Animr.ID=EAR.get("Bug");
   }
   public void math(int SID){
       if(HP<=0){kill.append(SID);return;}
       Walk(0.3f,0.5f,6);
-      Cont(W,H,35);
+      Cont(W,H,25);
       Phys(W,H,true);
       X+=VX;
       Y+=VY;
@@ -592,8 +608,8 @@ class Bug extends AI{
         scale(-1,1);
         translate(-X*2,0);
       }
-       Anim(EAR.get("Bug"),true,OG>3);
-      enANIM[EAR.get("Bug")].DIMG(X,Y,W,H,frame,true,OG>3,0xffFFFFFF);
+      Animr.Anim(true,OG>3);
+      Animr.DIMG(X,Y,W,H,true,OG>3,0xffFFFFFF);
       popMatrix();
   }
 }
@@ -607,6 +623,7 @@ class Fly extends AI{
     H=12;
     HP=12;
     T=4;
+    Animr.ID=EAR.get("Fly");
   }
   public void math(int SID){
     if(HP<=0){kill.append(SID);return;}
@@ -625,8 +642,8 @@ class Fly extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-     Anim(EAR.get("Fly"),false,true);
-    enANIM[EAR.get("Fly")].DIMG(X,Y,W,H,frame,false,true,0xffFFFFFF);
+    Animr.Anim(false,true);
+    Animr.DIMG(X,Y,W,H,false,true,0xffFFFFFF);
   }
 }
 
@@ -637,7 +654,8 @@ class Target extends AI{
     M=nM;
     W=6;
     H=24;
-    HP=900;
+    HP=9999;
+    Animr.ID=EAR.get("Target");
   }
   public void math(int SID){
     if(HP<=0){kill.append(SID);return;}
@@ -646,12 +664,38 @@ class Target extends AI{
     Phys(W,H,true);
     X+=VX;
     Y+=VY;
-    NewPartic(new SubText(X,Y,random(-1,1),random(-3,-1),60,0xffFFFFFF,"test"),true);
+    NewPartic(new StandImg(X,Y,random(-12,12),random(-12,12),15,0xffFFFFFF,"uranium.png"),true);
   }
   public void render(){
     stroke(0);
     fill(255);
     rect(X-W,Y-H,W*2,H);
+    Animr.Anim(false,false);
+    Animr.DIMG(X,Y,W,H,false,false,0xffFFFFFF);
+    Animr.EIMG(cos(frameCount/20.0f)*32+X,sin(frameCount/20.0f)*32+Y,8,8,0,0xffFFFFFF);
+  }
+  public void HURT(int dmg)
+  {
+    if(!hurte){return;}
+    HP-=dmg;
+    Animr.Action(0);
+    for(int B=0;B<5;B++){
+      AddPartic(4,X,Y,random(-1,1),random(-8,-2),50,color(255,0,0),true);
+    }
+    if(play.regenera==0){
+      if(dist(X,Y,play.X,play.Y)<=200 && play.HP>0){
+        AddPartic(1,play.X+random(-5,5),play.Y-12+random(-5,5),X+random(-5,5),Y-H/2+random(-5,5),60,color(255,0,0),true);
+        if(play.HP+dmg/4>100){
+          play.HP=100;
+        }else{
+          play.HP+=dmg/4;
+        }
+      }
+    }else{
+      if(random(1,100)<50 && play.HP>0){
+        NewPR(X,Y-H/2,random(-5,5),random(-5,5),10);
+      }
+    }
   }
 }
 
@@ -665,6 +709,7 @@ class Spewer extends AI{
     H=24;
     HP=34;
     T=5;
+    Animr.ID=EAR.get("Spewer");
   }
   public void math(int SID){
     if(dist(X,Y,play.X,play.Y)>150){
@@ -695,8 +740,8 @@ class Spewer extends AI{
         scale(-1,1);
         translate(-X*2,0);
       }
-      Anim(EAR.get("Spewer"),Gr && abs(VX)<0.5f,false);
-      enANIM[EAR.get("Spewer")].DIMG(X,Y,W,H,frame,Gr && abs(VX)<0.5f,false,0xffFFFFFF);
+      Animr.Anim(Gr && abs(VX)<0.5f,false);
+      Animr.DIMG(X,Y,W,H,Gr && abs(VX)<0.5f,false,0xffFFFFFF);
       popMatrix();
   }
 }
@@ -744,9 +789,10 @@ class Maze extends AI{
       BOSSID.append(ListAi.size());
     }else{
       HP=200;
-    }
+    };
+    Animr.ID=EAR.get("Maze");
   }
-  int cooldown = 350;
+  int cooldown = 370;
   int attack = 1;
   public void math(int SID){
     if(HP<=0){
@@ -774,7 +820,7 @@ class Maze extends AI{
       VY+=0.2f;
     }else{
       Gr=false;
-      if(cooldown>200){
+      if(cooldown>200 && cooldown<300){
         VX+=(play.X-X+cos((float)frameCount/20)*64)/10;
         VY+=(play.Y-Y+sin((float)frameCount/20)*64-200)/10;
         VX=VX/10*9;
@@ -824,7 +870,7 @@ class Maze extends AI{
         }
       }
       cooldown--;
-      if(cooldown<0){cooldown=300;attack = (int)random(0,2);}
+      if(cooldown<0){cooldown=370;attack = (int)random(0,2);}
     }
     Cont(W,H,1);
     Phys(W,H,false);
@@ -837,11 +883,11 @@ class Maze extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Maze"),false,true);
+    Animr.Anim(false,true);
     if(!Enraged){
-      enANIM[EAR.get("Maze")].DIMG(X,Y,W,H,frame,false,true,0xffFFFFFF);
+      Animr.DIMG(X,Y,W,H,false,true,0xffFFFFFF);
     }else{
-      enANIM[EAR.get("Maze")].DIMG(X,Y,W,H,frame,false,true,0xffFFAAAA);
+      Animr.DIMG(X,Y,W,H,false,true,0xffFFAAAA);
       stroke(255,0,0);
       noFill();
       circle(X+random(-2,2),Y-H/2+random(-2,2),36);
@@ -867,8 +913,9 @@ class Laze extends AI{
     }else{
       HP=200;
     }
+    Animr.ID=EAR.get("Laze");
   }
-  int cooldown = 300;
+  int cooldown = 420;
   int attack = 1;
   float LastPlayer = 0;
   float Tx;
@@ -899,7 +946,7 @@ class Laze extends AI{
       VY+=0.2f;
     }else{
       Gr=false;
-      if(cooldown>200){
+      if(cooldown>200  && cooldown<350){
         VX+=(play.X-X+cos(-(float)frameCount/20)*64)/10;
         VY+=(play.Y-Y+sin(-(float)frameCount/20)*64-200)/10;
         VX=VX/10*9;
@@ -954,7 +1001,7 @@ class Laze extends AI{
         }
       }
       cooldown--;
-      if(cooldown<0){cooldown=300;attack = (int)random(0,2);}
+      if(cooldown<0){cooldown=420;attack = (int)random(0,2);}
     }
     Cont(W,H,1);
     Phys(W,H,false);
@@ -967,11 +1014,11 @@ class Laze extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Laze"),false,true);
+    Animr.Anim(false,true);
     if(!Enraged){
-      enANIM[EAR.get("Laze")].DIMG(X,Y,W,H,frame,false,true,0xffFFFFFF);
+      Animr.DIMG(X,Y,W,H,false,true,0xffFFFFFF);
     }else{
-      enANIM[EAR.get("Laze")].DIMG(X,Y,W,H,frame,false,true,0xffFFAAAA);
+      Animr.DIMG(X,Y,W,H,false,true,0xffFFAAAA);
       stroke(255,0,0);
       noFill();
       circle(X+random(-2,2),Y-H/2+random(-2,2),36);
@@ -996,6 +1043,7 @@ class Tower extends AI{
     H=48;
     HP=34;
     T=3;
+    Animr.ID=EAR.get("Tower");
   }
   float Tx,Ty;
   public void math(int SID){
@@ -1036,8 +1084,8 @@ class Tower extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Tower"),abs(VX)>2,false);
-    enANIM[EAR.get("Tower")].DIMG(X,Y,W,H,frame,abs(VX)>2,false,0xffFFFFFF);
+    Animr.Anim(abs(VX)>2,false);
+    Animr.DIMG(X,Y,W,H,abs(VX)>2,false,0xffFFFFFF);
   }
 }
 
@@ -1049,6 +1097,7 @@ class Napalm extends AI{
     W=8;
     H=16;
     HP=1;
+    Animr.ID=EAR.get("Tower");
   }
   public void math(int SID){
     if(HP<=0){
@@ -1076,8 +1125,8 @@ class Napalm extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Tower"),abs(VX)>2,false);
-    enANIM[EAR.get("Tower")].DIMG(X,Y,W,H,frame,abs(VX)>2,false,0xffFFFFFF);
+    Animr.Anim(abs(VX)>2,false);
+    Animr.DIMG(X,Y,W,H,abs(VX)>2,false,0xffFFFFFF);
   }
 }
 
@@ -1159,6 +1208,7 @@ class Guardian extends AI{
     HP=5000;
     T=3;
     hurte=false;
+    Animr.ID=EAR.get("Guardian");
   }
   public void math(int SID){
     if(intro>0 && HP>0){
@@ -1200,8 +1250,8 @@ class Guardian extends AI{
       NewPR(X,Y-H/2,0,0,8);
     }
     if(cooldown==0 && attack==3){
-      for(int i=0;i<20;i++){
-        NewPR(X,Y-H/2,i*PI/10,0,9);
+      for(int i=0;i<10;i++){
+        NewPR(X,Y-H/2,i*PI/5,0,9);
       }
     }
     if(cooldown==0){
@@ -1219,8 +1269,8 @@ class Guardian extends AI{
       fill(255);
       rect(X-W,Y-H,W*2,H);
     }
-    Anim(EAR.get("Guardian"),false,false);
-    enANIM[EAR.get("Guardian")].DIMG(X,Y,W,H,frame,false,false,0xffFFFFFF);
+    Animr.Anim(false,false);
+    Animr.DIMG(X,Y,W,H,false,false,0xffFFFFFF);
     if(attack == 0){
       fill(255);
     }
@@ -1237,6 +1287,162 @@ class Guardian extends AI{
   }
 }
 
+class Crab extends AI{
+  int cooldown=400;
+  float PX=0;
+  float PY=0;
+  Crab(float nX,float nY,boolean nM){
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=32;
+    H=48;//1600
+    HP=1000;
+    T=3;
+    Animr.ID=EAR.get("Crab");
+  }
+  public void math(int SID){
+    if(HP<=0){
+      kill.append(SID);return;
+    }
+    cooldown--;
+    if(cooldown==0){
+      cooldown=400;
+      expd(PX,PY,128,30,20,true);
+      NewPartic(new Line(X,Y,X,Y-2000,60,0xffe8ff00),false);
+      NewPartic(new Line(PX,PY,PX,PY-2000,60,0xffe8ff00),false);
+    }
+    Fall();
+    if(dist(X,Y,play.X,play.Y)<128){
+      Walk(0.0f,-0.6f,0.0f);
+    }
+    Cont(W,H,15);
+    Phys(W,H,true);
+    X+=VX;
+    Y+=VY;
+  }
+  public void render(){
+    if(DebugDraw){
+      stroke(0);
+      fill(255);
+      rect(X-W,Y-H,W*2,H);
+    }
+    pushMatrix();
+    if(VX<0){
+      scale(-1,1);
+      translate(-X*2,0);
+    }
+    Animr.Anim(abs(VX)>0.3f,false);
+    Animr.DIMG(X,Y,W,H,abs(VX)>0.3f,false,0xffFFFFFF);
+    popMatrix();
+    if(cooldown<255){
+      stroke(0xffe8ff00,255-cooldown);
+      strokeWeight((255-cooldown)/25.5f);
+      line(X,Y,X,Y-2000);
+      line(PX,PY,PX,PY-2000);
+      if(cooldown>=30){
+        PX=play.X;
+        PY=play.Y;
+      }
+      strokeWeight(1);
+    }
+  }
+}
+
+class Piller extends AI{
+  boolean Enranged=false;
+  int AngyTimer = 300;
+  Piller(float nX,float nY,boolean nM){
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=30;
+    H=30;
+    HP=200;
+    T=0;
+    Animr.ID=EAR.get("Bug");
+  }
+  public void math(int SID){
+      if(HP<=0){kill.append(SID);return;}
+      if(play.Gr){
+        if(AngyTimer<300){
+          AngyTimer+=3;
+        }
+      }else{
+        AngyTimer--;
+      }
+      if(AngyTimer<=0){
+        Enranged=true;
+      }
+      if(Enranged){
+        float R=atan2(play.Y-Y-5,play.X-X);
+        for(int i=0;i<3;i++){
+          float Rand1=random(-PI/10,PI/10);
+          float Rand2=random(-2,2);
+          NewPR(X,Y-5,cos(R+Rand1)*(12+Rand2),sin(R+Rand1)*(12+Rand2),11);
+        }
+      }
+      Walk(0.5f,0.7f,3);
+      Cont(W,H,35);
+      Phys(W,H,true);
+      X+=VX;
+      Y+=VY;
+  }
+  public void render(){
+    if(DebugDraw){
+      stroke(0);
+      fill(255);
+      rect(X-W,Y-H,W*2,H);
+      fill(0);
+      text(AngyTimer,X,Y+30);
+    }
+      pushMatrix();
+      if(VX>0){
+        scale(-1,1);
+        translate(-X*2,0);
+      }
+       Animr.Anim(true,OG>3);
+      if(Enranged){
+        Animr.DIMG(X,Y,W,H,true,OG>3,0xffFFAAAA);
+        stroke(255,0,0);
+        noFill();
+        circle(X+random(-2,2),Y-H/2+random(-2,2),60);
+      }else{
+        Animr.DIMG(X,Y,W,H,true,OG>3,0xffFFFFFF);
+      }
+      popMatrix();
+  }
+}
+
+class Nucliy extends AI{
+  //oh boy
+  Nucliy(float nX,float nY,boolean nM){
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=24;
+    H=48;
+    HP=90;
+  }
+  int Cooldown=0;
+  public void math(int SID){
+    if(HP<=0){
+      kill.append(SID);
+      return;
+    }
+    Phys(W,H,true);
+    X+=VX;
+    Y+=VY;
+  }
+  public void render(){
+    if(DebugDraw){
+      stroke(0);
+      fill(255);
+      rect(X-W,Y-H,W*2,H);
+    }
+  }
+}
+
 class AI{
   float Bresistance=1;
   float X;
@@ -1249,8 +1455,7 @@ class AI{
   int HP;
   boolean Gr;
   boolean M;
-  int frame=0;
-  int timer=0;
+  SelfAnim Animr = new SelfAnim();
   int OG=0;
   boolean Ignore;
   boolean hurte=true;
@@ -1259,17 +1464,6 @@ class AI{
   public void math(int SID){
   }
   public void render(){
-  }
-  public void Anim(int EI,boolean move,boolean air){
-    timer++;
-    if(timer>enANIM[EI].delay){
-      timer=0;
-      frame++;
-    }
-    if(frame==enANIM[EI].getM(move,air)){
-      frame=0;
-    }
-    //println(frame);
   }
   public void Cont(float W,float H,int dmg){
     if(X-W<=play.X+6 && X+W>=play.X-6 && Y>=play.Y-24 && Y-H<=play.Y && play.IV==0 && play.HP>0){
@@ -1512,6 +1706,12 @@ public void NewAI(float X,float Y,String T,boolean M){
     case "Guardian":
       ListAi.add(new Guardian(X,Y,M));
     break;
+    case "Crab":
+      ListAi.add(new Crab(X,Y,M));
+    break;
+    case "Piller":
+      ListAi.add(new Piller(X,Y,M));
+    break;
   }
 }
 
@@ -1544,7 +1744,7 @@ class ANIMG{
   int timer=0;
   int frame=0;
   ANIMG(String file){
-    Frames = new PImage[0];
+    Frames = new PImage[0]; //<>//
     RFrames = new int[0];
     int[] RLOAD = new int[0];
     byte[] DATA = loadBytes(file);
@@ -1683,15 +1883,80 @@ class ProANIMG{
   }
 }
 
+class SelfAnim{
+  int frame=0;
+  int timer=0;
+  boolean Action=false;
+  int Acting=0;
+  int ID=0;
+  SelfAnim(){}
+  public void Anim(boolean move,boolean air){
+    timer++;
+    if(timer>enANIM[ID].delay){
+      timer=0;
+      frame++;
+    }
+    if(!Action){
+      if(frame>=getM(move,air)){
+        frame=0;
+      }
+    }else{
+      if(frame>=enANIM[ID].Actions[Acting].length){
+        frame=0;
+        Action=false;
+      }
+    }
+    //println(frame);
+  }
+  public void Action(int todo){
+    Action=true;
+    Acting=todo;
+    frame=0;
+  }
+  public void DIMG(float X,float Y,float w,float h,boolean moveing,boolean Airborn,int C){
+    tint(C);
+    if(Action){
+      image(enANIM[ID].Actions[Acting][frame],X-w,Y-h,w*2,h);
+    }else{
+      if(Airborn){
+        image(enANIM[ID].Air[frame],X-w,Y-h,w*2,h);
+      }else if(moveing){
+        image(enANIM[ID].Move[frame],X-w,Y-h,w*2,h);
+      }else{
+        image(enANIM[ID].Stand[frame],X-w,Y-h,w*2,h);
+      }
+    }
+    noTint();
+  }
+  public void EIMG(float X,float Y,float w,float h,int frame,int C){
+    tint(C);
+    image(enANIM[ID].Extras[frame],X-w/2,Y-h/2,w,h);
+    noTint();
+  }
+  public int getM(boolean mov,boolean air){
+    if(air){
+      return enANIM[ID].Air.length;
+    }else if(mov){
+      return enANIM[ID].Move.length;
+    }else{
+      return enANIM[ID].Stand.length;
+    }
+  }
+}
+
 class EnANIMG{
   int delay;
   PImage[] Air;
   PImage[] Move;
   PImage[] Stand;
+  PImage[][] Actions;
+  PImage[] Extras;
   EnANIMG(String file){
     Air = new  PImage[0];
     Move = new  PImage[0];
     Stand = new  PImage[0];
+    Actions = new PImage[0][0];//Oh no
+    Extras = new PImage[0];
     byte[] DATA = loadBytes(sketchPath()+"/data/Hostiles/"+file+"/file.EAF");
     int header=0;
     delay = BgetI(DATA,header,2);
@@ -1711,25 +1976,20 @@ class EnANIMG{
     for(int i=0;i<U;i++){
       Stand = (PImage[])append(Stand,SloadImage("Hostiles/"+file+"/stand"+i+".png"));
     }
-  }
-  public void DIMG(float X,float Y,float w,float h,int frame,boolean moveing,boolean Airborn,int C){
-    tint(C);
-    if(Airborn){
-      image(Air[frame],X-w,Y-h,w*2,h);
-    }else if(moveing){
-      image(Move[frame],X-w,Y-h,w*2,h);
-    }else{
-      image(Stand[frame],X-w,Y-h,w*2,h);
+        U = BgetI(DATA,header,2);
+    header+=2;
+    for(int i=0;i<U;i++){
+      Extras = (PImage[])append(Extras,SloadImage("Hostiles/"+file+"/extra"+i+".png"));
     }
-    noTint();
-  }
-  public int getM(boolean mov,boolean air){
-    if(air){
-      return Air.length;
-    }else if(mov){
-      return Move.length;
-    }else{
-      return Stand.length;
+        U = BgetI(DATA,header,2);
+    header+=2;
+    for(int i=0;i<U;i++){
+      int UU = BgetI(DATA,header,2);
+      header+=2;
+      Actions = (PImage[][])append(Actions,new PImage[0]);
+      for(int ii=0;ii<UU;ii++){
+        Actions[i] = (PImage[])append(Actions[i],SloadImage("Hostiles/"+file+"/action"+ii+i+".png"));
+      }
     }
   }
 }
@@ -1906,6 +2166,11 @@ public void UPDATE(){
       ZipEntry tmp = (ZipEntry)files.nextElement();
       InputStream open = opener.getInputStream(tmp);
       if(open.available()==0){continue;}
+      switch(removefirst(tmp.getName())){
+        case "data/Misc/sav":
+        case "data/Misc/config.json":
+        continue;
+      }
       byte[] shit = new byte[0];
       while(open.available()>0){
         byte[] out = new byte[1024];
@@ -1918,7 +2183,7 @@ public void UPDATE(){
   }catch(Exception e){
     e.printStackTrace();
   }
-  launch(sketchPath()+"/ProjectDFTEST.exe");
+  //launch(sketchPath()+"/ProjectDFTEST.exe");
   exit();
   //PrintCon(sketchPath());
   //ErrorTimer=120;
@@ -1972,6 +2237,9 @@ public void DrawConsole(){
   rect(0,20*15,width,15);
   fill(0xff0000FF);
   text(ConsoleInput,0,20*15);
+  float textmax=textWidth(ConsoleInput);
+  stroke(0xff0000FF);
+  line(textmax,20*15,textmax,21*15);
 }
 
 String[] Confunc = {
@@ -2010,6 +2278,8 @@ public void runConinput(){
       if(!Gaming){PrintCon("not gaming");break;}
       if(play.HP<=0){
         play.HP=100;
+        play.HD=0;
+        play.IV=60;
         PrintCon("get up!");
       }else{
         PrintCon("your not dead dumbass");
@@ -2133,6 +2403,21 @@ public void texttoscren(String text){
 }
 ArrayList<Effect> ListEffects;
 IntList Ekill;
+IntDict PartTextName;
+PImage[] PartImgs;
+
+public void PartINIC(){
+  PartImgs = new PImage[0];
+  PartTextName = new IntDict(0);
+  File WATFFEA = new File(sketchPath()+"/data/Particles");
+  PartImgs = (PImage[])append(PartImgs,SloadImage("Misc/mising.png"));
+  PartTextName.add("mising.png",0);
+  for(int i=0;i<WATFFEA.list().length;i++){
+    //File tmper = new File(sketchPath()+"/data/Particles/"+WATFFEA.list()[i]);
+    PartImgs = (PImage[])append(PartImgs,SloadImage(sketchPath()+"/data/Particles/"+WATFFEA.list()[i]));
+    PartTextName.add(WATFFEA.list()[i],PartTextName.size());
+  }
+}
 
 class Line extends Effect{
   Line(float nX,float nY,float nVX,float nVY,int ntime,int nC){
@@ -2159,7 +2444,8 @@ class Line extends Effect{
 }
 
 class GravPoint extends Effect{
-  GravPoint(float nX,float nY,float nVX,float nVY,int ntime,int nC){
+  float gravmult=1;
+  GravPoint(float nX,float nY,float nVX,float nVY,int ntime,int nC,float gravmult){
     X=nX;
     Y=nY;
     VX=nVX;
@@ -2167,12 +2453,13 @@ class GravPoint extends Effect{
     time=ntime;
     Mtime=ntime;
     C=nC;
+    this.gravmult=gravmult;
   }
   public void mathE(int T){
     if(time==0){
       Ekill.append(T);
     }
-    VY+=0.2f;
+    VY+=0.2f*gravmult;
     X+=VX;
     Y+=VY;
     time--;
@@ -2322,6 +2609,34 @@ class SubText extends Effect{
   }
 }
 
+class StandImg extends Effect{
+  StandImg(float nX,float nY,float nVX,float nVY,int ntime,int nC,String ImgName){
+    X=nX;
+    Y=nY;
+    VX=nVX;
+    VY=nVY;
+    time=ntime;
+    Mtime=ntime;
+    C=nC;
+    theImgID=PartTextName.get(ImgName,0);
+  }
+  int theImgID=0;
+  public void mathE(int T){
+    if(time==0){
+      Ekill.append(T);
+    }
+    X+=VX;
+    Y+=VY;
+    time--;
+  }
+  public void drawE(){
+    //fill(C);
+    tint(C,PApplet.parseFloat(time*255)/Mtime);
+    image(PartImgs[theImgID],X,Y);
+    noTint();
+  }
+}
+
 class Effect{
   float X;
   float Y;
@@ -2366,7 +2681,7 @@ public void AddPartic(int T,float X,float Y,float VX,float VY,int time,int C,boo
       ListEffects.add(new Line(X,Y,VX,VY,time,C));
     break;
     case 2:
-      ListEffects.add(new GravPoint(X,Y,VX,VY,time,C));
+      ListEffects.add(new GravPoint(X,Y,VX,VY,time,C,1));
     break;
     case 3:
       ListEffects.add(new VELLPoint(X,Y,VX,VY,time,C));
@@ -3261,6 +3576,7 @@ public void Save_config() {
   JSONObject out = new JSONObject();
   out.setBoolean("DebugStart", tmp.getBoolean("DebugStart"));
   out.setString("DebugMap", tmp.getString("DebugMap"));
+  out.setBoolean("Debugdraw", tmp.getBoolean("Debugdraw"));
   out.setBoolean("DebugTant", tmp.getBoolean("DebugTant"));
   JSONArray binds = new JSONArray();
   for (int u=0; u<Keybinds.length; u++) {
@@ -3276,7 +3592,7 @@ public void Save_config() {
     out.setInt(Configs.key(u), Configs.get(Configs.key(u)));
   }
   saveJSONObject(out, "data/Misc/config.json");
-  println("test");
+  //println("test");
 }
 
 public void Quit() {
@@ -4182,6 +4498,79 @@ class Soul extends PRO {
   }
 }
 
+class Rock extends PRO {
+  Rock(float nX, float nY, float nVX, float nVY, int nT) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    T = nT;
+    W=8;
+    H=8;
+    timer=0;
+    cframe=0;
+  }
+  public void math(int SID) {
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      return;
+    }
+    if (X>play.X-6 && X<play.X+6 && Y<play.Y && Y>play.Y-24) {
+      AThurt(16);
+      killPR.append(SID);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+    VY+=0.2f;
+  }
+  public void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+  }
+}
+
+class hurtbox extends PRO {
+  hurtbox(float nX, float nY, float nVX, float nVY,int hurtme) {
+    X = nX;
+    Y = nY;
+    W = nVX;
+    H = nVY;
+    ouch=hurtme;
+  }
+  int ouch=0;
+  int timer=15;
+  public void math(int SID) {
+    if(timer==0){
+      killPR.append(SID);
+      return;
+    }
+    if (X>play.X-6 && X<play.X+6 && Y<play.Y && Y>play.Y-24  && timer>10) {
+      AThurt(ouch);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+    VY+=0.2f;
+  }
+  public void render() {
+    noStroke();
+    fill(255,timer*255/15);
+    rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
 class PRO {
   float X;
   float Y;
@@ -4253,6 +4642,10 @@ public void expd(float x, float y, float r, int d, float f, boolean player) {
   }
 }
 
+public void NewSPr(PRO newthing){
+  ListPR.add(newthing);
+}
+
 public void NewPR(float X, float Y, float VX, float VY, int T) {
   switch(T) {
   case 0:
@@ -4287,6 +4680,9 @@ public void NewPR(float X, float Y, float VX, float VY, int T) {
     break;
   case 10:
     ListPR.add(new Soul(X, Y, VX, VY, T));
+    break;
+  case 11:
+    ListPR.add(new Rock(X, Y, VX, VY, T));
     break;
   }
 }
@@ -4612,8 +5008,8 @@ class Player{
         if(GetKeyBind("Player_Move_Right") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){dash(1);}
       }else{
         if(HP<=0){VY=-0.5f;}
-        if(!(GetKeyBind("Player_Move_Down") | GetKeyBind("Player_Move_Up"))){VY/=2;}
-        if(!(GetKeyBind("Player_Move_Left") | GetKeyBind("Player_Move_Right"))){VX/=2;}
+        if(!(GetKeyBind("Player_Move_Down") | GetKeyBind("Player_Move_Up"))){VY/=1.4f;}
+        if(!(GetKeyBind("Player_Move_Left") | GetKeyBind("Player_Move_Right"))){VX/=1.4f;}
         if(GetKeyBind("Player_Move_Down") && VY<5 && HP>0 && !ConsoleUP){VY+=2.5f;}
         if(GetKeyBind("Player_Move_Up") && VY>-5  && HP>0 && !ConsoleUP){VY-=2.5f;}
         if(GetKeyBind("Player_Move_Left") && VX>-5  && HP>0 && !ConsoleUP){VX-=2.5f;}
@@ -4632,8 +5028,8 @@ class Player{
       if(GetKeyBind("Player_Move_Up") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){updash();}
       if(GetKeyBind("Player_Move_Left") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){dash(-1);}
       if(GetKeyBind("Player_Move_Right") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){dash(1);}
-      if(GetKeyBind("Player_Move_Down") && HP>0 && !ConsoleUP){Ignore=true;}
     }
+    if(GetKeyBind("Player_Move_Down") && HP>0 && !ConsoleUP){Ignore=true;}
     PVY=VY;
     if(Gr){cooldownV=0;}
     Gr=false;
@@ -4664,7 +5060,7 @@ class Player{
     }
     frezzing=false;
     water=false;
-    if(Ignore){Checkfor();}
+    if(Ignore && !GetKeyBind("Player_Move_Down")){Checkfor();}
     coll(X-6,Y   ,X-6+VX+0.01f,Y+VY+0.01f);
     coll(X+6,Y   ,X+6+VX+0.01f,Y+VY+0.01f);
     coll(X-6,Y-24,X-6+VX+0.01f,Y-24+VY+0.01f);
@@ -4713,8 +5109,9 @@ class Player{
       }
       if(T>=0 && T<=1){
         PVector TOplayer=new PVector(play.X-(CSX[i]+CEX[i])/2,play.Y-12-(CSY[i]+CEY[i])/2);
-        PVector Normal=new PVector((CSX[i]-CEX[i]),(CSY[i]-CEY[i]));
-        if(CSX[i]>CEX[i]){Normal.rotate(-PI/2);}else{Normal.rotate(PI/2);}
+        PVector Normal=new PVector((CEX[i]-CSX[i]),(CEY[i]-CSY[i]));
+        Normal.rotate(-PI/2);
+        //if(CSX[i]>CEX[i]){Normal.rotate(-PI/2);}else{Normal.rotate(PI/2);}
         if(Normal.dot(TOplayer)<0 && CT[i]==1){
           Ignore=true;
         }
@@ -4727,9 +5124,10 @@ class Player{
         }
         //PVector TOplayer=atan2(play.Y-12-(CSY[i]+CEY[i])/2,play.X-(CSX[i]+CEX[i])/2);
         //PVector TOplayer=atan2(play.Y-12-(CSY[i]+CEY[i])/2,play.X-(CSX[i]+CEX[i])/2);
-        R=atan2(CSY[i]-CEY[i],CSX[i]-CEX[i]);
+        R=atan2(CSY[i]-CEY[i],CSX[i]-CEX[i])%PI;
         if(R<0){R+=PI;}
-        if(Normal.dot(TOplayer)>0 && R>-PI/4){//its a feature fuck it
+        //println(R);
+        if(Normal.dot(TOplayer)>0){//its a feature fuck it
           Gr=true;
         }
         break;
@@ -4847,7 +5245,7 @@ public void tantmath(){
     Blurer--;
     return;
   }
-  if(Must==0 && PMust!=0 && enemyDelay>=0){
+  if(Must==0 && PMust!=0){
     waveEnd=true;
     delaytowave=60;
   }
@@ -4916,11 +5314,11 @@ public void nextWave(){
   for(int i=0;i<ET.length;i++){
     if(ET[i].equals("air")){
       ArspawnID = append(ArspawnID,i);
-      println("air");
+      //println("air");
     }
     if(ET[i].equals("any")){
       GrspawnID = append(GrspawnID,i);
-      println("any");
+      //println("any");
     }
   }
 }
@@ -5022,6 +5420,7 @@ public void WeaponINIC() {
   MOAG.add(new Rocket());
   MOAG.add(new shoogun());
   MOAG.add(new devgun());
+  MOAG.add(new KILLgun());
   //ADDWeapon(-12,-4,40,10,false,"Weapons/" + "testgun.png");
   //ADDWeapon(-12,-4,0,60,false,"Weapons/" + "Railgun.png");
   //ADDWeapon(-9,-4,0,9,false,"Weapons/" + "Garant.png");
@@ -5082,11 +5481,11 @@ class Garant extends Weapon {
     WeapW=31;
     WeapH=6;
     SDelay=0;
-    EDelay=9;
+    EDelay=12;
     Const=false;
   }
   public void FIRE() {
-    Hitscan(0, 0, play.PO, false, 8, 12,1000);
+    Hitscan(0, 0, play.PO, false, 8, 20,1000);
   }
 }
 
@@ -5119,10 +5518,10 @@ class shoogun extends Weapon {
   }
   public void FIRE() {
     for (int i=0; i<5; i++) {
-      NewPR(play.X, play.Y-12, cos(play.PO+PI/10-PI/20*i)*10, sin(play.PO+PI/10-PI/20*i)*10, 2);
+      NewPR(play.X, play.Y-12, cos(play.PO+PI/20-PI/40*i)*10, sin(play.PO+PI/20-PI/40*i)*10, 2);
     }
     for (int i=0; i<5; i++) {
-      NewPR(play.X, play.Y-12, cos(play.PO+PI/10-PI/20*i)*8, sin(play.PO+PI/10-PI/20*i)*8, 2);
+      NewPR(play.X, play.Y-12, cos(play.PO+PI/20-PI/40*i)*8, sin(play.PO+PI/20-PI/40*i)*8, 2);
     }
     play.VX-=cos(play.PO)*8;
     play.VY-=sin(play.PO)*8;
@@ -5138,12 +5537,28 @@ class devgun extends Weapon {
     WeapW=19;
     WeapH=3;
     SDelay=0;
-    EDelay=25;
+    EDelay=15;
     Const=false;
   }
   public void FIRE() {
     AddPartic(1,play.X, play.Y-12, play.X+mouseX-width/2, play.Y+mouseY-height/2, 40, color(255),true);
     NewAI(play.X+mouseX-width/2,play.Y+mouseY-height/2,AINames[DevGun],false);
+  }
+}
+
+class KILLgun extends Weapon {
+  KILLgun() {
+    Sprite=SloadImage("Weapons/devgun.png");
+    WeaOffx=-7;
+    WeaOffy=-2;
+    WeapW=19;
+    WeapH=3;
+    SDelay=0;
+    EDelay=15;
+    Const=false;
+  }
+  public void FIRE() {
+    Hitscan(0, 0, play.PO, true, 8, 99999999,1000);
   }
 }
 
@@ -5306,7 +5721,7 @@ public float[] hitscan(float R, int dmg, boolean Pierce,float range) {
   return tmp;
 }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "ProjectDF" };
+    String[] appletArgs = new String[] { "ProjectDFTEST" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

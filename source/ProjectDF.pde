@@ -1,4 +1,4 @@
-String Version = "V 5.3";
+String Version = "V 5.4";
 
 keyboard EYS;
 
@@ -27,6 +27,7 @@ void setup(){
   EnemyAINIC();
   ProAINIC();
   MenuSetup();
+  PartINIC();
   Configs = new IntDict();
   
   Configs.set("DrawEffects", 1);
@@ -41,14 +42,18 @@ void setup(){
   if(tmp!=null){
     try{
     if(tmp.getBoolean("DebugStart",false)){
-      DebugDraw=true;
+      DebugDraw=tmp.getBoolean("DebugStart");
       HWeapon=append(HWeapon,byte(5));
+      curSDelay=append(curSDelay,byte(0));
+      curEDelay=append(curEDelay,byte(0));
+      HWeapon=append(HWeapon,byte(6));
       curSDelay=append(curSDelay,byte(0));
       curEDelay=append(curEDelay,byte(0));
       Start(tmp.getString("DebugMap","arena_vent"));
       if(tmp.getBoolean("DebugTant",false)){
         tantactive=true;
         tantrest();
+        round=int(tmp.getInt("DebugRound",1))-1;
         nextWave();
       }
     }
@@ -289,6 +294,9 @@ void MAINLOOP(){
       if(TT[i]==7 && random(0,100)<60){
         AddPartic(4,TX[i]+random(0,TW[i]),TY[i]+random(0,TH[i]-240),0,2,60,#54D5DB,true);
       }
+      if(TT[i]==8 && random(0,100)<60){
+        NewPartic(new GravPoint(TX[i]+random(0,TW[i]),TY[i]+random(120,TH[i]),0,0,240,#30A018,-0.2),true);
+      }
     }
   }
   if(tantactive){
@@ -304,7 +312,7 @@ void MAINLOOP(){
   Background.ambientLight(100, 100, 100);
   Background.directionalLight(155, 155, 155, -0.5, 0.5, -1);
   //Background.ambientLight(255, 255, 255);
-  Background.camera(-play.X/5,-123/ZOOMER ,-play.Y/5, -play.X/5,999, -play.Y/5, 0,0,-1);
+  Background.camera(-play.X/5,-121/ZOOMER ,-play.Y/5, -play.X/5,999, -play.Y/5, 0,0,-1);
   Background.perspective(PI/3.0,float(width)/float(height),1,100000);
   Background.pushMatrix();
   //Background.scale(1,1,-1);
@@ -344,6 +352,13 @@ void MAINLOOP(){
         float Y=CSY[i]*(u/10+0.05)+CEY[i]*(1-u/10-0.05);
         line(X,Y,X,Y+10);
       }
+    }
+  }
+  for(int i=0;i<TX.length;i++){
+    if(TT[i]==8){
+      stroke(#31DB46);
+      fill(#31DB46,100);
+      rect(TX[i],TY[i],TW[i],TH[i]);
     }
   }
   if(DebugDraw){

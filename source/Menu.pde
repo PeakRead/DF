@@ -126,6 +126,7 @@ void Save_config() {
   JSONObject out = new JSONObject();
   out.setBoolean("DebugStart", tmp.getBoolean("DebugStart"));
   out.setString("DebugMap", tmp.getString("DebugMap"));
+  out.setBoolean("Debugdraw", tmp.getBoolean("Debugdraw"));
   out.setBoolean("DebugTant", tmp.getBoolean("DebugTant"));
   JSONArray binds = new JSONArray();
   for (int u=0; u<Keybinds.length; u++) {
@@ -141,7 +142,7 @@ void Save_config() {
     out.setInt(Configs.key(u), Configs.get(Configs.key(u)));
   }
   saveJSONObject(out, "data/Misc/config.json");
-  println("test");
+  //println("test");
 }
 
 void Quit() {
