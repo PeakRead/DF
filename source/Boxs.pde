@@ -160,7 +160,7 @@ void UPDATE(){
   }catch(Exception e){
     e.printStackTrace();
   }
-  //launch(sketchPath()+"/ProjectDFTEST.exe");
+  launch(sketchPath()+"/ProjectDFTEST.exe");
   exit();
   //PrintCon(sketchPath());
   //ErrorTimer=120;

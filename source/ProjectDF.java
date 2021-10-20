@@ -15,9 +15,9 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class ProjectDFTEST extends PApplet {
+public class ProjectDF extends PApplet {
 
-String Version = "V 5.4";
+String Version = "V 5.5";
 
 keyboard EYS;
 
@@ -2183,7 +2183,7 @@ public void UPDATE(){
   }catch(Exception e){
     e.printStackTrace();
   }
-  //launch(sketchPath()+"/ProjectDFTEST.exe");
+  launch(sketchPath()+"/ProjectDFTEST.exe");
   exit();
   //PrintCon(sketchPath());
   //ErrorTimer=120;
@@ -2973,7 +2973,7 @@ boolean BACEXIST;
 PGraphics Background;
 
 public void openMap(String MAP){
-  ListAi = new ArrayList<AI>();
+  ListAi = new ArrayList<AI>(); //<>//
   ListEffects = new ArrayList<Effect>();
   ListPR = new ArrayList<PRO>();
   kill = new IntList();
@@ -3099,7 +3099,7 @@ public void openMap(String MAP){
     MAD[i] = new door(SX,SY,EX,EY,delay,ATcol,ATpro);
     Header+=14;
   }
-  yes = new String[0];
+  yes = new String[0]; //<>//
   NUM=BgetI(DATA,Header,2);
   Header+=2;
   for(int i=0;i<NUM;i++){
@@ -5721,7 +5721,7 @@ public float[] hitscan(float R, int dmg, boolean Pierce,float range) {
   return tmp;
 }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "ProjectDFTEST" };
+    String[] appletArgs = new String[] { "ProjectDF" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {
