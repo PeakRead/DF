@@ -62,7 +62,7 @@
     }
   ],
   "ReversedWhell": 1,
-  "DebugStart": true,
+  "DebugStart": false,
   "DebugTant": false,
   "Debugdraw": false,
   "DebugRound": 20,
