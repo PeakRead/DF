@@ -141,9 +141,9 @@ class KILLgun extends Weapon {
     WeaOffy=-2;
     WeapW=19;
     WeapH=3;
-    SDelay=0;
-    EDelay=15;
-    Const=false;
+    SDelay=15;
+    EDelay=1;
+    Const=true;
   }
   void FIRE() {
     Hitscan(0, 0, play.PO, true, 8, 99999999,1000);

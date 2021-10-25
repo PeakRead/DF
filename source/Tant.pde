@@ -1,6 +1,6 @@
 int round=0;
 boolean tantactive=false;
-String[] arenas;
+JSONArray[] arenas;
 int enemyDelay=0;
 int Grspawn=0;
 int[] GrspawnID;
@@ -15,15 +15,10 @@ int CurrentSave;
 void tantrest(){
   round=0;
   getFile();
-  arenas = new String[0];
-  File tmp = new File(sketchPath()+"/data/Maps");
-  String[] maps = tmp.list();
-  if(maps != null){
-  for(int i=0;i<maps.length;i++){
-    if(split(maps[i],'_')[0].equals("arena")){
-      arenas = append(arenas,split(maps[i],'.')[0]);
-    }
-  }
+  JSONArray BigFile = loadJSONArray(sketchPath()+"/data/Maps/RAN.json");
+  arenas = new JSONArray[BigFile.size()];
+  for(int i=0;i<BigFile.size();i++){
+    arenas[i]=BigFile.getJSONArray(i);
   }
 }
 
@@ -82,7 +77,6 @@ void nextWave(){
     return;
   }
   Blurer=60;
-  int map=(int)random(0,arenas.length);
   switch(round){
     case 10:
     case 20:
@@ -109,8 +103,10 @@ void nextWave(){
     CurrentArena="gate";
     break;
     default:
-    Start(arenas[map]);
-    CurrentArena=split(arenas[map],'_')[1];
+    String[] names = arenas[round/20].getStringArray();
+    int map=(int)random(0,names.length-1);
+    Start(names[map]);
+    CurrentArena=split(names[map],'_')[1];
     break;
   }
         Grspawn=0;

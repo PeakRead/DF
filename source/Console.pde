@@ -4,6 +4,7 @@ String[] Console = new String[100];
 boolean ConsoleUP = false;
 String ConsoleInput = "";
 int scrool=0;
+int consoleSell=-1;
 
 void resetCon(){
   for(int i=0;i<Console.length;i++){
@@ -27,33 +28,39 @@ void DrawConsole(){
   fill(#FF00FF);
   for(int i=scrool;i<20+scrool;i++){
     try{
-    text(Console[i],0,19*15-15*i+scrool*15);
+    text(Console[i],10,19*15-15*i+scrool*15);
     }catch(Exception e){/*ignore*/}
   }
   fill(#FFFF00,200);
   rect(0,20*15,width,15);
   fill(#0000FF);
-  text(ConsoleInput,0,20*15);
+  text(ConsoleInput,10,20*15);
   float textmax=textWidth(ConsoleInput);
   stroke(#0000FF);
-  line(textmax,20*15,textmax,21*15);
+  line(textmax+10,20*15,textmax+10,21*15);
+  rect(2,20*15+2-consoleSell*15+scrool*15-15,6,10);
 }
 
 String[] Confunc = {
-"help : displays this",
-"resurect : resurects the player if dead",
-"noclip : noclip",
-"map : load a map",
-"maps : displays all files in the maps folder",
-"clean : cleans the console",
-"cum : cast a 500dmg lighting call on self",
-"debugdraw : toggle the debugdrawing of stuff",
-"god : invunrabylaty",
-"notime : prevents the players HP from going below 0",
-"phys : toggle the physics(player included)",
-"restart : reset the player",
-"error : fake a error",
-"text : print shit to screen"};
+"help:posts this",
+"resurect:resurect the player hopefully...",
+"noclip:noclip",
+"map:switch maps",
+"clean:cleans the console",
+"cum:roll the d20",
+"debugdraw:toggles the visabilaty of many stuff",
+"god:god",
+"notime:its buddah the thing were you take damage but dont die",
+"tmp:mhhhh",
+"phys:toggle phys",
+"maps:lists all maps in the maps folder",
+"nextwave:nextwave",
+"gotowave:gotowave",
+"restart:restarts the player",
+"error:fake error maker",
+"tantsumon:summon a enemy in a tant summon point",
+"text:make a funny text"
+};
 
 void runConinput(){
   String[] args = split(ConsoleInput,' ');

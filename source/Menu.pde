@@ -472,7 +472,7 @@ class UI {
     }
     catch(Exception e) {
       PrintCon("sorry for that");
-      PrintCon(e.getMessage());
+      PrintCon(e.getMessage()+"");
       ErrorTimer=120;
     }
   }

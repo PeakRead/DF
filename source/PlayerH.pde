@@ -232,9 +232,9 @@ class Player{
     water=false;
     if(Ignore && !GetKeyBind("Player_Move_Down")){Checkfor();}
     coll(X-6,Y   ,X-6+VX+0.01,Y+VY+0.01);
-    coll(X+6,Y   ,X+6+VX+0.01,Y+VY+0.01);
-    coll(X-6,Y-24,X-6+VX+0.01,Y-24+VY+0.01);
-    coll(X+6,Y-24,X+6+VX+0.01,Y-24+VY+0.01);
+    coll(X+6,Y   ,X+6+VX-0.01,Y+VY+0.01);
+    coll(X-6,Y-24,X-6+VX+0.01,Y-24+VY-0.01);
+    coll(X+6,Y-24,X+6+VX-0.01,Y-24+VY-0.01);
     if(cill(-6+X+VX,Y+VY- 0, 6+X+VX,Y+VY- 0) | cill(-6+X+VX,Y+VY-24, 6+X+VX,Y+VY-24)){VY=0;}
     if(cill(-6+X+VX,Y+VY- 0,-6+X+VX,Y+VY-24) | cill( 6+X+VX,Y+VY- 0, 6+X+VX,Y+VY-24)){VX=0;}
     if(play.IV>0){

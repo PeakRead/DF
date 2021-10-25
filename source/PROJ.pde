@@ -310,7 +310,7 @@ class Earth extends PRO {
   int bombtimer=90;
   void math(int SID) {
     if (bombtimer%5==0) {
-      expd(X, Y-60,120, 16, 0, true);
+      expd(X, Y-60,120, 32, 0, true);
     }
     if (bombtimer==0) {
       killPR.append(SID);
@@ -357,7 +357,7 @@ class Air extends PRO {
       killPR.append(SID);
       return;
     }
-    if (Cont(W, H, 16)) {
+    if (Cont(W, H, 32)) {
       killPR.append(SID);
       return;
     }
@@ -394,7 +394,7 @@ class Fire extends PRO {
   float fuel=280;
   float rotate=0;
   void math(int SID) {
-    Cont(W, H, 12);
+    Cont(W, H, 32);
     rotate = atan2(play.Y-Y, play.X-X);
     AddPartic(3, X+random(-W/2, W/2), Y+random(-H/2, H/2), 0, -3, 40, color(#FF0000), false);
     if(fuel<240){
@@ -444,7 +444,7 @@ class Water extends PRO {
   int fuel=240;
   float rotate=0;
   void math(int SID) {
-    Cont(W, H, 12);
+    Cont(W, H, 32);
     if (fuel<200) {
       X+=cos(rotate)*9;
       Y+=sin(rotate)*9;
@@ -556,32 +556,55 @@ class Rock extends PRO {
 }
 
 class hurtbox extends PRO {
-  hurtbox(float nX, float nY, float nVX, float nVY,int hurtme) {
-    X = nX;
-    Y = nY;
-    W = nVX;
-    H = nVY;
-    ouch=hurtme;
+  hurtbox(float X, float Y, float W, float H, float R,int hurtme,int timer,int hurttimer) {
+    this.X = X;
+    this.Y = Y;
+    this.W = W;
+    this.H = H;
+    this.R = R;
+    this.timer=timer;
+    this.maxtimer=timer;
+    this.hurttimer=hurttimer;
+    ouch=hurtme;//POV you are looking at my code
   }
+  int maxtimer=15;
   int ouch=0;
   int timer=15;
+  int hurttimer=15;
+  float R=0;
   void math(int SID) {
     if(timer==0){
       killPR.append(SID);
       return;
     }
-    if (X>play.X-6 && X<play.X+6 && Y<play.Y && Y>play.Y-24  && timer>10) {
-      AThurt(ouch);
-      return;
+    timer--;
+    if(hurttimer>=0){
+      //even if not the best way of doing this
+      //the processes is fast
+      float[] Offx = {-6,-6,6,6};
+      float[] Offy = {0,-24,-24,0};
+      pushMatrix();
+      rotate(-R);
+      translate(-X,-Y);
+      for(int looper=0;looper<4;looper++){
+        float nx=screenX(play.X+Offx[looper],play.Y+Offy[looper]);
+        float ny=screenY(play.X+Offx[looper],play.Y+Offy[looper]);
+        if(nx>-W/2 && nx<W/2  &&  ny>-H/2 && ny<H/2){
+          AThurt(ouch);
+          break;
+        }
+      }
+      popMatrix();
     }
-    X+=VX;
-    Y+=VY;
-    VY+=0.2;
   }
   void render() {
+    pushMatrix();
+    translate(X,Y);
+    rotate(R);
     noStroke();
-    fill(255,timer*255/15);
-    rect(X-W, Y-H, W*2, H*2);
+    fill(255,timer*255/maxtimer);
+    rect(-W/2, -H/2, W, H);
+    popMatrix();
   }
 }
 

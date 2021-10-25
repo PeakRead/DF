@@ -155,12 +155,15 @@ void UPDATE(){
         out = subset(out,0,readed);
         shit = concat(shit,out);
       }
-      saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),shit);
+      println(sketchPath()+"/"+removefirst(tmp.getName()));
+      //saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),shit);
     }
+    opener.close();
   }catch(Exception e){
     e.printStackTrace();
   }
-  launch(sketchPath()+"/ProjectDFTEST.exe");
+  zipfile.delete();
+  launch(sketchPath()+"/ProjectDF.exe");
   exit();
   //PrintCon(sketchPath());
   //ErrorTimer=120;

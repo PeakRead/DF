@@ -168,6 +168,8 @@ class Target extends AI{
     X+=VX;
     Y+=VY;
     NewPartic(new StandImg(X,Y,random(-12,12),random(-12,12),15,#FFFFFF,"uranium.png"),true);
+    NewSPr(new hurtbox(X,Y,20,9000,-PI/4,0,15,5));
+    NewSPr(new hurtbox(X,Y,20,9000,PI/4,0,15,5));
   }
   void render(){
     stroke(0);
@@ -1004,10 +1006,10 @@ class AI{
     Gr=false;
   }
   void Phys(float W,float H,boolean C){
-    SPHYS(X-W,Y  ,X-W+VX+0.01,Y+VY+0.01,C);
-    SPHYS(X+W,Y  ,X+W+VX+0.01,Y+VY+0.01,C);
+    SPHYS(X-W,Y  ,X-W+VX+0.01,Y+VY-0.01,C);
+    SPHYS(X+W,Y  ,X+W+VX-0.01,Y+VY-0.01,C);
     SPHYS(X-W,Y-H,X-W+VX+0.01,Y-H+VY+0.01,C);
-    SPHYS(X+W,Y-H,X+W+VX+0.01,Y-H+VY+0.01,C);
+    SPHYS(X+W,Y-H,X+W+VX-0.01,Y-H+VY+0.01,C);
     if(true){
       if(Ignore & C){Checkfor();}
       if(sphys(X-W+VX,Y+VY,X+W+VX,Y+VY) | sphys(X-W+VX,Y-H+VY,X+W+VX,Y-H+VY)){VY=0;}

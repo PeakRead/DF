@@ -26,7 +26,7 @@ boolean BACEXIST;
 PGraphics Background;
 
 void openMap(String MAP){
-  ListAi = new ArrayList<AI>();
+  ListAi = new ArrayList<AI>(); //<>//
   ListEffects = new ArrayList<Effect>();
   ListPR = new ArrayList<PRO>();
   kill = new IntList();
@@ -38,7 +38,7 @@ void openMap(String MAP){
     BACEXIST=true;
   }catch(Exception e){
     PrintCon("no background detected");
-    PrintCon(e.getMessage());
+    PrintCon(e.getMessage()+"");
     ErrorTimer=120;
     BACEXIST=false;
   }
@@ -48,7 +48,7 @@ void openMap(String MAP){
     DATA = loadBytes("Maps/"+MAP+".BM");
   }catch(Exception e){
     PrintCon("???");
-    PrintCon(e.getMessage());
+    PrintCon(e.getMessage()+"");
     ErrorTimer=120;
     Gaming=false;
     MenuTurnOffAll();
@@ -152,7 +152,7 @@ void openMap(String MAP){
     MAD[i] = new door(SX,SY,EX,EY,delay,ATcol,ATpro);
     Header+=14;
   }
-  yes = new String[0];
+  yes = new String[0]; //<>//
   NUM=BgetI(DATA,Header,2);
   Header+=2;
   for(int i=0;i<NUM;i++){
@@ -241,6 +241,8 @@ void Restart(){
   kill = new IntList();
   Ekill = new IntList();
   killPR = new IntList();
+  BOSSHP.clear();
+  BOSSID.clear();
   DOORSOP=false;
 }
 

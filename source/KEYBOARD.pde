@@ -116,6 +116,7 @@ void keyPressed()
       switch(keyCode){
         case ENTER:
           runConinput();
+          consoleSell=-1;
         break;
         case BACKSPACE:
           if(ConsoleInput.length()>0){
@@ -127,6 +128,18 @@ void keyPressed()
         break;
         case ESC:
           ConsoleUP=false;
+          key=0;
+        break;
+        case UP:
+          consoleSell++;
+          consoleSell=min(consoleSell,99);
+          ConsoleInput=Console[consoleSell];
+          key=0;
+        break;
+        case DOWN:
+          consoleSell--;
+          consoleSell=max(consoleSell,0);
+          ConsoleInput=Console[consoleSell];
           key=0;
         break;
         default:

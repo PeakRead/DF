@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class ProjectDF extends PApplet {
 
-String Version = "V 5.5";
+String Version = "V 5.6";
 
 keyboard EYS;
 
@@ -665,6 +665,8 @@ class Target extends AI{
     X+=VX;
     Y+=VY;
     NewPartic(new StandImg(X,Y,random(-12,12),random(-12,12),15,0xffFFFFFF,"uranium.png"),true);
+    NewSPr(new hurtbox(X,Y,20,9000,-PI/4,0,15,5));
+    NewSPr(new hurtbox(X,Y,20,9000,PI/4,0,15,5));
   }
   public void render(){
     stroke(0);
@@ -1501,10 +1503,10 @@ class AI{
     Gr=false;
   }
   public void Phys(float W,float H,boolean C){
-    SPHYS(X-W,Y  ,X-W+VX+0.01f,Y+VY+0.01f,C);
-    SPHYS(X+W,Y  ,X+W+VX+0.01f,Y+VY+0.01f,C);
+    SPHYS(X-W,Y  ,X-W+VX+0.01f,Y+VY-0.01f,C);
+    SPHYS(X+W,Y  ,X+W+VX-0.01f,Y+VY-0.01f,C);
     SPHYS(X-W,Y-H,X-W+VX+0.01f,Y-H+VY+0.01f,C);
-    SPHYS(X+W,Y-H,X+W+VX+0.01f,Y-H+VY+0.01f,C);
+    SPHYS(X+W,Y-H,X+W+VX-0.01f,Y-H+VY+0.01f,C);
     if(true){
       if(Ignore & C){Checkfor();}
       if(sphys(X-W+VX,Y+VY,X+W+VX,Y+VY) | sphys(X-W+VX,Y-H+VY,X+W+VX,Y-H+VY)){VY=0;}
@@ -2178,12 +2180,15 @@ public void UPDATE(){
         out = subset(out,0,readed);
         shit = concat(shit,out);
       }
-      saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),shit);
+      println(sketchPath()+"/"+removefirst(tmp.getName()));
+      //saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),shit);
     }
+    opener.close();
   }catch(Exception e){
     e.printStackTrace();
   }
-  launch(sketchPath()+"/ProjectDFTEST.exe");
+  zipfile.delete();
+  launch(sketchPath()+"/ProjectDF.exe");
   exit();
   //PrintCon(sketchPath());
   //ErrorTimer=120;
@@ -2207,6 +2212,7 @@ String[] Console = new String[100];
 boolean ConsoleUP = false;
 String ConsoleInput = "";
 int scrool=0;
+int consoleSell=-1;
 
 public void resetCon(){
   for(int i=0;i<Console.length;i++){
@@ -2230,33 +2236,39 @@ public void DrawConsole(){
   fill(0xffFF00FF);
   for(int i=scrool;i<20+scrool;i++){
     try{
-    text(Console[i],0,19*15-15*i+scrool*15);
+    text(Console[i],10,19*15-15*i+scrool*15);
     }catch(Exception e){/*ignore*/}
   }
   fill(0xffFFFF00,200);
   rect(0,20*15,width,15);
   fill(0xff0000FF);
-  text(ConsoleInput,0,20*15);
+  text(ConsoleInput,10,20*15);
   float textmax=textWidth(ConsoleInput);
   stroke(0xff0000FF);
-  line(textmax,20*15,textmax,21*15);
+  line(textmax+10,20*15,textmax+10,21*15);
+  rect(2,20*15+2-consoleSell*15+scrool*15-15,6,10);
 }
 
 String[] Confunc = {
-"help : displays this",
-"resurect : resurects the player if dead",
-"noclip : noclip",
-"map : load a map",
-"maps : displays all files in the maps folder",
-"clean : cleans the console",
-"cum : cast a 500dmg lighting call on self",
-"debugdraw : toggle the debugdrawing of stuff",
-"god : invunrabylaty",
-"notime : prevents the players HP from going below 0",
-"phys : toggle the physics(player included)",
-"restart : reset the player",
-"error : fake a error",
-"text : print shit to screen"};
+"help:posts this",
+"resurect:resurect the player hopefully...",
+"noclip:noclip",
+"map:switch maps",
+"clean:cleans the console",
+"cum:roll the d20",
+"debugdraw:toggles the visabilaty of many stuff",
+"god:god",
+"notime:its buddah the thing were you take damage but dont die",
+"tmp:mhhhh",
+"phys:toggle phys",
+"maps:lists all maps in the maps folder",
+"nextwave:nextwave",
+"gotowave:gotowave",
+"restart:restarts the player",
+"error:fake error maker",
+"tantsumon:summon a enemy in a tant summon point",
+"text:make a funny text"
+};
 
 public void runConinput(){
   String[] args = split(ConsoleInput,' ');
@@ -2839,6 +2851,7 @@ public void keyPressed()
       switch(keyCode){
         case ENTER:
           runConinput();
+          consoleSell=-1;
         break;
         case BACKSPACE:
           if(ConsoleInput.length()>0){
@@ -2850,6 +2863,18 @@ public void keyPressed()
         break;
         case ESC:
           ConsoleUP=false;
+          key=0;
+        break;
+        case UP:
+          consoleSell++;
+          consoleSell=min(consoleSell,99);
+          ConsoleInput=Console[consoleSell];
+          key=0;
+        break;
+        case DOWN:
+          consoleSell--;
+          consoleSell=max(consoleSell,0);
+          ConsoleInput=Console[consoleSell];
           key=0;
         break;
         default:
@@ -2985,7 +3010,7 @@ public void openMap(String MAP){
     BACEXIST=true;
   }catch(Exception e){
     PrintCon("no background detected");
-    PrintCon(e.getMessage());
+    PrintCon(e.getMessage()+"");
     ErrorTimer=120;
     BACEXIST=false;
   }
@@ -2995,7 +3020,7 @@ public void openMap(String MAP){
     DATA = loadBytes("Maps/"+MAP+".BM");
   }catch(Exception e){
     PrintCon("???");
-    PrintCon(e.getMessage());
+    PrintCon(e.getMessage()+"");
     ErrorTimer=120;
     Gaming=false;
     MenuTurnOffAll();
@@ -3188,6 +3213,8 @@ public void Restart(){
   kill = new IntList();
   Ekill = new IntList();
   killPR = new IntList();
+  BOSSHP.clear();
+  BOSSID.clear();
   DOORSOP=false;
 }
 
@@ -3922,7 +3949,7 @@ class UI {
     }
     catch(Exception e) {
       PrintCon("sorry for that");
-      PrintCon(e.getMessage());
+      PrintCon(e.getMessage()+"");
       ErrorTimer=120;
     }
   }
@@ -4296,7 +4323,7 @@ class Earth extends PRO {
   int bombtimer=90;
   public void math(int SID) {
     if (bombtimer%5==0) {
-      expd(X, Y-60,120, 16, 0, true);
+      expd(X, Y-60,120, 32, 0, true);
     }
     if (bombtimer==0) {
       killPR.append(SID);
@@ -4343,7 +4370,7 @@ class Air extends PRO {
       killPR.append(SID);
       return;
     }
-    if (Cont(W, H, 16)) {
+    if (Cont(W, H, 32)) {
       killPR.append(SID);
       return;
     }
@@ -4380,7 +4407,7 @@ class Fire extends PRO {
   float fuel=280;
   float rotate=0;
   public void math(int SID) {
-    Cont(W, H, 12);
+    Cont(W, H, 32);
     rotate = atan2(play.Y-Y, play.X-X);
     AddPartic(3, X+random(-W/2, W/2), Y+random(-H/2, H/2), 0, -3, 40, color(0xffFF0000), false);
     if(fuel<240){
@@ -4430,7 +4457,7 @@ class Water extends PRO {
   int fuel=240;
   float rotate=0;
   public void math(int SID) {
-    Cont(W, H, 12);
+    Cont(W, H, 32);
     if (fuel<200) {
       X+=cos(rotate)*9;
       Y+=sin(rotate)*9;
@@ -4542,32 +4569,55 @@ class Rock extends PRO {
 }
 
 class hurtbox extends PRO {
-  hurtbox(float nX, float nY, float nVX, float nVY,int hurtme) {
-    X = nX;
-    Y = nY;
-    W = nVX;
-    H = nVY;
-    ouch=hurtme;
+  hurtbox(float X, float Y, float W, float H, float R,int hurtme,int timer,int hurttimer) {
+    this.X = X;
+    this.Y = Y;
+    this.W = W;
+    this.H = H;
+    this.R = R;
+    this.timer=timer;
+    this.maxtimer=timer;
+    this.hurttimer=hurttimer;
+    ouch=hurtme;//POV you are looking at my code
   }
+  int maxtimer=15;
   int ouch=0;
   int timer=15;
+  int hurttimer=15;
+  float R=0;
   public void math(int SID) {
     if(timer==0){
       killPR.append(SID);
       return;
     }
-    if (X>play.X-6 && X<play.X+6 && Y<play.Y && Y>play.Y-24  && timer>10) {
-      AThurt(ouch);
-      return;
+    timer--;
+    if(hurttimer>=0){
+      //even if not the best way of doing this
+      //the processes is fast
+      float[] Offx = {-6,-6,6,6};
+      float[] Offy = {0,-24,-24,0};
+      pushMatrix();
+      rotate(-R);
+      translate(-X,-Y);
+      for(int looper=0;looper<4;looper++){
+        float nx=screenX(play.X+Offx[looper],play.Y+Offy[looper]);
+        float ny=screenY(play.X+Offx[looper],play.Y+Offy[looper]);
+        if(nx>-W/2 && nx<W/2  &&  ny>-H/2 && ny<H/2){
+          AThurt(ouch);
+          break;
+        }
+      }
+      popMatrix();
     }
-    X+=VX;
-    Y+=VY;
-    VY+=0.2f;
   }
   public void render() {
+    pushMatrix();
+    translate(X,Y);
+    rotate(R);
     noStroke();
-    fill(255,timer*255/15);
-    rect(X-W, Y-H, W*2, H*2);
+    fill(255,timer*255/maxtimer);
+    rect(-W/2, -H/2, W, H);
+    popMatrix();
   }
 }
 
@@ -5062,9 +5112,9 @@ class Player{
     water=false;
     if(Ignore && !GetKeyBind("Player_Move_Down")){Checkfor();}
     coll(X-6,Y   ,X-6+VX+0.01f,Y+VY+0.01f);
-    coll(X+6,Y   ,X+6+VX+0.01f,Y+VY+0.01f);
-    coll(X-6,Y-24,X-6+VX+0.01f,Y-24+VY+0.01f);
-    coll(X+6,Y-24,X+6+VX+0.01f,Y-24+VY+0.01f);
+    coll(X+6,Y   ,X+6+VX-0.01f,Y+VY+0.01f);
+    coll(X-6,Y-24,X-6+VX+0.01f,Y-24+VY-0.01f);
+    coll(X+6,Y-24,X+6+VX-0.01f,Y-24+VY-0.01f);
     if(cill(-6+X+VX,Y+VY- 0, 6+X+VX,Y+VY- 0) | cill(-6+X+VX,Y+VY-24, 6+X+VX,Y+VY-24)){VY=0;}
     if(cill(-6+X+VX,Y+VY- 0,-6+X+VX,Y+VY-24) | cill( 6+X+VX,Y+VY- 0, 6+X+VX,Y+VY-24)){VX=0;}
     if(play.IV>0){
@@ -5194,7 +5244,7 @@ public void AThurt(int dmg){
 }
 int round=0;
 boolean tantactive=false;
-String[] arenas;
+JSONArray[] arenas;
 int enemyDelay=0;
 int Grspawn=0;
 int[] GrspawnID;
@@ -5209,15 +5259,10 @@ int CurrentSave;
 public void tantrest(){
   round=0;
   getFile();
-  arenas = new String[0];
-  File tmp = new File(sketchPath()+"/data/Maps");
-  String[] maps = tmp.list();
-  if(maps != null){
-  for(int i=0;i<maps.length;i++){
-    if(split(maps[i],'_')[0].equals("arena")){
-      arenas = append(arenas,split(maps[i],'.')[0]);
-    }
-  }
+  JSONArray BigFile = loadJSONArray(sketchPath()+"/data/Maps/RAN.json");
+  arenas = new JSONArray[BigFile.size()];
+  for(int i=0;i<BigFile.size();i++){
+    arenas[i]=BigFile.getJSONArray(i);
   }
 }
 
@@ -5276,7 +5321,6 @@ public void nextWave(){
     return;
   }
   Blurer=60;
-  int map=(int)random(0,arenas.length);
   switch(round){
     case 10:
     case 20:
@@ -5303,8 +5347,10 @@ public void nextWave(){
     CurrentArena="gate";
     break;
     default:
-    Start(arenas[map]);
-    CurrentArena=split(arenas[map],'_')[1];
+    String[] names = arenas[round/20].getStringArray();
+    int map=(int)random(0,names.length-1);
+    Start(names[map]);
+    CurrentArena=split(names[map],'_')[1];
     break;
   }
         Grspawn=0;
@@ -5553,9 +5599,9 @@ class KILLgun extends Weapon {
     WeaOffy=-2;
     WeapW=19;
     WeapH=3;
-    SDelay=0;
-    EDelay=15;
-    Const=false;
+    SDelay=15;
+    EDelay=1;
+    Const=true;
   }
   public void FIRE() {
     Hitscan(0, 0, play.PO, true, 8, 99999999,1000);
