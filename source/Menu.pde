@@ -29,6 +29,9 @@ void MenuSetup() {
   
   menuUI = (UI[])append(menuUI, new SaveButton(140, height-160, 100, 40, "MAIN_MENU", "nothing" , 10));
   menuUI = (UI[])append(menuUI, new SaveButton(260, height-160, 100, 40, "MAIN_MENU", "nothing" , 20));
+  menuUI = (UI[])append(menuUI, new SaveButton(320, height-180, 100, 10, "MAIN_MENU", "nothing" , 21));
+  menuUI = (UI[])append(menuUI, new SaveButton(380, height-160, 100, 40, "MAIN_MENU", "nothing" , 30));
+  menuUI = (UI[])append(menuUI, new SaveButton(500, height-160, 100, 40, "MAIN_MENU", "nothing" , 40));
   
   //OPTIONS_MENU
 

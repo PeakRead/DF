@@ -1,4 +1,4 @@
-String Version = "V 5.6";
+String Version = "V 6.0";
 
 keyboard EYS;
 
@@ -59,6 +59,7 @@ void setup(){
     }
     Configs.set("DrawEffects",tmp.getInt("DrawEffects",1));
     Configs.set("GuiScale",tmp.getInt("GuiScale",100));
+    Configs.set("Zoom",tmp.getInt("Zoom",100));
     JSONArray binds = tmp.getJSONArray("Binds");
     for(int i=0;i<binds.size();i++){
       JSONObject tmper = binds.getJSONObject(i);

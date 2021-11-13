@@ -195,7 +195,7 @@ class MazeBullets extends PRO {
     fill(#FFFFFF);
     stroke(#00FFFF);
     circle(X, Y, 20);
-    rect(X-W, Y-H, W*2, H*2);
+    //rect(X-W, Y-H, W*2, H*2);
   }
 }
 
@@ -310,7 +310,7 @@ class Earth extends PRO {
   int bombtimer=90;
   void math(int SID) {
     if (bombtimer%5==0) {
-      expd(X, Y-60,120, 32, 0, true);
+      expd(X, Y-60,120, 42, 0, true);
     }
     if (bombtimer==0) {
       killPR.append(SID);
@@ -444,7 +444,7 @@ class Water extends PRO {
   int fuel=240;
   float rotate=0;
   void math(int SID) {
-    Cont(W, H, 32);
+    Cont(W, H, 42);
     if (fuel<200) {
       X+=cos(rotate)*9;
       Y+=sin(rotate)*9;
@@ -542,6 +542,7 @@ class Rock extends PRO {
       killPR.append(SID);
       return;
     }
+    NewPartic(new GravPoint(X,Y,0,0,5,#222222,1),false);
     X+=VX;
     Y+=VY;
     VY+=0.2;
@@ -552,6 +553,9 @@ class Rock extends PRO {
       fill(255);
       rect(X-W, Y-H, W*2, H*2);
     }
+    noStroke();
+    fill(#676767);
+    circle(X,Y,W*2);
   }
 }
 
@@ -605,6 +609,204 @@ class hurtbox extends PRO {
     fill(255,timer*255/maxtimer);
     rect(-W/2, -H/2, W, H);
     popMatrix();
+  }
+}
+
+class MiniRocket extends PRO {
+  float Bombtimer=60;
+  MiniRocket(float nX, float nY, float nVX, float nVY, int nT) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    T = nT;
+    W=12;
+    H=12;
+  }
+  void math(int SID) {
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      expd(X, Y, 120, 15, 5, true);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      expd(X, Y, 120, 15, 5, true);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      expd(X, Y, 120, 15, 5, true);
+      return;
+    }
+    if (Bombtimer==0) {
+      killPR.append(SID);
+      expd(X, Y, 120, 15, 5, true);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+    Bombtimer--;
+    NewPartic(new GravPoint(X,Y,-VX,-VY,40,#CCCCCC,-0.4),true);
+    //VY+=0.2;
+  }
+  void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+    noStroke();
+    fill(#FA0000);
+    circle(X,Y,12);
+  }
+}
+
+class MiniBullet extends PRO {
+  MiniBullet(float nX, float nY, float nVX, float nVY, int nT) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    T = nT;
+    W=6;
+    H=6;
+  }
+  int fuel=30;
+  void math(int SID) {
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Cont(W, H, 32)) {
+      killPR.append(SID);
+      return;
+    }
+    AddPartic(1, X, Y, X+VX, Y+VY, 10, color(#FFFF00), true);
+    fuel--;
+    X+=VX;
+    Y+=VY;
+    //VY+=0.2;
+  }
+  void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+    fill(#FFFF00);
+    circle(X,Y,W);
+  }
+}
+
+class Eletro extends PRO {
+  Eletro(float nX, float nY, float nVX, float nVY,int timer) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=8;
+    H=8;
+    this.timer=timer;
+  }
+  int timer=0;
+  void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      return;
+    }
+    timer--;
+    if (Cont(W, H, 16)) {
+      killPR.append(SID);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    fill(#EAF9FF);
+    stroke(#05ACF7);
+    circle(X, Y, 20);
+    //rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
+class SEletro extends PRO {
+  SEletro(float nX, float nY, float nVX, float nVY,int timer,float Doff,float Roff) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=8;
+    H=8;
+    this.Doff=Doff;
+    this.Roff=Roff;
+    this.timer=timer;
+  }
+  float Doff=0;
+  float Roff=0;
+  void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      return;
+    }
+    timer--;
+    if (Cont(W, H, 16)) {
+      killPR.append(SID);
+      return;
+    }
+    Doff+=VX;
+    Roff+=VY;
+  }
+  void render() {
+    fill(#EAF9FF);
+    stroke(#05ACF7);
+    circle(X+(cos(Roff)*Doff), Y+(sin(Roff)*Doff), 20);
+    //rect(X-W, Y-H, W*2, H*2);
+  }
+  boolean Cont(float W, float H, int dmg) {
+    if (X+(cos(Roff)*Doff)+W>play.X-6 && X+(cos(Roff)*Doff)-W<play.X+6 && Y+(sin(Roff)*Doff)+H>play.Y-24 && Y+(sin(Roff)*Doff)-H<play.Y+0) {
+      AThurt(dmg);
+      return true;
+    }
+    return false;
+  }
+}
+
+class Bross extends PRO {
+  Bross(float nX, float nY, float nVX, float nVY,int timer,float R) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=8;
+    H=8;
+    this.timer=timer;
+    this.R=R;
+  }
+  float R=0;
+  void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      NewSPr(new hurtbox(X,Y,3000,20,R,35,10,1));
+      return;
+    }
+    NewPartic(new Line(X-cos(R)*1500,Y-sin(R)*1500,X+cos(R)*1500,Y+sin(R)*1500,2,#FF0000,timer),true);
+    timer--;
+  }
+  void render() {
+    fill(#EAF9FF);
+    stroke(#05ACF7);
+    circle(X, Y, 20);
+    //rect(X-W, Y-H, W*2, H*2);
   }
 }
 

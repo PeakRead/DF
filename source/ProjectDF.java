@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class ProjectDF extends PApplet {
 
-String Version = "V 5.6";
+String Version = "V 6.0";
 
 keyboard EYS;
 
@@ -78,6 +78,7 @@ public void setup(){
     }
     Configs.set("DrawEffects",tmp.getInt("DrawEffects",1));
     Configs.set("GuiScale",tmp.getInt("GuiScale",100));
+    Configs.set("Zoom",tmp.getInt("Zoom",100));
     JSONArray binds = tmp.getJSONArray("Binds");
     for(int i=0;i<binds.size();i++){
       JSONObject tmper = binds.getJSONObject(i);
@@ -502,84 +503,92 @@ int PMust=0;
 IntList BOSSHP;
 IntList BOSSID;
 
-String[] AINames={"Bug","Fly","Target","Spewer","testBoss","Maze","Laze","Maze_Boss","Laze_Boss","tower","napalm","Spirit","Guardian","Crab","Piller"};
-boolean[] Sgroun={true ,false,true    ,true    ,true      ,false ,false ,false      ,false      ,true   ,true    ,false   ,true      ,true  ,true};
+String[] AINames={"Bug", "Fly", "Target", "Spewer", "testBoss", "Maze", "Laze", "Maze_Boss", "Laze_Boss", "tower", "napalm", "Spirit", "Guardian", "Crab", "Piller", "Supply", "Supply_Boss", "Electron"};
+boolean[] Sgroun={true , false, true    , true    , true      , false , false , false      , false      , true   , true    , false   , true      , true  , true    , false   , false        , false     };
+String[] SupplySummon={"Fly", "Bug", "Spewer", "tower", "Maze", "Laze"};
 
-public void AIMath(){
+public void AIMath() {
   PMust=Must;
-  for(int i=0;i<ListAi.size();i++){
-    try{
+  for (int i=0; i<ListAi.size(); i++) {
+    try {
       ListAi.get(i).math(i);
       AI tmp = ListAi.get(i);
-      if(tmp.X>10000 | tmp.X<-10000 | tmp.Y>10000 | tmp.Y<-10000){kill.append(i);}
-    }catch(Exception e){
+      if (tmp.X>10000 | tmp.X<-10000 | tmp.Y>10000 | tmp.Y<-10000) {
+        kill.append(i);
+      }
+    }
+    catch(Exception e) {
       PrintCon("sorry for that");
       kill.append(i);
-      AddPartic(1,ListAi.get(i).X,ListAi.get(i).Y,ListAi.get(i).X,-10000,60,0xffFFFFFF,false);
-      AddPartic(5,ListAi.get(i).X,ListAi.get(i).Y,128,0,60,0xffFFFFFF,true);
-      for(int ohno=0;ohno<50;ohno++){
-        AddPartic(2,ListAi.get(i).X,ListAi.get(i).Y,random(-10,10),random(-10,10),60,0xffFFFFFF,false);
+      AddPartic(1, ListAi.get(i).X, ListAi.get(i).Y, ListAi.get(i).X, -10000, 60, 0xffFFFFFF, false);
+      AddPartic(5, ListAi.get(i).X, ListAi.get(i).Y, 128, 0, 60, 0xffFFFFFF, true);
+      for (int ohno=0; ohno<50; ohno++) {
+        AddPartic(2, ListAi.get(i).X, ListAi.get(i).Y, random(-10, 10), random(-10, 10), 60, 0xffFFFFFF, false);
       }
       PrintCon(e.toString());
       ErrorTimer=120;
     }
   }
-  for(int i=0;i<ListAi.size();i++){
-    try{
-      if(ListAi.get(i).getClass()==Class.forName("ProjectDFTEST$Spirit")){
+  for (int i=0; i<ListAi.size(); i++) {
+    try {
+      if (ListAi.get(i).getClass()==Class.forName("ProjectDF$Spirit")) {
         Spirit tmp = (Spirit)ListAi.get(i);
-        if(kill.hasValue(tmp.Connected)){
+        if (kill.hasValue(tmp.Connected)) {
           tmp.Con=false;
           tmp.hurte=true;
-          ListAi.set(i,tmp);
+          ListAi.set(i, tmp);
         }
       }
-    }catch(Exception e){}
+    }
+    catch(Exception e) {
+    }
   }
   kill.reverse();
-  for(int i=0;i<kill.size();i++){
+  for (int i=0; i<kill.size(); i++) {
     AI tmp = ListAi.get(kill.get(i));
     BOSSID.reverse();
     BOSSHP.reverse();
-    for(int u=0;u<BOSSID.size();u++){
-      if(kill.get(i)==BOSSID.get(u)){
+    for (int u=0; u<BOSSID.size(); u++) {
+      if (kill.get(i)==BOSSID.get(u)) {
         BOSSID.remove(u);
         BOSSHP.remove(u);
         break;
       }
-      if(kill.get(i)<BOSSID.get(u)){
-        BOSSID.set(u,BOSSID.get(u)-1);
+      if (kill.get(i)<BOSSID.get(u)) {
+        BOSSID.set(u, BOSSID.get(u)-1);
       }
     }
     BOSSID.reverse();
     BOSSHP.reverse();
-    if(dist(tmp.X,tmp.Y,play.X,play.Y)<=200 && play.HP>0){
-      AddPartic(1,play.X+random(-5,5),play.Y-12+random(-5,5),tmp.X+random(-5,5),tmp.Y-tmp.H/2+random(-5,5),60,color(255,0,0),true);
-      if(play.HP+5>100){
+    if (dist(tmp.X, tmp.Y, play.X, play.Y)<=200 && play.HP>0) {
+      AddPartic(1, play.X+random(-5, 5), play.Y-12+random(-5, 5), tmp.X+random(-5, 5), tmp.Y-tmp.H/2+random(-5, 5), 60, color(255, 0, 0), true);
+      if (play.HP+5>100) {
         play.HP=100;
-      }else{
+      } else {
         play.HP+=5;
       }
     }
-    if(tmp.M){Must--;}
+    if (tmp.M) {
+      Must--;
+    }
   }
-  for(int i=0;i<kill.size();i++){
+  for (int i=0; i<kill.size(); i++) {
     ListAi.remove(kill.get(i));
   }
   kill.clear();
 }
 
-public void AIR(){
-  for(int i=0;i<ListAi.size();i++){
+public void AIR() {
+  for (int i=0; i<ListAi.size(); i++) {
     ListAi.get(i).render();
-    if(DebugDraw){
-      text(ListAi.get(i).HP,ListAi.get(i).X+10,ListAi.get(i).Y-10);
+    if (DebugDraw) {
+      text(ListAi.get(i).HP, ListAi.get(i).X+10, ListAi.get(i).Y-10);
     }
   }
 }
 
-class Bug extends AI{
-  Bug(float nX,float nY,boolean nM){
+class Bug extends AI {
+  Bug(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -587,35 +596,38 @@ class Bug extends AI{
     H=14;
     HP=20;
     T=0;
-    Animr.ID=EAR.get("Bug");
+    Animr = new SelfAnim(EAR.get("Bug"));
   }
-  public void math(int SID){
-      if(HP<=0){kill.append(SID);return;}
-      Walk(0.3f,0.5f,6);
-      Cont(W,H,25);
-      Phys(W,H,true);
-      X+=VX;
-      Y+=VY;
+  public void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    Walk(0.3f, 0.5f, 6);
+    Cont(W, H, 25);
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
-      pushMatrix();
-      if(VX>0){
-        scale(-1,1);
-        translate(-X*2,0);
-      }
-      Animr.Anim(true,OG>3);
-      Animr.DIMG(X,Y,W,H,true,OG>3,0xffFFFFFF);
-      popMatrix();
+    pushMatrix();
+    if (VX>0) {
+      scale(-1, 1);
+      translate(-X*2, 0);
+    }
+    Animr.Anim(true, OG>3);
+    Animr.DIMG(X, Y, W, H, true, OG>3, 0xffFFFFFF);
+    popMatrix();
   }
 }
 
-class Fly extends AI{
-  Fly(float nX,float nY,boolean nM){
+class Fly extends AI {
+  Fly(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -623,87 +635,94 @@ class Fly extends AI{
     H=12;
     HP=12;
     T=4;
-    Animr.ID=EAR.get("Fly");
+    Animr = new SelfAnim(EAR.get("Fly"));
   }
-  public void math(int SID){
-    if(HP<=0){kill.append(SID);return;}
-    VX+=cos(atan2(play.Y-Y,play.X-X))*0.4f;
-    VY+=sin(atan2(play.Y-Y,play.X-X))*0.2f;
-    VX=constrain(VX,-10,10);
-    VY=constrain(VY,-10,10);
-    Cont(W,H,15);
-    Phys(W,H,false);
+  public void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    VX+=cos(atan2(play.Y-Y, play.X-X))*0.4f;
+    VY+=sin(atan2(play.Y-Y, play.X-X))*0.2f;
+    VX=constrain(VX, -10, 10);
+    VY=constrain(VY, -10, 10);
+    Cont(W, H, 15);
+    Phys(W, H, false);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
-    Animr.Anim(false,true);
-    Animr.DIMG(X,Y,W,H,false,true,0xffFFFFFF);
+    Animr.Anim(false, true);
+    Animr.DIMG(X, Y, W, H, false, true, 0xffFFFFFF);
   }
 }
 
-class Target extends AI{
-  Target(float nX,float nY,boolean nM){
+class Target extends AI {
+  Target(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
     W=6;
     H=24;
     HP=9999;
-    Animr.ID=EAR.get("Target");
+    Animr = new SelfAnim(EAR.get("Target"));
   }
-  public void math(int SID){
-    if(HP<=0){kill.append(SID);return;}
+  public void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
     Fall();
-    Cont(W,H,1);
-    Phys(W,H,true);
+    Cont(W, H, 1);
+    Phys(W, H, true);
     X+=VX;
     Y+=VY;
-    NewPartic(new StandImg(X,Y,random(-12,12),random(-12,12),15,0xffFFFFFF,"uranium.png"),true);
-    NewSPr(new hurtbox(X,Y,20,9000,-PI/4,0,15,5));
-    NewSPr(new hurtbox(X,Y,20,9000,PI/4,0,15,5));
+    NewPartic(new StandImg(X, Y, random(-12, 12), random(-12, 12), 15, 0xffFFFFFF, "uranium.png"), true);
+    NewSPr(new hurtbox(X, Y, 20, 9000, -PI/4, 0, 15, 5));
+    NewSPr(new hurtbox(X, Y, 20, 9000, PI/4, 0, 15, 5));
   }
-  public void render(){
+  public void render() {
     stroke(0);
     fill(255);
-    rect(X-W,Y-H,W*2,H);
-    Animr.Anim(false,false);
-    Animr.DIMG(X,Y,W,H,false,false,0xffFFFFFF);
-    Animr.EIMG(cos(frameCount/20.0f)*32+X,sin(frameCount/20.0f)*32+Y,8,8,0,0xffFFFFFF);
+    rect(X-W, Y-H, W*2, H);
+    Animr.Anim(false, false);
+    Animr.DIMG(X, Y, W, H, false, false, 0xffFFFFFF);
   }
   public void HURT(int dmg)
   {
-    if(!hurte){return;}
+    if (!hurte) {
+      return;
+    }
     HP-=dmg;
     Animr.Action(0);
-    for(int B=0;B<5;B++){
-      AddPartic(4,X,Y,random(-1,1),random(-8,-2),50,color(255,0,0),true);
+    for (int B=0; B<5; B++) {
+      AddPartic(4, X, Y, random(-1, 1), random(-8, -2), 50, color(255, 0, 0), true);
     }
-    if(play.regenera==0){
-      if(dist(X,Y,play.X,play.Y)<=200 && play.HP>0){
-        AddPartic(1,play.X+random(-5,5),play.Y-12+random(-5,5),X+random(-5,5),Y-H/2+random(-5,5),60,color(255,0,0),true);
-        if(play.HP+dmg/4>100){
+    if (play.regenera==0) {
+      if (dist(X, Y, play.X, play.Y)<=200 && play.HP>0) {
+        AddPartic(1, play.X+random(-5, 5), play.Y-12+random(-5, 5), X+random(-5, 5), Y-H/2+random(-5, 5), 60, color(255, 0, 0), true);
+        if (play.HP+dmg/4>100) {
           play.HP=100;
-        }else{
+        } else {
           play.HP+=dmg/4;
         }
       }
-    }else{
-      if(random(1,100)<50 && play.HP>0){
-        NewPR(X,Y-H/2,random(-5,5),random(-5,5),10);
+    } else {
+      if (random(1, 100)<50 && play.HP>0) {
+        NewPR(X, Y-H/2, random(-5, 5), random(-5, 5), 10);
       }
     }
   }
 }
 
-class Spewer extends AI{
+class Spewer extends AI {
   int cooldown=80;
-  Spewer(float nX,float nY,boolean nM){
+  Spewer(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -711,45 +730,48 @@ class Spewer extends AI{
     H=24;
     HP=34;
     T=5;
-    Animr.ID=EAR.get("Spewer");
+    Animr = new SelfAnim(EAR.get("Spewer"));
   }
-  public void math(int SID){
-    if(dist(X,Y,play.X,play.Y)>150){
-      Walk(0.01f,0.01f,1);
+  public void math(int SID) {
+    if (dist(X, Y, play.X, play.Y)>150) {
+      Walk(0.01f, 0.01f, 1);
     }
-    if(HP<=0){kill.append(SID);return;}
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
     Fall();
-    Cont(W,H,1);
-    Phys(W,H,true);
-    if(cooldown==0){
-      
-      NewPR(X+W,Y-H/2,cos(atan2(play.Y-Y+H/2-12,play.X+6-X-W))*6,sin(atan2(play.Y-Y+H/2-8,play.X+6-X-W))*6,0);
+    Cont(W, H, 1);
+    Phys(W, H, true);
+    if (cooldown==0) {
+
+      NewPR(X+W, Y-H/2, cos(atan2(play.Y-Y+H/2-12, play.X+6-X-W))*6, sin(atan2(play.Y-Y+H/2-8, play.X+6-X-W))*6, 0);
       cooldown=80;
-    }else{
+    } else {
       cooldown--;
     }
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
-      pushMatrix();
-      if(VX<0){
-        scale(-1,1);
-        translate(-X*2,0);
-      }
-      Animr.Anim(Gr && abs(VX)<0.5f,false);
-      Animr.DIMG(X,Y,W,H,Gr && abs(VX)<0.5f,false,0xffFFFFFF);
-      popMatrix();
+    pushMatrix();
+    if (VX<0) {
+      scale(-1, 1);
+      translate(-X*2, 0);
+    }
+    Animr.Anim(Gr && abs(VX)<0.5f, false);
+    Animr.DIMG(X, Y, W, H, Gr && abs(VX)<0.5f, false, 0xffFFFFFF);
+    popMatrix();
   }
 }
 
-class testBoss extends AI{
-  testBoss(float nX,float nY,boolean nM){
+class testBoss extends AI {
+  testBoss(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -759,285 +781,306 @@ class testBoss extends AI{
     BOSSHP.append(HP);
     BOSSID.append(ListAi.size());
   }
-  public void math(int SID){
-    if(HP<=0){kill.append(SID);return;}
+  public void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
     Fall();
-    Cont(W,H,1);
-    Phys(W,H,true);
+    Cont(W, H, 1);
+    Phys(W, H, true);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
+  public void render() {
     stroke(0);
     fill(255);
-    rect(X-W,Y-H,W*2,H);
+    rect(X-W, Y-H, W*2, H);
   }
 }
 
-class Maze extends AI{
+class Maze extends AI {
   boolean Enraged=false;
-  Maze(float nX,float nY,boolean nM,boolean Boss){
+  Maze(float nX, float nY, boolean nM, boolean Boss) {
     X=nX;
     Y=nY;
     M=nM;
     W=16;
     H=32;
     T=1;
-    if(Boss){
+    if (Boss) {
       HP=800;
       W=32;
       H=64;
       BOSSHP.append(HP);
       BOSSID.append(ListAi.size());
-    }else{
+    } else {
       HP=200;
     };
-    Animr.ID=EAR.get("Maze");
+    Animr = new SelfAnim(EAR.get("Maze"));
   }
   int cooldown = 370;
   int attack = 1;
-  public void math(int SID){
-    if(HP<=0){
-      if(Gr){
-        AddPartic(5,X,Y,32,0,15,0xff00FF00,false);
+  public void math(int SID) {
+    if (HP<=0) {
+      if (Gr || HP<=-1000) {
+        AddPartic(5, X, Y, 32, 0, 15, 0xff00FF00, false);
         kill.append(SID);
-        for(int all=0;all<ListAi.size();all++){
-          try{
-            if(ListAi.get(all).getClass()==Class.forName("ProjectDFTEST$Maze")){
+        for (int all=0; all<ListAi.size(); all++) {
+          try {
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Maze")) {
               Maze tmp = (Maze)ListAi.get(all);
               tmp.Enraged=true;
-              ListAi.set(all,tmp);
+              ListAi.set(all, tmp);
             }
-            if(ListAi.get(all).getClass()==Class.forName("ProjectDFTEST$Laze")){
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Laze")) {
               Laze tmp = (Laze)ListAi.get(all);
               tmp.Enraged=true;
-              ListAi.set(all,tmp);
+              ListAi.set(all, tmp);
             }
-          }catch(Exception e){
-            
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Supply")) {
+              Supply tmp = (Supply)ListAi.get(all);
+              tmp.Enraged=true;
+              ListAi.set(all, tmp);
+            }
+          }
+          catch(Exception e) {
           }
         }
         return;
       }
       VY+=0.2f;
-    }else{
+    } else {
       Gr=false;
-      if(cooldown>200 && cooldown<300){
+      if (cooldown>200 && cooldown<300) {
         VX+=(play.X-X+cos((float)frameCount/20)*64)/10;
         VY+=(play.Y-Y+sin((float)frameCount/20)*64-200)/10;
         VX=VX/10*9;
         VY=VY/10*9;
-      }else{
+      } else {
         VX=0;
         VY=0;
       }
-      if(cooldown<200 && cooldown>80){
+      if (cooldown<200 && cooldown>80) {
         float N=((float)cooldown-80)/120*8;
-        if(attack==0){
-        AddPartic(3,X,Y-H/2,cos(0*PI/2)*N,sin(0*PI/2)*N,15,0xff00FFFF,true);
-        AddPartic(3,X,Y-H/2,cos(1*PI/2)*N,sin(1*PI/2)*N,15,0xff00FFFF,true);
-        AddPartic(3,X,Y-H/2,cos(2*PI/2)*N,sin(2*PI/2)*N,15,0xff00FFFF,true);
-        AddPartic(3,X,Y-H/2,cos(3*PI/2)*N,sin(3*PI/2)*N,15,0xff00FFFF,true);
-        }else{
-        AddPartic(3,X,Y-H/2,cos(0*PI/2+PI/4)*N,sin(0*PI/2+PI/4)*N,15,0xff00FFFF,true);
-        AddPartic(3,X,Y-H/2,cos(1*PI/2+PI/4)*N,sin(1*PI/2+PI/4)*N,15,0xff00FFFF,true);
-        AddPartic(3,X,Y-H/2,cos(2*PI/2+PI/4)*N,sin(2*PI/2+PI/4)*N,15,0xff00FFFF,true);
-        AddPartic(3,X,Y-H/2,cos(3*PI/2+PI/4)*N,sin(3*PI/2+PI/4)*N,15,0xff00FFFF,true);
+        if (attack==0) {
+          AddPartic(3, X, Y-H/2, cos(0*PI/2)*N, sin(0*PI/2)*N, 15, 0xff00FFFF, true);
+          AddPartic(3, X, Y-H/2, cos(1*PI/2)*N, sin(1*PI/2)*N, 15, 0xff00FFFF, true);
+          AddPartic(3, X, Y-H/2, cos(2*PI/2)*N, sin(2*PI/2)*N, 15, 0xff00FFFF, true);
+          AddPartic(3, X, Y-H/2, cos(3*PI/2)*N, sin(3*PI/2)*N, 15, 0xff00FFFF, true);
+        } else {
+          AddPartic(3, X, Y-H/2, cos(0*PI/2+PI/4)*N, sin(0*PI/2+PI/4)*N, 15, 0xff00FFFF, true);
+          AddPartic(3, X, Y-H/2, cos(1*PI/2+PI/4)*N, sin(1*PI/2+PI/4)*N, 15, 0xff00FFFF, true);
+          AddPartic(3, X, Y-H/2, cos(2*PI/2+PI/4)*N, sin(2*PI/2+PI/4)*N, 15, 0xff00FFFF, true);
+          AddPartic(3, X, Y-H/2, cos(3*PI/2+PI/4)*N, sin(3*PI/2+PI/4)*N, 15, 0xff00FFFF, true);
         }
       }
-      if(!Enraged){
-        if(cooldown<80){
-          if(attack==0){
-            if(cooldown%10==0){
-              for(int i=0;i<4;i++){
-                NewPR(X,Y-H/2,cos(i*PI/2+(float)cooldown/60*PI)*5,sin(i*PI/2+(float)cooldown/60*PI)*5,3);
+      if (!Enraged) {
+        if (cooldown<80) {
+          if (attack==0) {
+            if (cooldown%10==0) {
+              for (int i=0; i<4; i++) {
+                NewPR(X, Y-H/2, cos(i*PI/2+(float)cooldown/60*PI)*5, sin(i*PI/2+(float)cooldown/60*PI)*5, 3);
               }
             }
-          }else{
-            if(cooldown%10==0){
-              float target = atan2(play.Y-Y,play.X-X);
-              for(int i=0;i<3;i++){
-                NewPR(X,Y-H/2,cos(target+PI/8*(i-1))*5,sin(target+PI/8*(i-1))*5,3);
+          } else {
+            if (cooldown%10==0) {
+              float target = atan2(play.Y-Y, play.X-X);
+              for (int i=0; i<3; i++) {
+                NewPR(X, Y-H/2, cos(target+PI/8*(i-1))*5, sin(target+PI/8*(i-1))*5, 3);
               }
             }
           }
         }
-      }else{
-        if(cooldown<80){
-            if(cooldown%10==0){
-              for(int i=0;i<8;i++){
-                NewPR(X,Y-H/2,cos(i*PI/4+(float)cooldown/60)*5,sin(i*PI/4+(float)cooldown/60)*5,3);
-              }
+      } else {
+        if (cooldown<80) {
+          if (cooldown%10==0) {
+            for (int i=0; i<8; i++) {
+              NewPR(X, Y-H/2, cos(i*PI/4+(float)cooldown/60)*5, sin(i*PI/4+(float)cooldown/60)*5, 3);
             }
+          }
         }
       }
       cooldown--;
-      if(cooldown<0){cooldown=370;attack = (int)random(0,2);}
+      if (cooldown<0) {
+        cooldown=370;
+        attack = (int)random(0, 2);
+      }
     }
-    Cont(W,H,1);
-    Phys(W,H,false);
+    Cont(W, H, 1);
+    Phys(W, H, false);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
-    Animr.Anim(false,true);
-    if(!Enraged){
-      Animr.DIMG(X,Y,W,H,false,true,0xffFFFFFF);
-    }else{
-      Animr.DIMG(X,Y,W,H,false,true,0xffFFAAAA);
-      stroke(255,0,0);
+    Animr.Anim(false, true);
+    if (!Enraged) {
+      Animr.DIMG(X, Y, W, H, false, true, 0xffFFFFFF);
+    } else {
+      Animr.DIMG(X, Y, W, H, false, true, 0xffFFAAAA);
+      stroke(255, 0, 0);
       noFill();
-      circle(X+random(-2,2),Y-H/2+random(-2,2),36);
+      circle(X+random(-2, 2), Y-H/2+random(-2, 2), 36);
     }
   }
 }
 
-class Laze extends AI{
+class Laze extends AI {
   boolean Enraged=false;
-  Laze(float nX,float nY,boolean nM,boolean Boss){
+  Laze(float nX, float nY, boolean nM, boolean Boss) {
     X=nX;
     Y=nY;
     M=nM;
     W=16;
     H=32;
     T=2;
-    if(Boss){
+    if (Boss) {
       HP=800;
       W=32;
       H=64;
       BOSSHP.append(HP);
       BOSSID.append(ListAi.size());
-    }else{
+    } else {
       HP=200;
     }
-    Animr.ID=EAR.get("Laze");
+    Animr = new SelfAnim(EAR.get("Laze"));
   }
   int cooldown = 420;
   int attack = 1;
   float LastPlayer = 0;
   float Tx;
   float Ty;
-  public void math(int SID){
-    if(HP<=0){
-      if(Gr){
-        AddPartic(5,X,Y,32,0,15,0xff00FF00,false);
+  public void math(int SID) {
+    if (HP<=0) {
+      if (Gr || HP<=-1000) {
+        AddPartic(5, X, Y, 32, 0, 15, 0xff00FF00, false);
         kill.append(SID);
-        for(int all=0;all<ListAi.size();all++){
-          try{
-            if(ListAi.get(all).getClass()==Class.forName("ProjectDFTEST$Maze")){
+        for (int all=0; all<ListAi.size(); all++) {
+          try {
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Maze")) {
               Maze tmp = (Maze)ListAi.get(all);
               tmp.Enraged=true;
-              ListAi.set(all,tmp);
+              ListAi.set(all, tmp);
             }
-            if(ListAi.get(all).getClass()==Class.forName("ProjectDFTEST$Laze")){
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Laze")) {
               Laze tmp = (Laze)ListAi.get(all);
               tmp.Enraged=true;
-              ListAi.set(all,tmp);
+              ListAi.set(all, tmp);
             }
-          }catch(Exception e){
-            
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Supply")) {
+              Supply tmp = (Supply)ListAi.get(all);
+              tmp.Enraged=true;
+              ListAi.set(all, tmp);
+            }
+          }
+          catch(Exception e) {
           }
         }
         return;
       }
       VY+=0.2f;
-    }else{
+    } else {
       Gr=false;
-      if(cooldown>200  && cooldown<350){
+      if (cooldown>200  && cooldown<350) {
         VX+=(play.X-X+cos(-(float)frameCount/20)*64)/10;
         VY+=(play.Y-Y+sin(-(float)frameCount/20)*64-200)/10;
         VX=VX/10*9;
         VY=VY/10*9;
-      }else{
+      } else {
         VX=0;
         VY=0;
       }
-      if(cooldown==200){
-        if(attack==0){
-          Tx=X;Ty=Y;
-        }
-        else{
-          LastPlayer = atan2(play.Y-Y,play.X-X);
+      if (cooldown==200) {
+        if (attack==0) {
+          Tx=X;
+          Ty=Y;
+        } else {
+          LastPlayer = atan2(play.Y-Y, play.X-X);
         }
       }
-      if(cooldown<200 && cooldown>80){
-        if(attack==0 || Enraged){
+      if (cooldown<200 && cooldown>80) {
+        if (attack==0 || Enraged) {
           Tx=(play.X+Tx)/2;
           Ty=(play.Y-12+Ty)/2;
-        }else{
-          float[] tmp=Enyscan(LastPlayer+PI/4,true,0,-H/2);
-          AddPartic(1,X,Y-H/2,tmp[0],tmp[1],2,color(100,0,0),true);
-                  tmp=Enyscan(LastPlayer-PI/4,true,0,-H/2);
-          AddPartic(1,X,Y-H/2,tmp[0],tmp[1],2,color(100,0,0),true);
+        } else {
+          float[] tmp=Enyscan(LastPlayer+PI/4, true, 0, -H/2);
+          AddPartic(1, X, Y-H/2, tmp[0], tmp[1], 2, color(100, 0, 0), true);
+          tmp=Enyscan(LastPlayer-PI/4, true, 0, -H/2);
+          AddPartic(1, X, Y-H/2, tmp[0], tmp[1], 2, color(100, 0, 0), true);
         }
       }
-      if(cooldown<80){
-        if(!Enraged){
-          if(attack==0){
-            if((cooldown+10)%20==0){
+      if (cooldown<80) {
+        if (!Enraged) {
+          if (attack==0) {
+            if ((cooldown+10)%20==0) {
               Tx=play.X;
               Ty=play.Y;
             }
-            if(cooldown%20==0){
-              float[] tmp=Enyhitscan(atan2(Ty-Y,Tx-X),25,true,0,-H/2);
-              AddPartic(1,X,Y-H/2,tmp[0],tmp[1],40,color(255,0,0),true);
+            if (cooldown%20==0) {
+              float[] tmp=Enyhitscan(atan2(Ty-Y, Tx-X), 25, true, 0, -H/2);
+              AddPartic(1, X, Y-H/2, tmp[0], tmp[1], 40, color(255, 0, 0), true);
             }
-          }else{
-            float[] tmp=Enyhitscan(LastPlayer+PI/4*((float)cooldown/80),15,true,0,-H/2);
-            AddPartic(1,X,Y-H/2,tmp[0],tmp[1],40,color(255,0,0),true);
-                    tmp=Enyhitscan(LastPlayer-PI/4*((float)cooldown/80),15,true,0,-H/2);
-            AddPartic(1,X,Y-H/2,tmp[0],tmp[1],40,color(255,0,0),true);
+          } else {
+            float[] tmp=Enyhitscan(LastPlayer+PI/4*((float)cooldown/80), 15, true, 0, -H/2);
+            AddPartic(1, X, Y-H/2, tmp[0], tmp[1], 40, color(255, 0, 0), true);
+            tmp=Enyhitscan(LastPlayer-PI/4*((float)cooldown/80), 15, true, 0, -H/2);
+            AddPartic(1, X, Y-H/2, tmp[0], tmp[1], 40, color(255, 0, 0), true);
           }
-        }else{
-          if(cooldown%8==0){
+        } else {
+          if (cooldown%8==0) {
             Tx=(play.X+Tx*2)/3;
             Ty=(play.Y-12+Ty*2)/3;
-            float[] tmp=Enyhitscan(atan2(Ty-Y,Tx-X),25,true,0,-H/2);
-            AddPartic(1,X,Y-H/2,tmp[0],tmp[1],40,color(255,0,0),true);
+            float[] tmp=Enyhitscan(atan2(Ty-Y, Tx-X), 25, true, 0, -H/2);
+            AddPartic(1, X, Y-H/2, tmp[0], tmp[1], 40, color(255, 0, 0), true);
           }
         }
       }
       cooldown--;
-      if(cooldown<0){cooldown=420;attack = (int)random(0,2);}
+      if (cooldown<0) {
+        cooldown=420;
+        attack = (int)random(0, 2);
+      }
     }
-    Cont(W,H,1);
-    Phys(W,H,false);
+    Cont(W, H, 1);
+    Phys(W, H, false);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
-    Animr.Anim(false,true);
-    if(!Enraged){
-      Animr.DIMG(X,Y,W,H,false,true,0xffFFFFFF);
-    }else{
-      Animr.DIMG(X,Y,W,H,false,true,0xffFFAAAA);
-      stroke(255,0,0);
+    Animr.Anim(false, true);
+    if (!Enraged) {
+      Animr.DIMG(X, Y, W, H, false, true, 0xffFFFFFF);
+    } else {
+      Animr.DIMG(X, Y, W, H, false, true, 0xffFFAAAA);
+      stroke(255, 0, 0);
       noFill();
-      circle(X+random(-2,2),Y-H/2+random(-2,2),36);
+      circle(X+random(-2, 2), Y-H/2+random(-2, 2), 36);
     }
-    if(cooldown<200 & (attack == 0 || Enraged)){
+    if (cooldown<200 & (attack == 0 || Enraged)) {
       stroke(0xffB703FF);
       noFill();
-      circle(Tx,Ty,16);
-      line(Tx-20,Ty,Tx+20,Ty);
-      line(Tx,Ty-20,Tx,Ty+20);
+      circle(Tx, Ty, 16);
+      line(Tx-20, Ty, Tx+20, Ty);
+      line(Tx, Ty-20, Tx, Ty+20);
+      stroke(0xffFF0000,100);
+      line(X,Y-H/2,Tx,Ty);
     }
   }
 }
 
-class Tower extends AI{
+class Tower extends AI {
   int cooldown=200;
-  Tower(float nX,float nY,boolean nM){
+  Tower(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -1045,95 +1088,108 @@ class Tower extends AI{
     H=48;
     HP=34;
     T=3;
-    Animr.ID=EAR.get("Tower");
+    Animr = new SelfAnim(EAR.get("Tower"));
   }
-  float Tx,Ty;
-  public void math(int SID){
-    if(HP<=0){kill.append(SID);return;}
-    Fall();
-      //Walk(0.3,0.5,6);
-      //Phys(W,H,true);
-      //Cont(W,H,35);
-    if(dist(X,Y,play.X,play.Y)<150){
-      Walk(-1,-1,1);
+  float Tx, Ty;
+  public void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
     }
-    Cont(W,H,45);
-    Phys(W,H,true);
-    if(cooldown==0){
-      float[] tmp=Enyhitscan(atan2(Ty-Y+12,Tx-X),25,true,0,-H/2);
-      AddPartic(1,X,Y-H+6,tmp[0],tmp[1],40,color(255,0,0),true);
+    Fall();
+    //Walk(0.3,0.5,6);
+    //Phys(W,H,true);
+    //Cont(W,H,35);
+    if (dist(X, Y, play.X, play.Y)<150) {
+      Walk(-1, -1, 1);
+    }
+    Cont(W, H, 45);
+    Phys(W, H, true);
+    if (cooldown==0) {
+      float[] tmp=Enyhitscan(atan2(Ty-Y+12, Tx-X), 25, true, 0, -H/2);
+      AddPartic(1, X, Y-H+6, tmp[0], tmp[1], 40, color(255, 0, 0), true);
       cooldown=200;
     }
-    if(cooldown>40 && cooldown<80){
-      float[] tmp=Enyscan(atan2(Ty-Y+12,Tx-X)+PI/8*(((float)cooldown-40)/40),true,0,-H/2);
-      AddPartic(1,X,Y-H+6,tmp[0],tmp[1],2,color(200,0,0),false);
-              tmp=Enyscan(atan2(Ty-Y+12,Tx-X)-PI/8*(((float)cooldown-40)/40),true,0,-H/2);
-      AddPartic(1,X,Y-H+6,tmp[0],tmp[1],2,color(200,0,0),false);
+    if (cooldown>40 && cooldown<80) {
+      float[] tmp=Enyscan(atan2(Ty-Y+12, Tx-X)+PI/8*(((float)cooldown-40)/40), true, 0, -H/2);
+      AddPartic(1, X, Y-H+6, tmp[0], tmp[1], 2, color(200, 0, 0), false);
+      tmp=Enyscan(atan2(Ty-Y+12, Tx-X)-PI/8*(((float)cooldown-40)/40), true, 0, -H/2);
+      AddPartic(1, X, Y-H+6, tmp[0], tmp[1], 2, color(200, 0, 0), false);
       Tx=play.X;
       Ty=play.Y;
     }
-    if(cooldown<80){
-      float[] tmp=Enyscan(atan2(Ty-Y+12,Tx-X),true,0,-H/2);
-      AddPartic(1,X,Y-H+6,tmp[0],tmp[1],2,color(100,0,0),true);
+    if (cooldown<80) {
+      float[] tmp=Enyscan(atan2(Ty-Y+12, Tx-X), true, 0, -H/2);
+      AddPartic(1, X, Y-H+6, tmp[0], tmp[1], 2, color(100, 0, 0), true);
     }
     cooldown--;
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
-    Animr.Anim(abs(VX)>2,false);
-    Animr.DIMG(X,Y,W,H,abs(VX)>2,false,0xffFFFFFF);
+    Animr.Anim(abs(VX)>2, false);
+    Animr.DIMG(X, Y, W, H, abs(VX)>2, false, 0xffFFFFFF);
   }
 }
 
-class Napalm extends AI{
-  Napalm(float nX,float nY,boolean nM){
+class Napalm extends AI {
+  Napalm(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
-    W=8;
-    H=16;
+    W=10;
+    H=20;
     HP=1;
-    Animr.ID=EAR.get("Tower");
+    Animr = new SelfAnim(EAR.get("Napalm"));
   }
-  public void math(int SID){
-    if(HP<=0){
-      for(int i=0;i<30;i++){
-        float R=random(-PI,0);
-        float P=random(2,10);
-        AddPartic(2,X,Y,cos(R)*P,sin(R)*P,40,color(0xffFF0000),false);
+  int dieng=0;
+  public void math(int SID) {
+    if (HP<=0 && dieng==0) {
+      Animr.Action(0);
+      dieng=1;
+    }
+    if (dieng>0) {
+      dieng++;
+      if (dieng==36) {
+        for (int i=0; i<30; i++) {
+          float T=random(5, 15);
+          float R=random(-PI, PI);
+          AddPartic(2, X, Y, cos(R)*T, sin(R)*T, 40, color(0xffFF0000), false);
+        }
+        for (int i=0; i<7; i++) {
+          //float T=random(5,15);
+          //float R=random(-PI,PI);
+          //NewPartic(new Line(X,Y-12,X+sin((i-4)*PI/12)*999,Y-cos((i-4)*PI/12)*999,40,color(#FF0000)),false);
+          NewPR(X, Y-12, sin((i-3)*PI/12)*3, -cos((i-3)*PI/12)*6, 4);
+        }
+        AddPartic(5, X, Y, 100, 0, 40, color(0xffFF0000), true);
+        kill.append(SID);
+        return;
       }
-      for(int i=0;i<9;i++){
-        float R=-PI*(PApplet.parseFloat(i)/8);
-        NewPR(X,Y-12,cos(R)*6,sin(R)*6,4);
-      }
-      AddPartic(5,X,Y,100,0,40,color(0xffFF0000),true);
-      kill.append(SID);
-      return;
     }
     Fall();
-    Phys(W,H,true);
+    Phys(W, H, true);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
-    Animr.Anim(abs(VX)>2,false);
-    Animr.DIMG(X,Y,W,H,abs(VX)>2,false,0xffFFFFFF);
+    Animr.Anim(false, false);
+    Animr.DIMG(X, Y, W, H, false, false, 0xffFFFFFF);
   }
 }
 
-class Spirit extends AI{
-  Spirit(float nX,float nY,boolean nM){
+class Spirit extends AI {
+  Spirit(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -1144,63 +1200,78 @@ class Spirit extends AI{
   int Cooldown=0;
   int Connected=0;
   boolean Con=false;
-  public void math(int SID){
-    if(HP<=0){
+  public void math(int SID) {
+    if (HP<=0) {
       kill.append(SID);
       return;
     }
-    if(Cooldown==0 & !Con){
-      int NUM=floor(random(0,ListAi.size()));
-      try{
-        if(!(ListAi.get(NUM).getClass()==Class.forName("ProjectDFTEST$Spirit")) && SID!=NUM){
+    if(!Con){hurte=true;}
+    if (Cooldown==0 & !Con) {
+      int NUM=floor(random(0, ListAi.size()));
+      try {
+        if (SID!=NUM && !(ListAi.get(NUM).getClass()==Class.forName("ProjectDF$Spirit"))) {
           Connected=NUM;
           Con=true;
           hurte=false;
           Cooldown=240;
         }
-      }catch(Exception e){}
+      }
+      catch(Exception e) {
+      }
     }
-    if(Cooldown>0 & !Con){
+    try {
+      if(ListAi.get(Connected).getClass()==Class.forName("ProjectDF$Spirit")){
+        Con=false;
+        hurte=true;
+      }
+    }catch(Exception e) {
+    }
+    if (Cooldown>0 & !Con) {
       Cooldown--;
     }
-    float R=atan2(Y-play.Y,X-play.X);
-    NewPR(X,Y-H/2,-cos(R),-sin(R),5);
-    if(dist(X,Y,play.X,play.Y)<150){
+    float R=atan2(Y-play.Y, X-play.X);
+    if(frameCount%2==0){
+      NewPR(X, Y-H/2, -cos(R), -sin(R), 5);
+    }
+    if (dist(X, Y, play.X, play.Y)<150) {
       VX+=cos(R);
       VY+=sin(R);
     }
-    if(dist(X,Y,play.X,play.Y)>350){
+    if (dist(X, Y, play.X, play.Y)>350) {
       VX-=cos(R);
       VY-=sin(R);
     }
-    VX=constrain(VX,-2,2);
-    VY=constrain(VY,-2,2);
+    VX=constrain(VX, -2, 2);
+    VY=constrain(VY, -2, 2);
     VY-=0.01f;
-    Phys(W,H,true);
+    Phys(W, H, true);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
+  public void render() {
     stroke(0xff00FFFF);
     fill(0xff00CCCC);
-    rect(X-W,Y-H,W*2,H);
-    if(Con){
-      try{
-      AI tmp = ListAi.get(Connected);
-      AddPartic(1,X,Y-H/2,tmp.X,tmp.Y,1,color(0xff00FFFF,100),true);
-      stroke(color(0xff00FFFF));
-      noFill();
-      quad(X-64,Y-H/2,X,Y-64-H/2,X+64,Y-H/2,X,Y+64-H/2);
-      }catch(Exception e){}
+    rect(X-W, Y-H, W*2, H);
+    if (Con) {
+      try {
+        AI tmp = ListAi.get(Connected);
+        AddPartic(1, X, Y-H/2, tmp.X, tmp.Y, 1, color(0xff00FFFF, 100), true);
+        stroke(color(0xff00FFFF));
+        noFill();
+        quad(X-64, Y-H/2, X, Y-64-H/2, X+64, Y-H/2, X, Y+64-H/2);
+      }
+      catch(Exception e) {
+        hurte=true;
+      }
     }
   }
 }
 
-class Guardian extends AI{
+class Guardian extends AI {
   int cooldown=360;
   int attack=0;
   int intro=240;
-  Guardian(float nX,float nY,boolean nM){
+  Guardian(float nX, float nY, boolean nM) {
     Bresistance=0;
     X=nX;
     Y=nY;
@@ -1210,90 +1281,91 @@ class Guardian extends AI{
     HP=5000;
     T=3;
     hurte=false;
-    Animr.ID=EAR.get("Guardian");
+    Animr = new SelfAnim(EAR.get("Guardian"));
   }
-  public void math(int SID){
-    if(intro>0 && HP>0){
+  public void math(int SID) {
+    if (intro>0 && HP>0) {
       intro--;
-      if(intro<120){
-        float R=random(-PI,PI);
-        float D=random(64,128);
-        NewPartic(new Wind(X-cos(R)*D,Y-H/2-sin(R)*D,cos(R)*D/10,sin(R)*D/10,10,0xffFFFFFF),true);
+      if (intro<120) {
+        float R=random(-PI, PI);
+        float D=random(64, 128);
+        NewPartic(new Wind(X-cos(R)*D, Y-H/2-sin(R)*D, cos(R)*D/10, sin(R)*D/10, 10, 0xffFFFFFF), true);
       }
     }
-    if(intro==1 && HP>0){
+    if (intro==1 && HP>0) {
       BOSSHP.append(HP);
       BOSSID.append(SID);
       hurte=true;
     }
-    if(HP<=0){
-      float R=random(-PI,PI);
-      float D=random(intro/3,intro);
-      NewPartic(new Wind(X,Y-H/2,cos(R)*D/3,sin(R)*D/3,10,0xffFFFFFF),true);
+    if (HP<=0) {
+      float R=random(-PI, PI);
+      float D=random(intro/3, intro);
+      NewPartic(new Wind(X, Y-H/2, cos(R)*D/3, sin(R)*D/3, 10, 0xffFFFFFF), true);
       intro++;
       cooldown=900;
-      if(intro>120){
-        NewPartic(new Explode(X,Y-H/2,128,0,60,0xffD80B0B),true);
-        NewPartic(new Explode(X,Y-H/2,128+64,0,60,0xffD8560B),true);
-        NewPartic(new Explode(X,Y-H/2,128+128,0,60,0xffD8C10B),true);
-        kill.append(SID);return;
+      if (intro>120) {
+        NewPartic(new Explode(X, Y-H/2, 128, 0, 60, 0xffD80B0B), true);
+        NewPartic(new Explode(X, Y-H/2, 128+64, 0, 60, 0xffD8560B), true);
+        NewPartic(new Explode(X, Y-H/2, 128+128, 0, 60, 0xffD8C10B), true);
+        kill.append(SID);
+        return;
       }
     }
     cooldown--;
-    if(cooldown<30 && attack==0){
-      float R = random(-PI/4,PI/4)-PI/2;
-      NewPR(X,Y-H/2,cos(R)*8,sin(R)*8,7);
+    if (cooldown<30 && attack==0) {
+      float R = random(-PI/4, PI/4)-PI/2;
+      NewPR(X, Y-H/2, cos(R)*8, sin(R)*8, 7);
     }
-    if(cooldown%120==0 && attack==1){
-      NewPR(X,Y,8,0,6);
-      NewPR(X,Y,-8,0,6);
+    if (cooldown%120==0 && attack==1) {
+      NewPR(X, Y, 8, 0, 6);
+      NewPR(X, Y, -8, 0, 6);
     }
-    if(cooldown==0 && attack==2){
-      NewPR(X,Y-H/2,0,0,8);
+    if (cooldown==0 && attack==2) {
+      NewPR(X, Y-H/2, 0, 0, 8);
     }
-    if(cooldown==0 && attack==3){
-      for(int i=0;i<10;i++){
-        NewPR(X,Y-H/2,i*PI/5,0,9);
+    if (cooldown==0 && attack==3) {
+      for (int i=0; i<10; i++) {
+        NewPR(X, Y-H/2, i*PI/5, 0, 9);
       }
     }
-    if(cooldown==0){
-      attack=floor(random(0,4));
+    if (cooldown==0) {
+      attack=floor(random(0, 4));
       cooldown=120;
     }
     Fall();
-    Phys(W,H,true);
+    Phys(W, H, true);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
-    Animr.Anim(false,false);
-    Animr.DIMG(X,Y,W,H,false,false,0xffFFFFFF);
-    if(attack == 0){
+    Animr.Anim(false, false);
+    Animr.DIMG(X, Y, W, H, false, false, 0xffFFFFFF);
+    if (attack == 0) {
       fill(255);
     }
-    if(attack == 1){
+    if (attack == 1) {
       fill(0xffFFA600);
     }
-    if(attack == 2){
+    if (attack == 2) {
       fill(0xffFF0000);
     }
-    if(attack == 3){
+    if (attack == 3) {
       fill(0xff00C5FF);
     }
-    circle(X,Y-H/2,max(0,map(intro,0,120,64,0)));
+    circle(X, Y-H/2, max(0, map(intro, 0, 120, 64, 0)));
   }
 }
 
-class Crab extends AI{
+class Crab extends AI {
   int cooldown=400;
   float PX=0;
   float PY=0;
-  Crab(float nX,float nY,boolean nM){
+  Crab(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -1301,48 +1373,49 @@ class Crab extends AI{
     H=48;//1600
     HP=1000;
     T=3;
-    Animr.ID=EAR.get("Crab");
+    Animr = new SelfAnim(EAR.get("Crab"));
   }
-  public void math(int SID){
-    if(HP<=0){
-      kill.append(SID);return;
+  public void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
     }
     cooldown--;
-    if(cooldown==0){
+    if (cooldown==0) {
       cooldown=400;
-      expd(PX,PY,128,30,20,true);
-      NewPartic(new Line(X,Y,X,Y-2000,60,0xffe8ff00),false);
-      NewPartic(new Line(PX,PY,PX,PY-2000,60,0xffe8ff00),false);
+      expd(PX, PY, 128, 30, 20, true);
+      NewPartic(new Line(X, Y, X, Y-2000, 60, 0xffe8ff00, 5), false);
+      NewPartic(new Line(PX, PY, PX, PY-2000, 60, 0xffe8ff00, 5), false);
     }
     Fall();
-    if(dist(X,Y,play.X,play.Y)<128){
-      Walk(0.0f,-0.6f,0.0f);
+    if (dist(X, Y, play.X, play.Y)<128) {
+      Walk(0.0f, -0.6f, 0.0f);
     }
-    Cont(W,H,15);
-    Phys(W,H,true);
+    Cont(W, H, 15);
+    Phys(W, H, true);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
     pushMatrix();
-    if(VX<0){
-      scale(-1,1);
-      translate(-X*2,0);
+    if (VX<0) {
+      scale(-1, 1);
+      translate(-X*2, 0);
     }
-    Animr.Anim(abs(VX)>0.3f,false);
-    Animr.DIMG(X,Y,W,H,abs(VX)>0.3f,false,0xffFFFFFF);
+    Animr.Anim(abs(VX)>0.3f, false);
+    Animr.DIMG(X, Y, W, H, abs(VX)>0.3f, false, 0xffFFFFFF);
     popMatrix();
-    if(cooldown<255){
-      stroke(0xffe8ff00,255-cooldown);
+    if (cooldown<255) {
+      stroke(0xffe8ff00, 255-cooldown);
       strokeWeight((255-cooldown)/25.5f);
-      line(X,Y,X,Y-2000);
-      line(PX,PY,PX,PY-2000);
-      if(cooldown>=30){
+      line(X, Y, X, Y-2000);
+      line(PX, PY, PX, PY-2000);
+      if (cooldown>=30) {
         PX=play.X;
         PY=play.Y;
       }
@@ -1351,10 +1424,10 @@ class Crab extends AI{
   }
 }
 
-class Piller extends AI{
+class Piller extends AI {
   boolean Enranged=false;
   int AngyTimer = 300;
-  Piller(float nX,float nY,boolean nM){
+  Piller(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -1362,63 +1435,73 @@ class Piller extends AI{
     H=30;
     HP=200;
     T=0;
-    Animr.ID=EAR.get("Bug");
+    Animr = new SelfAnim(EAR.get("Piller"));
   }
-  public void math(int SID){
-      if(HP<=0){kill.append(SID);return;}
-      if(play.Gr){
-        if(AngyTimer<300){
+  public void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    if (!Enranged) {
+      if (play.Gr) {
+        if (AngyTimer<300) {
           AngyTimer+=3;
         }
-      }else{
+      } else {
         AngyTimer--;
       }
-      if(AngyTimer<=0){
+      if (AngyTimer<=0) {
         Enranged=true;
+        AngyTimer=100;
       }
-      if(Enranged){
-        float R=atan2(play.Y-Y-5,play.X-X);
-        for(int i=0;i<3;i++){
-          float Rand1=random(-PI/10,PI/10);
-          float Rand2=random(-2,2);
-          NewPR(X,Y-5,cos(R+Rand1)*(12+Rand2),sin(R+Rand1)*(12+Rand2),11);
+    }
+    if (Enranged) {
+      if (AngyTimer<=0) {
+        float R=atan2(play.Y-Y-5, play.X-X);
+        for (int i=0; i<3; i++) {
+          float Rand1=random(-PI/10, PI/10);
+          float Rand2=random(-2, 2);
+          NewPR(X, Y-8, cos(R+Rand1)*(12+Rand2), sin(R+Rand1)*(12+Rand2), 11);
         }
+        AngyTimer=100;
       }
-      Walk(0.5f,0.7f,3);
-      Cont(W,H,35);
-      Phys(W,H,true);
-      X+=VX;
-      Y+=VY;
+      AngyTimer--;
+    }
+    Walk(0.5f, 0.7f, 3);
+    Cont(W, H, 35);
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
       fill(0);
-      text(AngyTimer,X,Y+30);
+      text(AngyTimer, X, Y+30);
     }
-      pushMatrix();
-      if(VX>0){
-        scale(-1,1);
-        translate(-X*2,0);
-      }
-       Animr.Anim(true,OG>3);
-      if(Enranged){
-        Animr.DIMG(X,Y,W,H,true,OG>3,0xffFFAAAA);
-        stroke(255,0,0);
-        noFill();
-        circle(X+random(-2,2),Y-H/2+random(-2,2),60);
-      }else{
-        Animr.DIMG(X,Y,W,H,true,OG>3,0xffFFFFFF);
-      }
-      popMatrix();
+    pushMatrix();
+    if (VX>0) {
+      scale(-1, 1);
+      translate(-X*2, 0);
+    }
+    Animr.Anim(true, false);
+    if (Enranged) {
+      Animr.DIMG(X, Y, W, H, true, false, 0xffFFAAAA);
+      stroke(255, 0, 0);
+      noFill();
+      circle(X+random(-2, 2), Y-H/2+random(-2, 2), 60);
+    } else {
+      Animr.DIMG(X, Y, W, H, true, false, 0xffFFFFFF);
+    }
+    popMatrix();
   }
 }
 
-class Nucliy extends AI{
+class Nucliy extends AI {
   //oh boy
-  Nucliy(float nX,float nY,boolean nM){
+  Nucliy(float nX, float nY, boolean nM) {
     X=nX;
     Y=nY;
     M=nM;
@@ -1427,25 +1510,365 @@ class Nucliy extends AI{
     HP=90;
   }
   int Cooldown=0;
-  public void math(int SID){
-    if(HP<=0){
+  public void math(int SID) {
+    if (HP<=0) {
       kill.append(SID);
       return;
     }
-    Phys(W,H,true);
+    Phys(W, H, true);
     X+=VX;
     Y+=VY;
   }
-  public void render(){
-    if(DebugDraw){
+  public void render() {
+    if (DebugDraw) {
       stroke(0);
       fill(255);
-      rect(X-W,Y-H,W*2,H);
+      rect(X-W, Y-H, W*2, H);
     }
   }
 }
 
-class AI{
+class Supply extends AI {
+  Supply(float nX, float nY, boolean nM, boolean Boss) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=36;
+    H=36;
+    if (Boss) {
+      HP=1900;
+      W=48;
+      H=48;
+      BOSSHP.append(HP);
+      BOSSID.append(ListAi.size());
+    } else {
+      HP=260;
+    }
+    Animr = new SelfAnim(EAR.get("Supply"));
+  }
+  boolean Enraged=false;
+  int delay=300;
+  int gun1mode=0;
+  int gun1timer=0;
+  int gun2mode=0;
+  int gun2timer=0;
+  public void math(int SID) {
+    if (HP<=0) {
+      if (Gr || HP<=-1000) {
+        AddPartic(5, X, Y, 32, 0, 15, 0xff00FF00, false);
+        kill.append(SID);
+        for (int all=0; all<ListAi.size(); all++) {
+          try {
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Maze")) {
+              Maze tmp = (Maze)ListAi.get(all);
+              tmp.Enraged=true;
+              ListAi.set(all, tmp);
+            }
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Laze")) {
+              Laze tmp = (Laze)ListAi.get(all);
+              tmp.Enraged=true;
+              ListAi.set(all, tmp);
+            }
+            if (ListAi.get(all).getClass()==Class.forName("ProjectDF$Supply")) {
+              Supply tmp = (Supply)ListAi.get(all);
+              tmp.Enraged=true;
+              ListAi.set(all, tmp);
+            }
+          }
+          catch(Exception e) {
+          }
+        }
+        return;
+      }
+      VY+=0.2f;
+    } else {
+      //GUN1
+      if (gun1mode==0) {
+        if (gun1timer>0) {
+          if (gun1timer>10) {
+            R1=atan2(play.Y-Y+H/3*2, play.X-X-W/3);
+            float[] tmp=Enyscan(R1, true, +W/3, -H/3*2);
+            AddPartic(1, X+W/3, Y-H/3*2, tmp[0], tmp[1], 2, color(255, 0, 0), true);
+            tmp=Enyscan(R1+(gun1timer-10)/200.0f, true, +H/3, -H/3*2);
+            AddPartic(1, X+W/3, Y-H/3*2, tmp[0], tmp[1], 2, color(255, 0, 0), true);
+            tmp=Enyscan(R1-(gun1timer-10)/200.0f, true, +H/3, -H/3*2);
+            AddPartic(1, X+W/3, Y-H/3*2, tmp[0], tmp[1], 2, color(255, 0, 0), true);
+          }
+        }
+        if (gun1timer==0) {
+          float[] tmp=Enyhitscan(R1, 0, true, +W/3, -H/3*2);
+          AddPartic(1, X+W/3, Y-H/3*2, tmp[0], tmp[1], 40, color(255, 0, 0), true);
+        }
+      }
+      if (gun1mode==1) {
+        R1=atan2(play.Y-Y+H/3*2, play.X-X-W/3);
+        if (gun1timer%100==0) {
+          NewSPr(new MiniRocket(X+W/3, Y-H/3*2, cos(R1)*2, sin(R1)*2, 0));
+          NewSPr(new MiniRocket(X+W/3, Y-H/3*2, cos(R1)*4, sin(R1)*4, 0));
+        }
+      }
+      if (gun1mode==2) {
+        R1=atan2(play.Y-Y+H/3*2, play.X-X-W/3);
+        if (gun1timer%20==0) {
+          NewSPr(new MiniBullet(X+W/3, Y-H/3*2, cos(R1)*4, sin(R1)*4, 0));
+        }
+      }
+      if (gun1timer==0) {
+        gun1timer=300;
+        gun1mode=round(random(0, 2));
+      }
+      gun1timer--;
+      //GUN2
+      if (gun2mode==0) {
+        if (gun2timer>0) {
+          if (gun2timer>10) {
+            R1=atan2(play.Y-Y+H/3*2, play.X-X+W/3);
+            float[] tmp=Enyscan(R1, true, -W/3, -H/3*2);
+            AddPartic(1, X-W/3, Y-H/3*2, tmp[0], tmp[1], 2, color(255, 0, 0), true);
+            tmp=Enyscan(R1+(gun1timer-10)/200.0f, true, -W/3, -H/3*2);
+            AddPartic(1, X-W/3, Y-H/3*2, tmp[0], tmp[1], 2, color(255, 0, 0), true);
+            tmp=Enyscan(R1-(gun1timer-10)/200.0f, true, -W/3, -H/3*2);
+            AddPartic(1, X-W/3, Y-H/3*2, tmp[0], tmp[1], 2, color(255, 0, 0), true);
+          }
+        }
+        if (gun2timer==0) {
+          float[] tmp=Enyhitscan(R1, 0, true, -W/3, -H/3*2);
+          AddPartic(1, X-W/3, Y-H/3*2, tmp[0], tmp[1], 40, color(255, 0, 0), true);
+        }
+      }
+      if (gun2mode==1) {
+        R1=atan2(play.Y-Y+H/3*2, play.X-X+W/3);
+        if (gun2timer%100==0) {
+          NewSPr(new MiniRocket(X-W/3, Y-H/3*2, cos(R1)*2, sin(R1)*2, 0));
+          NewSPr(new MiniRocket(X-W/3, Y-H/3*2, cos(R1)*4, sin(R1)*4, 0));
+        }
+      }
+      if (gun2mode==2) {
+        R1=atan2(play.Y-Y+H/3*2, play.X-X+W/3);
+        if (gun2timer%20==0) {
+          NewSPr(new MiniBullet(X-W/3, Y-H/3*2, cos(R1)*4, sin(R1)*4, 0));
+        }
+      }
+      if (gun2timer==0) {
+        gun2timer=300;
+        gun2mode=round(random(0, 2));
+      }
+      gun2timer--;
+
+
+      VX+=(play.X-X+cos((float)frameCount/40)*128)/10;
+      VY+=(play.Y-Y+sin((float)frameCount/40)*32-200)/10;
+      VX=VX/10*9;
+      VY=VY/10*9;
+      if (delay==0) {
+        Animr.Action(0);
+        Must++;
+        NewAI(X, Y, SupplySummon[floor(constrain(abs(randomGaussian()), 0, 2)*2.5f)], true);
+        for (int t=0; t<20; t++) {
+          AddPartic(3, X, Y, random(-4, 4), random(-4, 4), 120, color(200, 0, 200), true);
+        }
+        delay=201;
+      }
+      delay--;
+    }
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
+  }
+  float R1=0;
+  public void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+      Animr.Anim(false, true);
+      Animr.DIMG(X, Y, W, H, false, true, 0xffFFFFFF);
+      Animr.EIMG(X+H/3, Y-H/3*2, 16, 16, R1, gun1mode, 0xffFFFFFF);
+      Animr.EIMG(X-H/3, Y-H/3*2, 16, 16, R1, gun2mode, 0xffFFFFFF);
+    }
+  }
+}
+
+class Electron extends AI {
+  Electron(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=24;
+    H=48;
+    HP=6000;
+    BOSSHP.append(HP);
+    BOSSID.append(ListAi.size());
+    Animr = new SelfAnim(EAR.get("Electron"));
+    for (int i=0; i<16; i++) {
+      NewPartic(new Wind(X, Y-H/2, random(-15, 15), random(-15, 15), 120, 0xffFFFFFF), true);
+    }
+  }
+  int Cooldown=300;
+  int Shield=1000;
+  boolean downed=false;
+  int attack=0;
+  float attacking=0;
+  public void math(int SID) {
+    println(Gr);
+    if (HP<=0) {
+      NewPartic(new Explode(X, Y-H/2, 150, 0, 40, 0xffEA0C13), true);
+      NewPartic(new Explode(X, Y-H/2, 300, 0, 40, 0xffEA0C13), true);
+      for (int i=0; i<16; i++) {
+        NewPartic(new Wind(X, Y-H/2, random(-15, 15), random(-15, 15), 120, 0xffFFFFFF), true);
+      }
+      kill.append(SID);
+      return;
+    }else{
+    if (Shield<=0) {
+      NewPartic(new Explode(X, Y-H/2, 100, 0, 40, 0xffEA0C13), true);
+      for (int i=0; i<4; i++) {
+        NewPartic(new Smoke(X, Y-H/2, random(-5, 5), random(-5, 5), 40, 0xff393030, -0.5f), true);
+      }
+      downed=true;
+      Shield=0;
+    }
+    if (downed) {
+      if (Shield==1000) {
+        downed=false;
+        Cooldown=50;
+        attacking=0;
+      }
+      Shield+=2;
+      VY+=0.5f;
+    } else {
+      if (Cooldown==0 && attacking<=0) {
+        attacking=300;
+        //attack=round(random(0, 3));
+      }
+      if (attacking>0) {
+        if (attack==0) {
+          if (attacking%30==0) {
+            for (int i=0; i<8; i++) {
+              //NewSPr(new SEletro(X,Y,3,PI/200,400,0,i*PI/4+attacking/20.0));//HARD
+              //NewSPr(new SEletro(X,Y,3,-PI/200,400,0,i*PI/4-attacking/20.0));//HARD
+              //NewSPr(new SEletro(X,Y,6,PI/200,400,0,i*PI/4+attacking/20.0));//HARD
+              //NewSPr(new SEletro(X,Y,6,-PI/200,400,0,i*PI/4-attacking/20.0));//HARD
+              NewSPr(new SEletro(X, Y-H/2, 3, PI/400, 400, 0, i*PI/4+attacking/15.0f));
+            }
+          }
+          if ((attacking-15)%30==0) {
+            for (int i=0; i<8; i++) {
+              NewSPr(new SEletro(X, Y-H/2, 3, -PI/400, 400, 0, i*PI/4+attacking/15.0f));
+            }
+          }
+        }
+        if (attack==1) {
+          if (attacking%30==0) {
+            for (int i=0; i<1; i++) {
+              //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
+              //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
+              //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
+              //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
+              if(random(0,1)<0.5f){
+              NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/2));
+              NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, 0));
+              }else{
+              NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/4));
+              NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/4*3));
+              }
+            }
+          }
+        }
+        if (attack==2) {
+          //if (attacking%5==0) {
+          //  for (int i=0; i<3; i++) {
+          //    NewSPr(new SEletro(X, Y-H/2, -6, random(-PI/400, PI/400), 400, 1200, random(-PI, PI)));
+          //  }
+          //}
+          //if (attacking%25==0) {
+          //    NewSPr(new Bross(play.X+random(-200,200),play.Y-12+random(-200,200),random(-2,2),random(-2,2),60,round(random(0,7))*PI/8));//HARD
+          //}
+          if (attacking%5==0) {
+            for (int i=0; i<2; i++) {
+              NewSPr(new SEletro(X, Y-H/2, -6, random(-PI/400, PI/400), 400, 1200, random(-PI, PI)));
+            }
+          }
+        }
+        if (attack==3) {
+          if (attacking%30==0) {//TRUE 20
+            for (int i=0; i<4; i++) {
+              //NewSPr(new Bross(play.X+random(-200,200),play.Y-12+random(-200,200),random(-2,2),random(-2,2),60,round(random(0,7))*PI/8));//HARD
+              NewSPr(new Bross(play.X+random(-400, 400), play.Y-12+random(-400, 400), 0, 0, 60, round(random(0, 3))*PI/4));
+            }
+          }
+        }
+        attacking--;
+        if (attacking<=0) {
+          Cooldown=300;
+          attack++;
+          if(attack==4){attack=0;}
+        }
+      } else {
+        Cooldown--;
+      }
+      VX+=(0-X)/10;
+      VY+=(-500-Y)/10;
+      VX=VX/10*9;
+      VY=VY/10*9;
+    }
+    }
+    Phys(W, H, false);
+    X+=VX;
+    Y+=VY;
+  }
+  public void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    Animr.Anim(false, !downed);
+    Animr.DIMG(X, Y, W, H, false, !downed, 0xffFFFFFF);
+    if(!downed){
+      for(int i=0;i<4;i++){
+        Animr.EIMG(X+cos(frameCount/60.0f+PI/2*i)*50, Y+sin(frameCount/60.0f+PI/2*i)*50-H/2, 21, 21, 0, attack, 0xffFFFFFF);
+      }
+    }
+    noStroke();
+    fill(0xff7ECCF0, 75);
+    circle(X, Y-H/2, 100);
+    arc(X, Y-H/2, 100,100,-PI/2,PI*Shield/500-PI/2);
+  }
+  public void HURT(int dmg)
+  {
+    if (!hurte) {
+      return;
+    }
+    if (downed) {
+      HP-=dmg;
+      for (int B=0; B<5; B++) {
+        AddPartic(4, X, Y, random(-1, 1), random(-8, -2), 50, color(255, 0, 0), true);
+      }
+      if (play.regenera==0) {
+        if (dist(X, Y, play.X, play.Y)<=200 && play.HP>0) {
+          AddPartic(1, play.X+random(-5, 5), play.Y-12+random(-5, 5), X+random(-5, 5), Y-H/2+random(-5, 5), 60, color(255, 0, 0), true);
+          if (play.HP+dmg/4>100) {
+            play.HP=100;
+          } else {
+            play.HP+=dmg/4;
+          }
+        }
+      } else {
+        if (random(1, 100)<50 && play.HP>0) {
+          NewPR(X, Y-H/2, random(-5, 5), random(-5, 5), 10);
+        }
+      }
+    } else {
+      Shield-=dmg;
+      for (int B=0; B<5; B++) {
+        AddPartic(4, X, Y, random(-8, 8), random(-8, 8), 50, 0xff7ECCF0, true);
+      }
+    }
+  }
+}
+
+class AI {
   float Bresistance=1;
   float X;
   float Y;
@@ -1457,119 +1880,150 @@ class AI{
   int HP;
   boolean Gr;
   boolean M;
-  SelfAnim Animr = new SelfAnim();
+  SelfAnim Animr;
+  ;
   int OG=0;
   boolean Ignore;
   boolean hurte=true;
   //AI(float nX,float nY,boolean nM){
   //}
-  public void math(int SID){
+  public void math(int SID) {
   }
-  public void render(){
+  public void render() {
   }
-  public void Cont(float W,float H,int dmg){
-    if(X-W<=play.X+6 && X+W>=play.X-6 && Y>=play.Y-24 && Y-H<=play.Y && play.IV==0 && play.HP>0){
+  public void Cont(float W, float H, int dmg) {
+    if (X-W<=play.X+6 && X+W>=play.X-6 && Y>=play.Y-24 && Y-H<=play.Y && play.IV==0 && play.HP>0) {
       AThurt(dmg);
-      if(X<=play.X){
+      if (X<=play.X) {
         VX-=5;
-      }else{
+      } else {
         VX+=5;
       }
     }
   }
-  public void Fall(){
-    if(Gr==false){
-      if(VY<20){VY+=0.5f;}
+  public void Fall() {
+    if (Gr==false) {
+      if (VY<20) {
+        VY+=0.5f;
+      }
       OG++;
-    }else{
+    } else {
       VX/=2;
       OG=0;
     }
     Gr=false;
   }
-  public void Walk(float GS,float AS,float JF){
-    if(Gr==false){
-      if(VY<20){VY+=0.5f;}
-      if(play.X<X && VX>-7){VX-=AS;}
-      if(play.X>X && VX<7 ){VX+=AS;}
+  public void Walk(float GS, float AS, float JF) {
+    if (Gr==false) {
+      if (VY<20) {
+        VY+=0.5f;
+      }
+      if (play.X<X && VX>-7) {
+        VX-=AS;
+      }
+      if (play.X>X && VX<7 ) {
+        VX+=AS;
+      }
       OG++;
-    }else{
-      if(play.Y+10<Y && random(0,100)<5){VY-=JF;}
-      if(play.X<X && VX>-7){VX-=GS;}
-      if(play.X>X && VX< 7){VX+=GS;}
-      if(play.Y>Y){Ignore=true;}
+    } else {
+      if (play.Y+10<Y && random(0, 100)<5) {
+        VY-=JF;
+      }
+      if (play.X<X && VX>-7) {
+        VX-=GS;
+      }
+      if (play.X>X && VX< 7) {
+        VX+=GS;
+      }
+      if (play.Y>Y) {
+        Ignore=true;
+      }
       OG=0;
     }
     Gr=false;
   }
-  public void Phys(float W,float H,boolean C){
-    SPHYS(X-W,Y  ,X-W+VX+0.01f,Y+VY-0.01f,C);
-    SPHYS(X+W,Y  ,X+W+VX-0.01f,Y+VY-0.01f,C);
-    SPHYS(X-W,Y-H,X-W+VX+0.01f,Y-H+VY+0.01f,C);
-    SPHYS(X+W,Y-H,X+W+VX-0.01f,Y-H+VY+0.01f,C);
-    if(true){
-      if(Ignore & C){Checkfor();}
-      if(sphys(X-W+VX,Y+VY,X+W+VX,Y+VY) | sphys(X-W+VX,Y-H+VY,X+W+VX,Y-H+VY)){VY=0;}
-      if(sphys(X-W+VX,Y+VY,X-W+VX,Y-H+VY) | sphys(X+W+VX,Y+VY,X+W+VX,Y-H+VY)){VX=0;}
+  public void Phys(float W, float H, boolean C) {
+    SPHYS(X-W+0.01f, Y-0.01f, X-W+VX, Y+VY, C);
+    SPHYS(X+W-0.01f, Y-0.01f, X+W+VX, Y+VY, C);
+    SPHYS(X-W+0.01f, Y-H+0.01f, X-W+VX, Y-H+VY, C);
+    SPHYS(X+W-0.01f, Y-H+0.01f, X+W+VX, Y-H+VY, C);
+    if (true) {
+      if (Ignore & C) {
+        Checkfor();
+      }
+      if (sphys(X-W+VX, Y+VY, X+W+VX, Y+VY) | sphys(X-W+VX, Y-H+VY, X+W+VX, Y-H+VY)) {
+        VY=0;
+      }
+      if (sphys(X-W+VX, Y+VY, X-W+VX, Y-H+VY) | sphys(X+W+VX, Y+VY, X+W+VX, Y-H+VY)) {
+        VX=0;
+      }
     }
   }
-  public void SPHYS(float T1,float T2,float T3,float T4,boolean C){
+  public void SPHYS(float T1, float T2, float T3, float T4, boolean C) {
     float[] T;
-    T=coll(T1,T2,T3,T4,Ignore || !C);
-    if(T[0]>=0 && T[0]<=1){
+    T=coll(T1, T2, T3, T4, Ignore || !C);
+    if (T[0]>=0 && T[0]<=1) {
       int i = (int)T[2];
-      PVector TOplayer=new PVector(play.X-(CSX[i]+CEX[i])/2,play.Y-12-(CSY[i]+CEY[i])/2);
-      PVector Normal=new PVector((CSX[i]-CEX[i]),(CSY[i]-CEY[i]));
-      if(CSX[i]>CEX[i]){Normal.rotate(-PI/2);}else{Normal.rotate(PI/2);}
-      if(Normal.dot(TOplayer)<0 && CT[i]==1){
+      PVector TOplayer=new PVector(play.X-(CSX[i]+CEX[i])/2, play.Y-12-(CSY[i]+CEY[i])/2);
+      PVector Normal=new PVector((CSX[i]-CEX[i]), (CSY[i]-CEY[i]));
+      if (CSX[i]>CEX[i]) {
+        Normal.rotate(-PI/2);
+      } else {
+        Normal.rotate(PI/2);
+      }
+      if (Normal.dot(TOplayer)<0 && CT[i]==1) {
         Ignore=true;
       }
       //float R=atan2(CSY[(int)T[2]]-CEY[(int)T[2]],CSX[(int)T[2]]-CEX[(int)T[2]]);
-      float R=atan2(CSY[i]-CEY[i],CSX[i]-CEX[i]);
+      float R=atan2(CSY[i]-CEY[i], CSX[i]-CEX[i]);
       float NV = VX * cos(R) + VY * sin(R);
       VX = cos(R) * NV * 0.99f;
       VY = sin(R) * NV * 0.99f;
       //float ISB=atan2(Y-H/2-(CSY[(int)T[2]]+CEY[(int)T[2]])/2,X-(CSX[(int)T[2]]+CEX[(int)T[2]])/2);
-      R=atan2(CSY[i]-CEY[i],CSX[i]-CEX[i]);
-      if(R<0){R+=PI;}
-      if(Normal.dot(TOplayer)>0 && R>-PI/4){//its a feature fuck it
+      R=atan2(CSY[i]-CEY[i], CSX[i]-CEX[i]);
+      if (R<0) {
+        R+=PI;
+      }
+      if (Normal.dot(TOplayer)>0 && R>-PI/4) {//its a feature fuck it
         Gr=true;
       }
       //Gr=true;
     }
   }
-  public boolean sphys(float T1,float T2,float T3,float T4){
+  public boolean sphys(float T1, float T2, float T3, float T4) {
     float[] T;
-    T=coll(T1,T2,T3,T4,Ignore);
-    if(T[0]>0 && T[0]<1){
+    T=coll(T1, T2, T3, T4, Ignore);
+    if (T[0]>0 && T[0]<1) {
       return true;
     }
     return false;
   }
   public void HURT(int dmg)
   {
-    if(!hurte){return;}
-    HP-=dmg;
-    for(int B=0;B<5;B++){
-      AddPartic(4,X,Y,random(-1,1),random(-8,-2),50,color(255,0,0),true);
+    if (!hurte) {
+      return;
     }
-    if(play.regenera==0){
-      if(dist(X,Y,play.X,play.Y)<=200 && play.HP>0){
-        AddPartic(1,play.X+random(-5,5),play.Y-12+random(-5,5),X+random(-5,5),Y-H/2+random(-5,5),60,color(255,0,0),true);
-        if(play.HP+dmg/4>100){
+    HP-=dmg;
+    for (int B=0; B<5; B++) {
+      AddPartic(4, X, Y, random(-1, 1), random(-8, -2), 50, color(255, 0, 0), true);
+    }
+    if (play.regenera==0) {
+      if (dist(X, Y, play.X, play.Y)<=200 && play.HP>0) {
+        AddPartic(1, play.X+random(-5, 5), play.Y-12+random(-5, 5), X+random(-5, 5), Y-H/2+random(-5, 5), 60, color(255, 0, 0), true);
+        if (play.HP+dmg/4>100) {
           play.HP=100;
-        }else{
+        } else {
           play.HP+=dmg/4;
         }
       }
-    }else{
-      if(random(1,100)<50 && play.HP>0){
-        NewPR(X,Y-H/2,random(-5,5),random(-5,5),10);
+    } else {
+      if (random(1, 100)<50 && play.HP>0) {
+        NewPR(X, Y-H/2, random(-5, 5), random(-5, 5), 10);
       }
     }
   }
 
-  public float[] Enyhitscan(float R, int dmg,boolean lazer,float Offx,float Offy) {
+  public float[] Enyhitscan(float R, int dmg, boolean lazer, float Offx, float Offy) {
     float MT=9999;
     int T=-1;
     float OX=X+Offx;
@@ -1594,18 +2048,18 @@ class AI{
       float T2 = TLineToLine(X+Offx, Y+Offy, X+Offx+cos(R), Y+Offy+sin(R), play.X+6, play.Y-24, play.X-6, play.Y);
       if (min(T1, T2)>0 && min(T1, T2)<MT) {
         AThurt(dmg);
-        if(!lazer){
+        if (!lazer) {
           MT=min(MT, min(T1, T2));
           float[] tmp = {play.X+cos(R)*MT, play.Y-12+sin(R)*MT};
           return tmp;
         }
       }
     }
-    float[] tmp = {X+Offx+cos(R)*MT,Y+Offy+sin(R)*MT};
+    float[] tmp = {X+Offx+cos(R)*MT, Y+Offy+sin(R)*MT};
     return tmp;
   }
 
-  public float[] Enyscan(float R,boolean lazer,float Offx,float Offy) {
+  public float[] Enyscan(float R, boolean lazer, float Offx, float Offy) {
     float MT=9999;
     int T=-1;
     float OX=X+Offx;
@@ -1629,112 +2083,124 @@ class AI{
       float T1 = TLineToLine(X+Offx, Y+Offy, X+Offx+cos(R), Y+Offy+sin(R), play.X-6, play.Y-24, play.X+6, play.Y);
       float T2 = TLineToLine(X+Offx, Y+Offy, X+Offx+cos(R), Y+Offy+sin(R), play.X+6, play.Y-24, play.X-6, play.Y);
       if (min(T1, T2)>0 && min(T1, T2)<MT) {
-        if(!lazer){
+        if (!lazer) {
           MT=min(MT, min(T1, T2));
           float[] tmp = {play.X+cos(R)*MT, play.Y-12+sin(R)*MT};
           return tmp;
         }
       }
     }
-    float[] tmp = {X+Offx+cos(R)*MT,Y+Offy+sin(R)*MT};
+    float[] tmp = {X+Offx+cos(R)*MT, Y+Offy+sin(R)*MT};
     return tmp;
   }
-  public void Checkfor(){//find better sulucion
+  public void Checkfor() {//find better sulucion
     int buffer=3;
-    if(!(Checkforsub(X-W/2,Y+buffer,X-W/2,Y-H-buffer)||
-    Checkforsub(X+W/2,Y+buffer,X+W/2,Y-H-buffer)||
-    Checkforsub(X-W/2-buffer,Y,X+W/2+buffer,Y)||
-    Checkforsub(X-W/2+buffer,Y-H,X+W/2+buffer,Y-H))){
+    if (!(Checkforsub(X-W/2, Y+buffer, X-W/2, Y-H-buffer)||
+      Checkforsub(X+W/2, Y+buffer, X+W/2, Y-H-buffer)||
+      Checkforsub(X-W/2-buffer, Y, X+W/2+buffer, Y)||
+      Checkforsub(X-W/2+buffer, Y-H, X+W/2+buffer, Y-H))) {
       Ignore=false;
     }
   }
-  public boolean Checkforsub(float SX,float SY,float EX,float EY){
-    int[] list=CB(SX,SY,EX,EY);
-    for(int e=0;e<list.length;e++){
+  public boolean Checkforsub(float SX, float SY, float EX, float EY) {
+    int[] list=CB(SX, SY, EX, EY);
+    for (int e=0; e<list.length; e++) {
       int i=list[e];
       float t;
       float r;
-      t=TLineToLine(SX,SY,EX,EY,CSX[i],CSY[i],CEX[i],CEY[i]);
-      r=TLineToLine(CSX[i],CSY[i],CEX[i],CEY[i],SX,SY,EX,EY);
+      t=TLineToLine(SX, SY, EX, EY, CSX[i], CSY[i], CEX[i], CEY[i]);
+      r=TLineToLine(CSX[i], CSY[i], CEX[i], CEY[i], SX, SY, EX, EY);
       float T=1;
-      if(t<T && t>0 && r<=1 && r>=0){
-          T=t;
-          return true;
+      if (t<T && t>0 && r<=1 && r>=0) {
+        T=t;
+        return true;
       }
     }
     return false;
   }
 }
 
-public void NewAI(float X,float Y,String T,boolean M){
+public void NewAI(float X, float Y, String T, boolean M) {
   //Need to figure a better way of doin this
-  switch(T){//
-    case "Bug":
-      ListAi.add(new Bug(X,Y,M));
+  switch(T) {//
+  case "Bug":
+    ListAi.add(new Bug(X, Y, M));
     break;
-    case "Fly":
-      ListAi.add(new Fly(X,Y,M));
+  case "Fly":
+    ListAi.add(new Fly(X, Y, M));
     break;
-    case "Target":
-      ListAi.add(new Target(X,Y,M));
+  case "Target":
+    ListAi.add(new Target(X, Y, M));
     break;
-    case "Spewer":
-      ListAi.add(new Spewer(X,Y,M));
+  case "Spewer":
+    ListAi.add(new Spewer(X, Y, M));
     break;
-    case "testBoss":
-      ListAi.add(new testBoss(X,Y,M));
+  case "testBoss":
+    ListAi.add(new testBoss(X, Y, M));
     break;
-    case "Maze":
-      ListAi.add(new Maze(X,Y,M,false));
+  case "Maze":
+    ListAi.add(new Maze(X, Y, M, false));
     break;
-    case "Laze":
-      ListAi.add(new Laze(X,Y,M,false));
+  case "Laze":
+    ListAi.add(new Laze(X, Y, M, false));
     break;
-    case "Maze_Boss":
-      ListAi.add(new Maze(X,Y,M,true));
+  case "Maze_Boss":
+    ListAi.add(new Maze(X, Y, M, true));
     break;
-    case "Laze_Boss":
-      ListAi.add(new Laze(X,Y,M,true));
+  case "Laze_Boss":
+    ListAi.add(new Laze(X, Y, M, true));
     break;
-    case "tower":
-      ListAi.add(new Tower(X,Y,M));
+  case "tower":
+    ListAi.add(new Tower(X, Y, M));
     break;
-    case "napalm":
-      ListAi.add(new Napalm(X,Y,M));
+  case "napalm":
+    ListAi.add(new Napalm(X, Y, M));
     break;
-    case "Spirit":
-      ListAi.add(new Spirit(X,Y,M));
+  case "Spirit":
+    ListAi.add(new Spirit(X, Y, M));
     break;
-    case "Guardian":
-      ListAi.add(new Guardian(X,Y,M));
+  case "Guardian":
+    ListAi.add(new Guardian(X, Y, M));
     break;
-    case "Crab":
-      ListAi.add(new Crab(X,Y,M));
+  case "Crab":
+    ListAi.add(new Crab(X, Y, M));
     break;
-    case "Piller":
-      ListAi.add(new Piller(X,Y,M));
+  case "Piller":
+    ListAi.add(new Piller(X, Y, M));
+    break;
+  case "Supply":
+    ListAi.add(new Supply(X, Y, M, false));
+    break;
+  case "Supply_Boss":
+    ListAi.add(new Supply(X, Y, M, true));
+    break;
+  case "Electron":
+    ListAi.add(new Electron(X, Y, M));
     break;
   }
 }
 
-public float[] coll(float OX,float OY,float NX,float NY,boolean Ignore){
-  for(int i=0;i<CSX.length;i++){//OH god this is terrible
+public float[] coll(float OX, float OY, float NX, float NY, boolean Ignore) {
+  for (int i=0; i<CSX.length; i++) {//OH god this is terrible
     float T=100;
     float N=0;
     float t;
     float r;
-    
-    t=TLineToLine(OX,OY,NX,NY,CSX[i],CSY[i],CEX[i],CEY[i]);
-    r=TLineToLine(CSX[i],CSY[i],CEX[i],CEY[i],OX,OY,NX,NY);
-    for(int u=0;u<4;u++){
-      if(t<=T && t>=0 && r<=1 && r>=0 && !(Ignore && CT[i]==1)){
+
+    t=TLineToLine(OX, OY, NX, NY, CSX[i], CSY[i], CEX[i], CEY[i]);
+    r=TLineToLine(CSX[i], CSY[i], CEX[i], CEY[i], OX, OY, NX, NY);
+    for (int u=0; u<4; u++) {
+      if (t<=T && t>=0 && r<=1 && r>=0 && !(Ignore && CT[i]==1)) {
         {
           T=t;
           N=u;
         }
       }
     }
-    if(T>=0 && T<=1){float[] tmp = {T,N,i};return tmp;}
+    if (T>=0 && T<=1) {
+      float[] tmp = {T, N, i};
+      return tmp;
+    }
   }
   float[] tmp = {-1};
   return tmp;
@@ -1746,7 +2212,7 @@ class ANIMG{
   int timer=0;
   int frame=0;
   ANIMG(String file){
-    Frames = new PImage[0]; //<>//
+    Frames = new PImage[0]; //<>// //<>//
     RFrames = new int[0];
     int[] RLOAD = new int[0];
     byte[] DATA = loadBytes(file);
@@ -1826,8 +2292,16 @@ public void EnemyAINIC(){
 
 public void ProAINIC(){
   proANIM = new ProANIMG[0];
-  proANIM = (ProANIMG[])append(proANIM,new ProANIMG("PlayerRocket"));
-  proANIM = (ProANIMG[])append(proANIM,new ProANIMG("Spit"));
+  File WATFFEA = new File(sketchPath()+"/data/Pro");
+  for(int i=0;i<WATFFEA.list().length;i++){
+    File tmper = new File(sketchPath()+"/data/Pro/"+WATFFEA.list()[i]);
+    if(tmper.list().length>0){
+      tmper = new File(sketchPath()+"/data/Pro/"+WATFFEA.list()[i]+"/file.SFF");
+      if(tmper.exists()){
+        proANIM = (ProANIMG[])append(proANIM,new ProANIMG(WATFFEA.list()[i]));
+      }
+    }
+  }
 }
 
 class ProANIMG{
@@ -1888,13 +2362,17 @@ class ProANIMG{
 class SelfAnim{
   int frame=0;
   int timer=0;
+  int delay=0;
   boolean Action=false;
   int Acting=0;
   int ID=0;
-  SelfAnim(){}
+  SelfAnim(int ID){
+    this.ID=ID;
+    delay=enANIM[ID].delay;
+  }
   public void Anim(boolean move,boolean air){
     timer++;
-    if(timer>enANIM[ID].delay){
+    if(timer>delay){
       timer=0;
       frame++;
     }
@@ -1930,9 +2408,13 @@ class SelfAnim{
     }
     noTint();
   }
-  public void EIMG(float X,float Y,float w,float h,int frame,int C){
+  public void EIMG(float X,float Y,float w,float h,float r,int frame,int C){
     tint(C);
-    image(enANIM[ID].Extras[frame],X-w/2,Y-h/2,w,h);
+    pushMatrix();
+    translate(X,Y);
+    rotate(r);
+    image(enANIM[ID].Extras[frame],-w/2,-h/2,w,h);
+    popMatrix();
     noTint();
   }
   public int getM(boolean mov,boolean air){
@@ -2432,7 +2914,7 @@ public void PartINIC(){
 }
 
 class Line extends Effect{
-  Line(float nX,float nY,float nVX,float nVY,int ntime,int nC){
+  Line(float nX,float nY,float nVX,float nVY,int ntime,int nC,float Weight){
     X=nX;
     Y=nY;
     VX=nVX;
@@ -2440,7 +2922,9 @@ class Line extends Effect{
     time=ntime;
     Mtime=ntime;
     C=nC;
+    this.Weight=Weight;
   }
+  float Weight=5;
   public void mathE(int T){
     if(time==0){
       Ekill.append(T);
@@ -2449,7 +2933,7 @@ class Line extends Effect{
     time--;
   }
   public void drawE(){
-    strokeWeight((float)time*(float)5/(float)Mtime);
+    strokeWeight((float)time*(float)Weight/(float)Mtime);
     stroke(C,(float)time*(float)255/(float)Mtime);
     line(X,Y,VX,VY);
   }
@@ -2649,6 +3133,32 @@ class StandImg extends Effect{
   }
 }
 
+class Smoke extends Effect{
+  float gravmult=1;
+  Smoke(float nX,float nY,float nVX,float nVY,int ntime,int nC,float gravmult){
+    X=nX;
+    Y=nY;
+    VX=nVX;
+    VY=nVY;
+    time=ntime;
+    Mtime=ntime;
+    C=nC;
+    this.gravmult=gravmult;
+  }
+  public void mathE(int T){
+    if(time==0){
+      Ekill.append(T);
+    }
+    NewPartic(new GravPoint(X,Y,0,0,Mtime,C,-1),true);
+    VY+=1*gravmult;
+    X+=VX;
+    Y+=VY;
+    time--;
+  }
+  public void drawE(){
+  }
+}
+
 class Effect{
   float X;
   float Y;
@@ -2690,7 +3200,7 @@ public void AddPartic(int T,float X,float Y,float VX,float VY,int time,int C,boo
   if(Configs.get("DrawEffects")==0 && !Important){return;}
   switch(T){
     case 1:
-      ListEffects.add(new Line(X,Y,VX,VY,time,C));
+      ListEffects.add(new Line(X,Y,VX,VY,time,C,5));
     break;
     case 2:
       ListEffects.add(new GravPoint(X,Y,VX,VY,time,C,1));
@@ -2998,7 +3508,7 @@ boolean BACEXIST;
 PGraphics Background;
 
 public void openMap(String MAP){
-  ListAi = new ArrayList<AI>(); //<>//
+  ListAi = new ArrayList<AI>();
   ListEffects = new ArrayList<Effect>();
   ListPR = new ArrayList<PRO>();
   kill = new IntList();
@@ -3124,7 +3634,7 @@ public void openMap(String MAP){
     MAD[i] = new door(SX,SY,EX,EY,delay,ATcol,ATpro);
     Header+=14;
   }
-  yes = new String[0]; //<>//
+  yes = new String[0];
   NUM=BgetI(DATA,Header,2);
   Header+=2;
   for(int i=0;i<NUM;i++){
@@ -3506,6 +4016,9 @@ public void MenuSetup() {
   
   menuUI = (UI[])append(menuUI, new SaveButton(140, height-160, 100, 40, "MAIN_MENU", "nothing" , 10));
   menuUI = (UI[])append(menuUI, new SaveButton(260, height-160, 100, 40, "MAIN_MENU", "nothing" , 20));
+  menuUI = (UI[])append(menuUI, new SaveButton(320, height-180, 100, 10, "MAIN_MENU", "nothing" , 21));
+  menuUI = (UI[])append(menuUI, new SaveButton(380, height-160, 100, 40, "MAIN_MENU", "nothing" , 30));
+  menuUI = (UI[])append(menuUI, new SaveButton(500, height-160, 100, 40, "MAIN_MENU", "nothing" , 40));
   
   //OPTIONS_MENU
 
@@ -4208,7 +4721,7 @@ class MazeBullets extends PRO {
     fill(0xffFFFFFF);
     stroke(0xff00FFFF);
     circle(X, Y, 20);
-    rect(X-W, Y-H, W*2, H*2);
+    //rect(X-W, Y-H, W*2, H*2);
   }
 }
 
@@ -4323,7 +4836,7 @@ class Earth extends PRO {
   int bombtimer=90;
   public void math(int SID) {
     if (bombtimer%5==0) {
-      expd(X, Y-60,120, 32, 0, true);
+      expd(X, Y-60,120, 42, 0, true);
     }
     if (bombtimer==0) {
       killPR.append(SID);
@@ -4457,7 +4970,7 @@ class Water extends PRO {
   int fuel=240;
   float rotate=0;
   public void math(int SID) {
-    Cont(W, H, 32);
+    Cont(W, H, 42);
     if (fuel<200) {
       X+=cos(rotate)*9;
       Y+=sin(rotate)*9;
@@ -4555,6 +5068,7 @@ class Rock extends PRO {
       killPR.append(SID);
       return;
     }
+    NewPartic(new GravPoint(X,Y,0,0,5,0xff222222,1),false);
     X+=VX;
     Y+=VY;
     VY+=0.2f;
@@ -4565,6 +5079,9 @@ class Rock extends PRO {
       fill(255);
       rect(X-W, Y-H, W*2, H*2);
     }
+    noStroke();
+    fill(0xff676767);
+    circle(X,Y,W*2);
   }
 }
 
@@ -4618,6 +5135,204 @@ class hurtbox extends PRO {
     fill(255,timer*255/maxtimer);
     rect(-W/2, -H/2, W, H);
     popMatrix();
+  }
+}
+
+class MiniRocket extends PRO {
+  float Bombtimer=60;
+  MiniRocket(float nX, float nY, float nVX, float nVY, int nT) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    T = nT;
+    W=12;
+    H=12;
+  }
+  public void math(int SID) {
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      expd(X, Y, 120, 15, 5, true);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      expd(X, Y, 120, 15, 5, true);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      expd(X, Y, 120, 15, 5, true);
+      return;
+    }
+    if (Bombtimer==0) {
+      killPR.append(SID);
+      expd(X, Y, 120, 15, 5, true);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+    Bombtimer--;
+    NewPartic(new GravPoint(X,Y,-VX,-VY,40,0xffCCCCCC,-0.4f),true);
+    //VY+=0.2;
+  }
+  public void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+    noStroke();
+    fill(0xffFA0000);
+    circle(X,Y,12);
+  }
+}
+
+class MiniBullet extends PRO {
+  MiniBullet(float nX, float nY, float nVX, float nVY, int nT) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    T = nT;
+    W=6;
+    H=6;
+  }
+  int fuel=30;
+  public void math(int SID) {
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Cont(W, H, 32)) {
+      killPR.append(SID);
+      return;
+    }
+    AddPartic(1, X, Y, X+VX, Y+VY, 10, color(0xffFFFF00), true);
+    fuel--;
+    X+=VX;
+    Y+=VY;
+    //VY+=0.2;
+  }
+  public void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+    fill(0xffFFFF00);
+    circle(X,Y,W);
+  }
+}
+
+class Eletro extends PRO {
+  Eletro(float nX, float nY, float nVX, float nVY,int timer) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=8;
+    H=8;
+    this.timer=timer;
+  }
+  int timer=0;
+  public void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      return;
+    }
+    timer--;
+    if (Cont(W, H, 16)) {
+      killPR.append(SID);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+  }
+  public void render() {
+    fill(0xffEAF9FF);
+    stroke(0xff05ACF7);
+    circle(X, Y, 20);
+    //rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
+class SEletro extends PRO {
+  SEletro(float nX, float nY, float nVX, float nVY,int timer,float Doff,float Roff) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=8;
+    H=8;
+    this.Doff=Doff;
+    this.Roff=Roff;
+    this.timer=timer;
+  }
+  float Doff=0;
+  float Roff=0;
+  public void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      return;
+    }
+    timer--;
+    if (Cont(W, H, 16)) {
+      killPR.append(SID);
+      return;
+    }
+    Doff+=VX;
+    Roff+=VY;
+  }
+  public void render() {
+    fill(0xffEAF9FF);
+    stroke(0xff05ACF7);
+    circle(X+(cos(Roff)*Doff), Y+(sin(Roff)*Doff), 20);
+    //rect(X-W, Y-H, W*2, H*2);
+  }
+  public boolean Cont(float W, float H, int dmg) {
+    if (X+(cos(Roff)*Doff)+W>play.X-6 && X+(cos(Roff)*Doff)-W<play.X+6 && Y+(sin(Roff)*Doff)+H>play.Y-24 && Y+(sin(Roff)*Doff)-H<play.Y+0) {
+      AThurt(dmg);
+      return true;
+    }
+    return false;
+  }
+}
+
+class Bross extends PRO {
+  Bross(float nX, float nY, float nVX, float nVY,int timer,float R) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=8;
+    H=8;
+    this.timer=timer;
+    this.R=R;
+  }
+  float R=0;
+  public void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      NewSPr(new hurtbox(X,Y,3000,20,R,35,10,1));
+      return;
+    }
+    NewPartic(new Line(X-cos(R)*1500,Y-sin(R)*1500,X+cos(R)*1500,Y+sin(R)*1500,2,0xffFF0000,timer),true);
+    timer--;
+  }
+  public void render() {
+    fill(0xffEAF9FF);
+    stroke(0xff05ACF7);
+    circle(X, Y, 20);
+    //rect(X-W, Y-H, W*2, H*2);
   }
 }
 
@@ -5263,7 +5978,7 @@ public void tantrest(){
   arenas = new JSONArray[BigFile.size()];
   for(int i=0;i<BigFile.size();i++){
     arenas[i]=BigFile.getJSONArray(i);
-  }
+  } //<>//
 }
 
 public void tantmath(){
@@ -5315,25 +6030,31 @@ public void tantmath(){
 public void nextWave(){
   BOSSHP.clear();
   BOSSID.clear();
+  Must=0;
+  PMust=0;
   if(round==Indexs.length){
     Blurer=90000;
     round++;
     return;
   }
   Blurer=60;
+  round++;
   switch(round){
     case 10:
     case 20:
+    case 21:
+    case 30:
+    case 40:
     CurrentSave=round;
     byte[] out = new byte[1];
     byte[] tmp = BsetI(round,1);
     out[0]=tmp[0];
     saveBytes("data/Misc/sav",out);
+    println(round);
     break;
     default:
     break;
   }
-  round++;
   getWave(round);
   enemyDelay=-120;
   waveEnd=false;
@@ -5345,6 +6066,14 @@ public void nextWave(){
     case 20:
     Start("Boss1");
     CurrentArena="gate";
+    break;
+    case 30:
+    Start("arena_caves");
+    CurrentArena=split("arena_caves",'_')[1];
+    break;
+    case 40:
+    Start("Boss2");
+    CurrentArena="light";
     break;
     default:
     String[] names = arenas[round/20].getStringArray();
@@ -5378,13 +6107,15 @@ public void ResartWave(){
 }
 
 public void arenaSpawn(String name){
-  boolean gr=false;
+  boolean gr=false; //<>//
   for(int i=0;i<AINames.length;i++){
     if(AINames[i].equals(name)){
       gr=Sgroun[i];
       break;
     }
   }
+  //println(name + "!" + round);
+  Must++;
   if(gr){
     float X=EX[GrspawnID[Grspawn]];
     float Y=EY[GrspawnID[Grspawn]];
@@ -5392,7 +6123,6 @@ public void arenaSpawn(String name){
     if(Grspawn==GrspawnID.length){
       Grspawn=0;
     }
-    Must++;
     NewAI(X,Y+-11,name,true);
     for(int t=0;t<10;t++){
       AddPartic(3,X,Y,random(-2,2),random(-2,2),100,color(155,0,155),true);
@@ -5404,7 +6134,6 @@ public void arenaSpawn(String name){
     if(Arspawn==ArspawnID.length){
       Arspawn=0;
     }
-    Must++;
     NewAI(X,Y+-11,name,true);
     for(int t=0;t<10;t++){
       AddPartic(3,X,Y,random(-2,2),random(-2,2),100,color(155,0,155),true);
@@ -5605,6 +6334,10 @@ class KILLgun extends Weapon {
   }
   public void FIRE() {
     Hitscan(0, 0, play.PO, true, 8, 99999999,1000);
+    Hitscan(0, 0, play.PO+cos(frameCount/5.0f)*0.2f, true, 8, 999999,1000);
+    Hitscan(0, 0, play.PO-cos(frameCount/5.0f)*0.2f, true, 8, 999999,1000);
+    Hitscan(0, 0, play.PO+sin(frameCount/5.0f)*0.2f, true, 8, 999999,1000);
+    Hitscan(0, 0, play.PO-sin(frameCount/5.0f)*0.2f, true, 8, 999999,1000);
   }
 }
 

@@ -17,7 +17,7 @@ void PartINIC(){
 }
 
 class Line extends Effect{
-  Line(float nX,float nY,float nVX,float nVY,int ntime,color nC){
+  Line(float nX,float nY,float nVX,float nVY,int ntime,color nC,float Weight){
     X=nX;
     Y=nY;
     VX=nVX;
@@ -25,7 +25,9 @@ class Line extends Effect{
     time=ntime;
     Mtime=ntime;
     C=nC;
+    this.Weight=Weight;
   }
+  float Weight=5;
   void mathE(int T){
     if(time==0){
       Ekill.append(T);
@@ -34,7 +36,7 @@ class Line extends Effect{
     time--;
   }
   void drawE(){
-    strokeWeight((float)time*(float)5/(float)Mtime);
+    strokeWeight((float)time*(float)Weight/(float)Mtime);
     stroke(C,(float)time*(float)255/(float)Mtime);
     line(X,Y,VX,VY);
   }
@@ -234,6 +236,32 @@ class StandImg extends Effect{
   }
 }
 
+class Smoke extends Effect{
+  float gravmult=1;
+  Smoke(float nX,float nY,float nVX,float nVY,int ntime,color nC,float gravmult){
+    X=nX;
+    Y=nY;
+    VX=nVX;
+    VY=nVY;
+    time=ntime;
+    Mtime=ntime;
+    C=nC;
+    this.gravmult=gravmult;
+  }
+  void mathE(int T){
+    if(time==0){
+      Ekill.append(T);
+    }
+    NewPartic(new GravPoint(X,Y,0,0,Mtime,C,-1),true);
+    VY+=1*gravmult;
+    X+=VX;
+    Y+=VY;
+    time--;
+  }
+  void drawE(){
+  }
+}
+
 class Effect{
   float X;
   float Y;
@@ -275,7 +303,7 @@ void AddPartic(int T,float X,float Y,float VX,float VY,int time,color C,boolean 
   if(Configs.get("DrawEffects")==0 && !Important){return;}
   switch(T){
     case 1:
-      ListEffects.add(new Line(X,Y,VX,VY,time,C));
+      ListEffects.add(new Line(X,Y,VX,VY,time,C,5));
     break;
     case 2:
       ListEffects.add(new GravPoint(X,Y,VX,VY,time,C,1));

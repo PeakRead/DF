@@ -61,17 +61,16 @@
       "key": "4"
     }
   ],
-  "ReversedWhell": 1,
-  "DebugStart": true,
   "DebugTant": false,
-  "Debugdraw": false,
-  "DebugRound": 20,
-  "GuiScale": 100,
   "DrawEffects": 1,
-  "DebugMap": "arena_island",
+  "DebugMap": "",
+  "SimpleExplosion": 1,
+  "ShouldPause": 1,
+  "ReversedWhell": 1,
+  "DebugStart": false,
+  "GuiScale": 100,
   "Zoom": 100,
   "HurtScale": 1,
   "Fullscreen": 0,
-  "SimpleExplosion": 1,
-  "ShouldPause": 1
+  "Debugdraw": false
 }

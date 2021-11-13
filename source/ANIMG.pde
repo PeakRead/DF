@@ -5,7 +5,7 @@ class ANIMG{
   int timer=0;
   int frame=0;
   ANIMG(String file){
-    Frames = new PImage[0]; //<>//
+    Frames = new PImage[0]; //<>// //<>//
     RFrames = new int[0];
     int[] RLOAD = new int[0];
     byte[] DATA = loadBytes(file);
@@ -85,8 +85,16 @@ void EnemyAINIC(){
 
 void ProAINIC(){
   proANIM = new ProANIMG[0];
-  proANIM = (ProANIMG[])append(proANIM,new ProANIMG("PlayerRocket"));
-  proANIM = (ProANIMG[])append(proANIM,new ProANIMG("Spit"));
+  File WATFFEA = new File(sketchPath()+"/data/Pro");
+  for(int i=0;i<WATFFEA.list().length;i++){
+    File tmper = new File(sketchPath()+"/data/Pro/"+WATFFEA.list()[i]);
+    if(tmper.list().length>0){
+      tmper = new File(sketchPath()+"/data/Pro/"+WATFFEA.list()[i]+"/file.SFF");
+      if(tmper.exists()){
+        proANIM = (ProANIMG[])append(proANIM,new ProANIMG(WATFFEA.list()[i]));
+      }
+    }
+  }
 }
 
 class ProANIMG{
@@ -147,13 +155,17 @@ class ProANIMG{
 class SelfAnim{
   int frame=0;
   int timer=0;
+  int delay=0;
   boolean Action=false;
   int Acting=0;
   int ID=0;
-  SelfAnim(){}
+  SelfAnim(int ID){
+    this.ID=ID;
+    delay=enANIM[ID].delay;
+  }
   void Anim(boolean move,boolean air){
     timer++;
-    if(timer>enANIM[ID].delay){
+    if(timer>delay){
       timer=0;
       frame++;
     }
@@ -189,9 +201,13 @@ class SelfAnim{
     }
     noTint();
   }
-  void EIMG(float X,float Y,float w,float h,int frame,color C){
+  void EIMG(float X,float Y,float w,float h,float r,int frame,color C){
     tint(C);
-    image(enANIM[ID].Extras[frame],X-w/2,Y-h/2,w,h);
+    pushMatrix();
+    translate(X,Y);
+    rotate(r);
+    image(enANIM[ID].Extras[frame],-w/2,-h/2,w,h);
+    popMatrix();
     noTint();
   }
   int getM(boolean mov,boolean air){

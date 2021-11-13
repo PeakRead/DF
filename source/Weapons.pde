@@ -147,6 +147,10 @@ class KILLgun extends Weapon {
   }
   void FIRE() {
     Hitscan(0, 0, play.PO, true, 8, 99999999,1000);
+    Hitscan(0, 0, play.PO+cos(frameCount/5.0)*0.2, true, 8, 999999,1000);
+    Hitscan(0, 0, play.PO-cos(frameCount/5.0)*0.2, true, 8, 999999,1000);
+    Hitscan(0, 0, play.PO+sin(frameCount/5.0)*0.2, true, 8, 999999,1000);
+    Hitscan(0, 0, play.PO-sin(frameCount/5.0)*0.2, true, 8, 999999,1000);
   }
 }
 

@@ -19,7 +19,7 @@ void tantrest(){
   arenas = new JSONArray[BigFile.size()];
   for(int i=0;i<BigFile.size();i++){
     arenas[i]=BigFile.getJSONArray(i);
-  }
+  } //<>//
 }
 
 void tantmath(){
@@ -71,25 +71,31 @@ void tantmath(){
 void nextWave(){
   BOSSHP.clear();
   BOSSID.clear();
+  Must=0;
+  PMust=0;
   if(round==Indexs.length){
     Blurer=90000;
     round++;
     return;
   }
   Blurer=60;
+  round++;
   switch(round){
     case 10:
     case 20:
+    case 21:
+    case 30:
+    case 40:
     CurrentSave=round;
     byte[] out = new byte[1];
     byte[] tmp = BsetI(round,1);
     out[0]=tmp[0];
     saveBytes("data/Misc/sav",out);
+    println(round);
     break;
     default:
     break;
   }
-  round++;
   getWave(round);
   enemyDelay=-120;
   waveEnd=false;
@@ -101,6 +107,14 @@ void nextWave(){
     case 20:
     Start("Boss1");
     CurrentArena="gate";
+    break;
+    case 30:
+    Start("arena_caves");
+    CurrentArena=split("arena_caves",'_')[1];
+    break;
+    case 40:
+    Start("Boss2");
+    CurrentArena="light";
     break;
     default:
     String[] names = arenas[round/20].getStringArray();
@@ -134,13 +148,15 @@ void ResartWave(){
 }
 
 void arenaSpawn(String name){
-  boolean gr=false;
+  boolean gr=false; //<>//
   for(int i=0;i<AINames.length;i++){
     if(AINames[i].equals(name)){
       gr=Sgroun[i];
       break;
     }
   }
+  //println(name + "!" + round);
+  Must++;
   if(gr){
     float X=EX[GrspawnID[Grspawn]];
     float Y=EY[GrspawnID[Grspawn]];
@@ -148,7 +164,6 @@ void arenaSpawn(String name){
     if(Grspawn==GrspawnID.length){
       Grspawn=0;
     }
-    Must++;
     NewAI(X,Y+-11,name,true);
     for(int t=0;t<10;t++){
       AddPartic(3,X,Y,random(-2,2),random(-2,2),100,color(155,0,155),true);
@@ -160,7 +175,6 @@ void arenaSpawn(String name){
     if(Arspawn==ArspawnID.length){
       Arspawn=0;
     }
-    Must++;
     NewAI(X,Y+-11,name,true);
     for(int t=0;t<10;t++){
       AddPartic(3,X,Y,random(-2,2),random(-2,2),100,color(155,0,155),true);

@@ -26,7 +26,7 @@ boolean BACEXIST;
 PGraphics Background;
 
 void openMap(String MAP){
-  ListAi = new ArrayList<AI>(); //<>//
+  ListAi = new ArrayList<AI>();
   ListEffects = new ArrayList<Effect>();
   ListPR = new ArrayList<PRO>();
   kill = new IntList();
@@ -152,7 +152,7 @@ void openMap(String MAP){
     MAD[i] = new door(SX,SY,EX,EY,delay,ATcol,ATpro);
     Header+=14;
   }
-  yes = new String[0]; //<>//
+  yes = new String[0];
   NUM=BgetI(DATA,Header,2);
   Header+=2;
   for(int i=0;i<NUM;i++){
