@@ -9,13 +9,14 @@ the only reason this is in github is that i wanted to try make an autoupdater fo
 
 if you want dont
 
-very WIP
+less WIP than befour so thats good
 
 made in processing:
 basicaly java but i dont want to deal whit System.out.print i just want a print stuff
 
-gameplay is like the combat part of Terraria
+gameplay is... something?
+i dont know anymore
 
-20 bad levels exist
+40 bad levels exist now
 
 byebye
