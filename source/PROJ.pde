@@ -27,6 +27,8 @@ class Spit extends PRO {
     T = nT;
     W=6;
     H=6;
+    Light = FindLight();
+    Power = 1;
   }
   void math(int SID) {
     if (Coll(X-W, Y-W, X+W, Y+W)) {
@@ -59,6 +61,7 @@ class Spit extends PRO {
     if (random(0, 1)<0.2) {
       AddPartic(4, X, Y, 0, 0, 40, color(#548454), false);
     }
+    UpdateLight();
   }
   void render() {
     proANIM[1].ANR(X, Y, cframe);
@@ -77,6 +80,8 @@ class Gran extends PRO {
     H=6;
     timer=0;
     cframe=0;
+    Light = FindLight();
+    Power = 0.8;
   }
   void math(int SID) {
     if (Coll(X-W, Y-W, X+W, Y+W)) {
@@ -115,6 +120,7 @@ class Gran extends PRO {
     X+=VX;
     Y+=VY;
     Bombtimer--;
+    UpdateLight();
     //VY+=0.2;
   }
   void render() {
@@ -131,6 +137,8 @@ class Sharp extends PRO {
     T = nT;
     W=6;
     H=6;
+    Light = FindLight();
+    Power = 0.2;
   }
   void math(int SID) {
     if (Coll(X-W, Y-W, X+W, Y+W)) {
@@ -153,6 +161,7 @@ class Sharp extends PRO {
     Y+=VY;
     VY+=0.2;
     AddPartic(3, X, Y, 0, 0, 8, color(#AAAA00), false);
+    UpdateLight();
   }
   void render() {
     stroke(#FFFF00);  
@@ -170,6 +179,8 @@ class MazeBullets extends PRO {
     T = nT;
     W=8;
     H=8;
+    Light = FindLight();
+    Power = 1;
   }
   void math(int SID) {
     if (Coll(X-W, Y-W, X+W, Y+W)) {
@@ -190,6 +201,7 @@ class MazeBullets extends PRO {
     }
     X+=VX;
     Y+=VY;
+    UpdateLight();
   }
   void render() {
     fill(#FFFFFF);
@@ -208,6 +220,8 @@ class NapalmFire extends PRO {
     T = nT;
     W=8;
     H=8;
+    Light = FindLight();
+    Power = 1;
   }
   boolean Stuck=false;
   void math(int SID) {
@@ -231,6 +245,7 @@ class NapalmFire extends PRO {
       X+=VX;
       Y+=VY;
     }
+    UpdateLight();
   }
   void render() {
     noStroke();
@@ -254,6 +269,8 @@ class SpirtShit extends PRO {
     H=6;
     timer=0;
     cframe=0;
+    Light = FindLight();
+    Power = 0.1;
   }
   void math(int SID) {
     if (Coll(X-W, Y-W, X+W, Y+W)) {
@@ -285,6 +302,7 @@ class SpirtShit extends PRO {
     X+=VX;
     Y+=VY;
     //VY+=0.2;
+    UpdateLight();
   }
   void render() {
     noStroke();
@@ -306,6 +324,8 @@ class Earth extends PRO {
     H=2;
     timer=0;
     cframe=0;
+    Light = FindLight();
+    Power = 0.2;
   }
   int bombtimer=90;
   void math(int SID) {
@@ -320,6 +340,7 @@ class Earth extends PRO {
     X+=VX;
     Y+=VY;
     //VY+=0.2;
+    UpdateLight();
   }
   void render() {
     if (DebugDraw) {
@@ -341,6 +362,8 @@ class Air extends PRO {
     H=6;
     timer=0;
     cframe=0;
+    Light = FindLight();
+    Power = 0.2;
   }
   float rotate=0;
   int fuel=30;
@@ -371,6 +394,7 @@ class Air extends PRO {
     X+=VX;
     Y+=VY;
     //VY+=0.2;
+    UpdateLight();
   }
   void render() {
     noStroke();
@@ -390,6 +414,8 @@ class Fire extends PRO {
     H=32;
     timer=0;
     cframe=0;
+    Light = FindLight();
+    Power = 0.2;
   }
   float fuel=280;
   float rotate=0;
@@ -407,6 +433,7 @@ class Fire extends PRO {
       return;
     }
     //VY+=0.2;
+    UpdateLight();
   }
   void render() {
     if (DebugDraw) {
@@ -440,6 +467,8 @@ class Water extends PRO {
     H=32;
     timer=0;
     cframe=0;
+    Light = FindLight();
+    Power = 0.2;
   }
   int fuel=240;
   float rotate=0;
@@ -455,6 +484,7 @@ class Water extends PRO {
       return;
     }
     //VY+=0.2;
+    UpdateLight();
   }
   void render() {
     if (DebugDraw) {
@@ -478,6 +508,8 @@ class Soul extends PRO {
     H=8;
     timer=0;
     cframe=0;
+    Light = FindLight();
+    Power = 0.3;
   }
   int fuel=240;
   void math(int SID) {
@@ -500,6 +532,7 @@ class Soul extends PRO {
     Y+=VY;
     VX=VX*4/5;
     VY=VY*4/5;
+    UpdateLight();
   }
   void render() {
     if (DebugDraw) {
@@ -523,6 +556,8 @@ class Rock extends PRO {
     H=8;
     timer=0;
     cframe=0;
+    Light = FindLight();
+    Power = 1;
   }
   void math(int SID) {
     if (Coll(X-W, Y-W, X+W, Y+W)) {
@@ -546,6 +581,7 @@ class Rock extends PRO {
     X+=VX;
     Y+=VY;
     VY+=0.2;
+    UpdateLight();
   }
   void render() {
     if (DebugDraw) {
@@ -582,6 +618,7 @@ class hurtbox extends PRO {
       return;
     }
     timer--;
+    hurttimer--;
     if(hurttimer>=0){
       //even if not the best way of doing this
       //the processes is fast
@@ -622,6 +659,8 @@ class MiniRocket extends PRO {
     T = nT;
     W=12;
     H=12;
+    Light = FindLight();
+    Power = 0.2;
   }
   void math(int SID) {
     if (Coll(X-W, Y-W, X+W, Y+W)) {
@@ -648,6 +687,7 @@ class MiniRocket extends PRO {
     Y+=VY;
     Bombtimer--;
     NewPartic(new GravPoint(X,Y,-VX,-VY,40,#CCCCCC,-0.4),true);
+    UpdateLight();
     //VY+=0.2;
   }
   void render() {
@@ -671,6 +711,8 @@ class MiniBullet extends PRO {
     T = nT;
     W=6;
     H=6;
+    Light = FindLight();
+    Power = 0.2;
   }
   int fuel=30;
   void math(int SID) {
@@ -694,6 +736,7 @@ class MiniBullet extends PRO {
     fuel--;
     X+=VX;
     Y+=VY;
+    UpdateLight();
     //VY+=0.2;
   }
   void render() {
@@ -791,6 +834,8 @@ class Bross extends PRO {
     H=8;
     this.timer=timer;
     this.R=R;
+    Light = FindLight();
+    Power = 1;
   }
   float R=0;
   void math(int SID) {
@@ -801,12 +846,363 @@ class Bross extends PRO {
     }
     NewPartic(new Line(X-cos(R)*1500,Y-sin(R)*1500,X+cos(R)*1500,Y+sin(R)*1500,2,#FF0000,timer),true);
     timer--;
+    UpdateLight();
   }
   void render() {
     fill(#EAF9FF);
     stroke(#05ACF7);
     circle(X, Y, 20);
     //rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
+class WindBall extends PRO {
+  WindBall(float nX, float nY, float nVX, float nVY) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=32;
+    H=32;
+    Light = FindLight();
+    Power = 0.3;
+  }
+  float R=random(-PI,PI);
+  int timer=240;
+  void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      return;
+    }
+    if (X+W>play.X-6 && X-W<play.X+6 && Y+H>play.Y-24 && Y-H<play.Y+0) {
+      play.VX+=cos(R);
+      play.VY+=sin(R);
+    }
+    NewPartic(new Wind(X+random(-16,16),Y+random(-16,16),cos(R)*5,sin(R)*5,15,#D0CFD1),true);
+    timer--;
+    X+=VX;
+    Y+=VY;
+    UpdateLight();
+  }
+  void render() {
+    fill(#D0CFD1,100);
+    stroke(#D0CFD1,100);
+    circle(X, Y, 64);
+    //rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
+class IceBall extends PRO {
+  IceBall(float nX, float nY, float nVX, float nVY) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=32;
+    H=32;
+    Light = FindLight();
+    Power = 0.3;
+  }
+  float R=random(-PI,PI);
+  int timer=480;
+  void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      return;
+    }
+    if (X+W>play.X-6 && X-W<play.X+6 && Y+H>play.Y-24 && Y-H<play.Y+0) {
+      play.frezzing=true;
+    }
+    NewPartic(new GravPoint(X+random(-32,32),Y+random(-32,32)-H/2,0,0,15,#D0CFD1,0),true);
+    timer--;
+    X+=VX;
+    Y+=VY;
+    UpdateLight();
+  }
+  void render() {
+    fill(#75DBD2,100);
+    stroke(#75DBD2,100);
+    circle(X, Y, 64);
+    //rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
+class Melting extends PRO {
+  Melting(float nX, float nY, float nVX, float nVY) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=16;
+    H=16;
+    Light = FindLight();
+    Power = 0.3;
+  }
+  int timer=480;
+  boolean Grounded=false;
+  void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      return;
+    }
+    if(!Grounded){
+      if (Coll(X-W, Y-W, X+W, Y+W)) {
+        Grounded=true;
+      }
+      if (Coll(X+H, Y-H, X-H, Y+H)) {
+        Grounded=true;
+      }
+      if (Coll(X, Y, X+VX, Y+VY)) {
+        Grounded=true;
+      }
+    }
+    if (Cont(W,H,32)) {
+      killPR.append(SID);
+      return;
+    }
+    timer--;
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-10, 10), Y-random(0, 20), random(-1,1), 0, 60, #D8C004, -0.2), true);
+    }
+    if(!Grounded){
+      VY+=0.2;
+      X+=VX;
+      Y+=VY;
+    }
+    UpdateLight();
+  }
+  void render() {
+    fill(#D8C004);
+    stroke(#D8C004);
+    circle(X, Y, 32);
+    fill(#F5EA6F,100);
+    stroke(#F5EA6F,100);
+    circle(X, Y, 16);
+    //rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
+class Rage extends PRO {
+  Rage(float nX, float nY, float nVX, float nVY) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=8;
+    H=8;
+    Light = FindLight();
+    Power = 0.3;
+  }
+  int timer=480;
+  void math(int SID) {
+    if (timer==0) {
+      killPR.append(SID);
+      expd(X,Y,128,32,0,true);
+      return;
+    }
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      expd(X,Y,128,32,0,true);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      expd(X,Y,128,32,0,true);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      expd(X,Y,128,32,0,true);
+      return;
+    }
+    if (Cont(W,H,32)) {
+      killPR.append(SID);
+      expd(X,Y,128,32,0,true);
+      return;
+    }
+    timer--;
+    NewPartic(new GravPoint(X+random(-10, 10), Y-random(0, 20), 0  , 0, 60, #155A0B, 0), true);
+    X+=VX;
+    Y+=VY;
+    UpdateLight();
+  }
+  void render() {
+    fill(#155A0B,100);
+    stroke(#155A0B,100);
+    circle(X, Y, 16);
+    //rect(X-W, Y-H, W*2, H*2);
+  }
+}
+
+class MiniFire extends PRO {
+  MiniFire(float nX, float nY, float nVX, float nVY) {
+    X = nX;
+    Y = nY;
+    VX = nVX;
+    VY = nVY;
+    W=16;
+    H=16;
+    timer=0;
+    cframe=0;
+    Light = FindLight();
+    Power = 0.3;
+  }
+  float fuel=140;
+  float rotate=0;
+  void math(int SID) {
+    Cont(W, H, 32);
+    rotate = atan2(play.Y-Y, play.X-X);
+    AddPartic(3, X+random(-W/2, W/2), Y+random(-H/2, H/2), 0, -3, 40, color(#FF0000), false);
+    VX+=cos(rotate)*0.3;
+    VY+=sin(rotate)*0.3;
+    fuel--;
+    if (fuel==0) {
+      killPR.append(SID);
+      return;
+    }
+    X+=VX;
+    Y+=VY;
+    UpdateLight();
+    //VY+=0.2;
+  }
+  void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+    fill(#FF0000, fuel/120*255);
+    circle(X, Y, W*2.5);
+    fill(#FF8D00, fuel/120*255);
+    circle(X, Y, W*1.5);
+  }
+}
+
+class Shard extends PRO {
+  Shard(float nX, float nY, float nR, float nV, int nT) {
+    X = nX;
+    Y = nY;
+    VX = cos(nR)*nV;
+    VY = sin(nR)*nV;
+    T = nT;
+    W=6;
+    H=6;
+  }
+  int fuel=60;
+  void math(int SID) {
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Cont(W, H, 32)) {
+      killPR.append(SID);
+      return;
+    }
+    AddPartic(1, X, Y, X+VX, Y+VY, 6, color(#FFFFFF), true);
+    fuel--;
+    X+=VX;
+    Y+=VY;
+    //VY+=0.2;
+  }
+  void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+    fill(#FFFFFF);
+    circle(X,Y,W);
+  }
+}
+
+class DeathShard extends PRO {
+  DeathShard(float nX, float nY, float nR, float nV, int nT) {
+    X = nX;
+    Y = nY;
+    VX = cos(nR)*nV;
+    VY = sin(nR)*nV;
+    T = nT;
+    W=12;
+    H=12;
+  }
+  int fuel=60;
+  void math(int SID) {
+    if (Coll(X-W, Y-W, X+W, Y+W)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X+H, Y-H, X-H, Y+H)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Coll(X, Y, X+VX, Y+VY)) {
+      killPR.append(SID);
+      return;
+    }
+    if (Cont(W, H, 32)) {
+      killPR.append(SID);
+      return;
+    }
+    AddPartic(1, X, Y, X+VX, Y+VY, 6, color(#FFFFFF), true);
+    fuel--;
+    X+=VX;
+    Y+=VY;
+    //VY+=0.2;
+  }
+  void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+    fill(#FFFFFF);
+    circle(X,Y,W*2);
+  }
+}
+
+class Heal extends PRO {
+  Heal(float nX, float nY, int nT) {
+    X = nX;
+    Y = nY;
+    VX = 0;
+    VY = 0;
+    T = nT;
+    W=12;
+    H=12;
+  }
+  void math(int SID) {
+    if (play.HP<=0) {
+      killPR.append(SID);
+      NewPartic(new LAGPoint(X,Y,random(-5,5),random(-5,5),30,#FF0000),true);
+      return;
+    }
+    if (dist(play.X,play.Y-12,X,Y)<12) {
+      killPR.append(SID);
+      play.HP=min(100,play.HP+1);
+      return;
+    }
+    AddPartic(1, X, Y, X+VX, Y+VY, 10, color(#FF0000), true);
+    float R=atan2(play.Y-Y-12,play.X-X);
+    X+=cos(R)*12;
+    Y+=sin(R)*12;
+    //VY+=0.2;
+  }
+  void render() {
+    if (DebugDraw) {
+      noStroke();
+      fill(255);
+      rect(X-W, Y-H, W*2, H*2);
+    }
+    fill(#FF0000);
+    circle(X,Y,W);
   }
 }
 
@@ -820,6 +1216,8 @@ class PRO {
   int cframe;
   int timer;
   int T;
+  int Light;
+  float Power;
   boolean Cont(float W, float H, int dmg) {
     if (X+W>play.X-6 && X-W<play.X+6 && Y+H>play.Y-24 && Y-H<play.Y+0) {
       AThurt(dmg);
@@ -851,6 +1249,22 @@ class PRO {
     }
     return false;
   }
+  void UpdateLight(){
+    LightActive[Light] = true;
+    LightPower[Light] = Power;
+    LightX[Light] = X;
+    LightY[Light] = Y;
+  }
+}
+
+int FindLight(){
+  for(int i=0;i<128;i++){
+    if(!LightActive[i]){
+      LightActive[i]=true;
+      return i;
+    }
+  }
+  return 0;
 }
 
 void expd(float x, float y, float r, int d, float f, boolean player) {

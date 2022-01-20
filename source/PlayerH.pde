@@ -15,6 +15,7 @@ class Player{
   boolean notime=false;
   int IV=0;
   boolean Gr=false;
+  boolean Friction=false;
   boolean Ignore=false;
   int cooldownV = 0;
   int cooldownH = 0;
@@ -192,7 +193,7 @@ class Player{
         }
       }
       if(GetKeyBind("Player_Move_Up") && HP>0 && !ConsoleUP){VY=-12;}
-      if(!GetKeyBind("Player_Move_Right") && !GetKeyBind("Player_Move_Left")){VX/=2;}
+      if(!GetKeyBind("Player_Move_Right") && !GetKeyBind("Player_Move_Left") && Friction){VX/=2;}
       if(GetKeyBind("Player_Move_Left") && VX>-7 && HP>0 && !ConsoleUP){VX-=0.7;}
       if(GetKeyBind("Player_Move_Right") && VX< 7 && HP>0 && !ConsoleUP){VX+=0.7;}
       if(GetKeyBind("Player_Move_Up") && GetKeyBind("Player_Boost") && HP>0 && !ConsoleUP){updash();}
@@ -299,6 +300,11 @@ class Player{
         //println(R);
         if(Normal.dot(TOplayer)>0){//its a feature fuck it
           Gr=true;
+          if(CT[i]!=2){
+            Friction=true;
+          }else{
+            Friction=false;
+          }
         }
         break;
       }

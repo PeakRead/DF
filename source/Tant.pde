@@ -13,42 +13,53 @@ String CurrentArena="";
 int CurrentSave;
 
 void tantrest(){
+  DarkenActive=false;
   round=0;
   getFile();
   JSONArray BigFile = loadJSONArray(sketchPath()+"/data/Maps/RAN.json");
   arenas = new JSONArray[BigFile.size()];
   for(int i=0;i<BigFile.size();i++){
     arenas[i]=BigFile.getJSONArray(i);
-  } //<>//
+  }
 }
 
+int Epilog=0;
+
 void tantmath(){
-  if(round-1==Indexs.length){
-    if(Blurer==90000){
-    texttoscren("thats all that exists");
-    }
-    if(Blurer==90000-240){
-    texttoscren("but there might be more");
-    }
-    if(Blurer==90000-480){
-    texttoscren("but now...");
-    }
-    if(Blurer==90000-480-240){//mathhard
-    TextCurr=7;
-    TextString="fuckoff";
-    TextShow=true;
-    }
-    if(Blurer==90000-480-240-60){
-    exit();
-    }
-    play.VX=0;
-    play.VY=0;
-    Blurer--;
-    return;
-  }
   if(Must==0 && PMust!=0){
     waveEnd=true;
     delaytowave=60;
+  }
+  if(round==Indexs.length && waveEnd){
+    if(Epilog==240){
+      NewPartic(new SubText(play.X,play.Y-24,0,-1,60,#FFFFFF,"alright",32.0),true);
+    }
+    if(Epilog==240+120*1){
+      NewPartic(new SubText(play.X,play.Y-24,0,-1,60,#FFFFFF,"i killed god.",32.0),true);
+    }
+    if(Epilog==240+120*2){
+      NewPartic(new SubText(play.X,play.Y,0,-1,60,#FFFFFF,"now what?",32.0),true);
+    }
+    if(Epilog==240+120*4){
+      NewPartic(new SubText(play.X,play.Y,0,-1,60,#FFFFFF,"...",32.0),true);
+    }
+    if(Epilog==240+120*6){
+      AddPartic(1,play.X,play.Y,play.X,-10000,60,#FFFFFF,true);
+      for(int ohno=0;ohno<50;ohno++){
+        AddPartic(2,play.X,play.Y,random(-10,10),random(-10,10),60,#FFFFFF,true);
+      }
+      expd(play.X, play.Y+8, 256, 500, 500, true);
+      play.HP=-500;
+    }
+    if(Epilog==240+120*7){
+      texttoscren("sorry theres no good ending");
+    }
+    if(Epilog==240+120*9){
+      exit();
+    }
+    Epilog++;
+    println(Epilog);
+    return;
   }
   if(Blurer>0 && !waveEnd){
     Blurer--;
@@ -86,6 +97,9 @@ void nextWave(){
     case 21:
     case 30:
     case 40:
+    case 41:
+    case 50:
+    case 60:
     CurrentSave=round;
     byte[] out = new byte[1];
     byte[] tmp = BsetI(round,1);
@@ -116,6 +130,10 @@ void nextWave(){
     Start("Boss2");
     CurrentArena="light";
     break;
+    case 60:
+    Start("Boss3");
+    CurrentArena="end";
+    break;
     default:
     String[] names = arenas[round/20].getStringArray();
     int map=(int)random(0,names.length-1);
@@ -127,6 +145,7 @@ void nextWave(){
         Arspawn=0;
   GrspawnID = new int[0];
   ArspawnID = new int[0];
+  DarkenActive=false;
   for(int i=0;i<ET.length;i++){
     if(ET[i].equals("air")){
       ArspawnID = append(ArspawnID,i);
@@ -134,6 +153,10 @@ void nextWave(){
     }
     if(ET[i].equals("any")){
       GrspawnID = append(GrspawnID,i);
+      //println("any");
+    }
+    if(ET[i].equals("dark")){
+      DarkenActive=true;
       //println("any");
     }
   }
@@ -148,7 +171,7 @@ void ResartWave(){
 }
 
 void arenaSpawn(String name){
-  boolean gr=false; //<>//
+  boolean gr=false;
   for(int i=0;i<AINames.length;i++){
     if(AINames[i].equals(name)){
       gr=Sgroun[i];
@@ -156,7 +179,6 @@ void arenaSpawn(String name){
     }
   }
   //println(name + "!" + round);
-  Must++;
   if(gr){
     float X=EX[GrspawnID[Grspawn]];
     float Y=EY[GrspawnID[Grspawn]];
@@ -164,7 +186,9 @@ void arenaSpawn(String name){
     if(Grspawn==GrspawnID.length){
       Grspawn=0;
     }
-    NewAI(X,Y+-11,name,true);
+    if(NewAI(X,Y+-11,name,true)){
+      Must++;
+    }
     for(int t=0;t<10;t++){
       AddPartic(3,X,Y,random(-2,2),random(-2,2),100,color(155,0,155),true);
     }
@@ -175,7 +199,9 @@ void arenaSpawn(String name){
     if(Arspawn==ArspawnID.length){
       Arspawn=0;
     }
-    NewAI(X,Y+-11,name,true);
+    if(NewAI(X,Y+-11,name,true)){
+      Must++;
+    }
     for(int t=0;t<10;t++){
       AddPartic(3,X,Y,random(-2,2),random(-2,2),100,color(155,0,155),true);
     }

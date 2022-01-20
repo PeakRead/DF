@@ -59,7 +59,8 @@ String[] Confunc = {
 "restart:restarts the player",
 "error:fake error maker",
 "tantsumon:summon a enemy in a tant summon point",
-"text:make a funny text"
+"text:make a funny text",
+"dark:enable disable Darken"
 };
 
 void runConinput(){
@@ -193,6 +194,17 @@ void runConinput(){
         if(i!=args.length-1){text+=' ';}
       }
       texttoscren(text);
+    break;
+    case "dark":
+      DarkenActive = !DarkenActive;
+    break;
+    case "hurt":
+      if(args.length<2){
+        PrintCon("expected more arguments");
+        break;
+      }
+      AThurt(int(args[1]));
+      //play.HP -= int();
     break;
     default:
       PrintCon("what?");

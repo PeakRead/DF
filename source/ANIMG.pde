@@ -5,7 +5,7 @@ class ANIMG{
   int timer=0;
   int frame=0;
   ANIMG(String file){
-    Frames = new PImage[0]; //<>// //<>//
+    Frames = new PImage[0];
     RFrames = new int[0];
     int[] RLOAD = new int[0];
     byte[] DATA = loadBytes(file);
@@ -30,7 +30,7 @@ class ANIMG{
       header+=2;
     }
     for(int u=0;u<RLOAD.length;u++){
-      Frames = (PImage[])append(Frames,SloadImage("Maps/"+MAPname+"/"+(sub)+(u)+".png"));
+      Frames = (PImage[])append(Frames,SloadImage("Maps/"+Mapinfo.Name+"/"+(sub)+(u)+".png"));
       image(Frames[RFrames[u]],0,0);
     }
         delay = BgetI(DATA,header,2);

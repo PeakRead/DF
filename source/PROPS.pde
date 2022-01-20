@@ -5,10 +5,14 @@ class PROP{
   int timer=0;
   int delay=0;
   int frame=0;
+  int light=0;
   PROP(float nX,float nY,String nT){
     X=nX;
     Y=nY;
     T=nT;
+    if(T.equals("lamp")){
+      light=FindLight();
+    }
   }
   void math(){
     timer++;
@@ -19,9 +23,18 @@ class PROP{
     if(frame==PROPR[Propredirect.get(T)].size()){
       frame=0;
     }
+    if(T.equals("lamp")){
+      LightX[light] = X;
+      LightY[light] = Y-60;
+      LightPower[light] = 1;
+      LightActive[light] = true;
+    }
   }
   void render(){
     PROPR[Propredirect.get(T)].ANR(X,Y,frame);
+    if(T.equals("lamp")){
+      
+    }
   }
 }
 

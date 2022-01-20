@@ -184,7 +184,8 @@ class Wind extends Effect{
 
 class SubText extends Effect{
   String text;
-  SubText(float nX,float nY,float nVX,float nVY,int ntime,color nC,String ntext){
+  float scale;
+  SubText(float nX,float nY,float nVX,float nVY,int ntime,color nC,String ntext,float scale){
     X=nX;
     Y=nY;
     VX=nVX;
@@ -193,6 +194,7 @@ class SubText extends Effect{
     Mtime=ntime;
     C=nC;
     text=ntext;
+    this.scale=scale;
   }
   void mathE(int T){
     if(time==0){
@@ -204,7 +206,9 @@ class SubText extends Effect{
   }
   void drawE(){
     fill(C);
+    textSize(scale);
     text(text,X,Y);
+    textSize(12);
   }
 }
 
@@ -236,6 +240,36 @@ class StandImg extends Effect{
   }
 }
 
+class ShockWave extends Effect{
+  ShockWave(float nX,float nY,float nVX,float nVY,int ntime,color nC){
+    X=nX;
+    Y=nY;
+    VX=nVX;
+    VY=nVY;
+    time=ntime;
+    Mtime=ntime;
+    C=nC;
+    theImgID=PartTextName.get("Shockwave.png",0);
+  }
+  int theImgID=0;
+  float scale=0;
+  void mathE(int T){
+    if(time==0){
+      Ekill.append(T);
+    }
+    X+=VX;
+    Y+=VY;
+    scale+=20;
+    time--;
+  }
+  void drawE(){
+    //fill(C);
+    tint(C,float(time*255)/Mtime);
+    image(PartImgs[theImgID],X-scale/2,Y-scale/2,scale,scale);
+    noTint();
+  }
+}
+
 class Smoke extends Effect{
   float gravmult=1;
   Smoke(float nX,float nY,float nVX,float nVY,int ntime,color nC,float gravmult){
@@ -259,6 +293,33 @@ class Smoke extends Effect{
     time--;
   }
   void drawE(){
+  }
+}
+
+class Circle extends Effect{
+  Circle(float nX,float nY,float nR,int ntime,color nC,float Weight){
+    X=nX;
+    Y=nY;
+    VX=nR;
+    VY=0;
+    time=ntime;
+    Mtime=ntime;
+    C=nC;
+    this.Weight=Weight;
+  }
+  float Weight=5;
+  void mathE(int T){
+    if(time==0){
+      Ekill.append(T);
+    }
+    //nothing!!
+    time--;
+  }
+  void drawE(){
+    strokeWeight((float)time*(float)Weight/(float)Mtime);
+    stroke(C,(float)time*(float)255/(float)Mtime);
+    noFill();
+    circle(X,Y,VX);
   }
 }
 
@@ -321,7 +382,7 @@ void AddPartic(int T,float X,float Y,float VX,float VY,int time,color C,boolean 
       ListEffects.add(new Wind(X,Y,VX,VY,time,C));
     break;
     case 7:
-      ListEffects.add(new SubText(X,Y,VX,VY,time,C,""));
+      ListEffects.add(new SubText(X,Y,VX,VY,time,C,"",24));
       //Text tmp=(Text)ListEffects.get(ListEffects.size()-1);
       //tmp.text="test";
       //ListEffects.set(ListEffects.size()-1,tmp);

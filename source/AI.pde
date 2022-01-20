@@ -5,10 +5,11 @@ int PMust=0;
 IntList BOSSHP;
 IntList BOSSID;
 
-String[] AINames={"Bug", "Fly", "Target", "Spewer", "testBoss", "Maze", "Laze", "Maze_Boss", "Laze_Boss", "tower", "napalm", "Spirit", "Guardian", "Crab", "Piller", "Supply", "Supply_Boss", "Electron"};
-boolean[] Sgroun={true , false, true    , true    , true      , false , false , false      , false      , true   , true    , false   , true      , true  , true    , false   , false        , false     };
+String[] AINames={"Bug", "Fly", "Target", "Spewer", "testBoss", "Maze", "Laze", "Maze_Boss", "Laze_Boss", "tower", "napalm", "Spirit", "Guardian", "Crab", "Piller", "Supply", "Supply_Boss", "Electron", "Limbo","Lust","Gluttony","Greed","Anger","Heresy","Hatred","Violence","Fraud","Treachery","Zenith"};
+boolean[] Sgroun={true ,false , true    , true    , true      , false , false , false      , false      , true   , true    , false   , true      , true  , true    , false   , false        , false     , false  ,false ,false     ,false  ,false  ,false   ,false   ,false     ,false  ,false      ,false};
 String[] SupplySummon={"Fly", "Bug", "Spewer", "tower", "Maze", "Laze"};
-
+String[] LimboSummoners = {"Limbo","Lust","Gluttony","Greed","Anger","Heresy","Violence","Fraud","Treachery"};
+  
 void AIMath() {
   PMust=Must;
   for (int i=0; i<ListAi.size(); i++) {
@@ -574,8 +575,8 @@ class Laze extends AI {
       circle(Tx, Ty, 16);
       line(Tx-20, Ty, Tx+20, Ty);
       line(Tx, Ty-20, Tx, Ty+20);
-      stroke(#FF0000,100);
-      line(X,Y-H/2,Tx,Ty);
+      stroke(#FF0000, 100);
+      line(X, Y-H/2, Tx, Ty);
     }
   }
 }
@@ -707,11 +708,13 @@ class Spirit extends AI {
       kill.append(SID);
       return;
     }
-    if(!Con){hurte=true;}
+    if (!Con) {
+      hurte=true;
+    }
     if (Cooldown==0 & !Con) {
       int NUM=floor(random(0, ListAi.size()));
       try {
-        if (SID!=NUM && !(ListAi.get(NUM).getClass()==Class.forName("ProjectDF$Spirit"))) {
+        if (SID!=NUM && !(ListAi.get(NUM).getClass()==Class.forName("ProjectDF$Spirit") || ListAi.get(NUM).getClass()==Class.forName("ProjectDF$Hatred"))) {
           Connected=NUM;
           Con=true;
           hurte=false;
@@ -722,17 +725,18 @@ class Spirit extends AI {
       }
     }
     try {
-      if(ListAi.get(Connected).getClass()==Class.forName("ProjectDF$Spirit")){
+      if (ListAi.get(Connected).getClass()==Class.forName("ProjectDF$Spirit") || ListAi.get(Connected).getClass()==Class.forName("ProjectDF$Hatred")) {
         Con=false;
         hurte=true;
       }
-    }catch(Exception e) {
+    }
+    catch(Exception e) {
     }
     if (Cooldown>0 & !Con) {
       Cooldown--;
     }
     float R=atan2(Y-play.Y, X-play.X);
-    if(frameCount%2==0){
+    if (frameCount%2==0) {
       NewPR(X, Y-H/2, -cos(R), -sin(R), 5);
     }
     if (dist(X, Y, play.X, play.Y)<150) {
@@ -873,7 +877,7 @@ class Crab extends AI {
     M=nM;
     W=32;
     H=48;//1600
-    HP=1000;
+    HP=400;//1000 is too much for you
     T=3;
     Animr = new SelfAnim(EAR.get("Crab"));
   }
@@ -1221,99 +1225,101 @@ class Electron extends AI {
       }
       kill.append(SID);
       return;
-    }else{
-    if (Shield<=0) {
-      NewPartic(new Explode(X, Y-H/2, 100, 0, 40, #EA0C13), true);
-      for (int i=0; i<4; i++) {
-        NewPartic(new Smoke(X, Y-H/2, random(-5, 5), random(-5, 5), 40, #393030, -0.5), true);
-      }
-      downed=true;
-      Shield=0;
-    }
-    if (downed) {
-      if (Shield==1000) {
-        downed=false;
-        Cooldown=50;
-        attacking=0;
-      }
-      Shield+=2;
-      VY+=0.5;
     } else {
-      if (Cooldown==0 && attacking<=0) {
-        attacking=300;
-        //attack=round(random(0, 3));
-      }
-      if (attacking>0) {
-        if (attack==0) {
-          if (attacking%30==0) {
-            for (int i=0; i<8; i++) {
-              //NewSPr(new SEletro(X,Y,3,PI/200,400,0,i*PI/4+attacking/20.0));//HARD
-              //NewSPr(new SEletro(X,Y,3,-PI/200,400,0,i*PI/4-attacking/20.0));//HARD
-              //NewSPr(new SEletro(X,Y,6,PI/200,400,0,i*PI/4+attacking/20.0));//HARD
-              //NewSPr(new SEletro(X,Y,6,-PI/200,400,0,i*PI/4-attacking/20.0));//HARD
-              NewSPr(new SEletro(X, Y-H/2, 3, PI/400, 400, 0, i*PI/4+attacking/15.0));
-            }
-          }
-          if ((attacking-15)%30==0) {
-            for (int i=0; i<8; i++) {
-              NewSPr(new SEletro(X, Y-H/2, 3, -PI/400, 400, 0, i*PI/4+attacking/15.0));
-            }
-          }
+      if (Shield<=0) {
+        NewPartic(new Explode(X, Y-H/2, 100, 0, 40, #EA0C13), true);
+        for (int i=0; i<4; i++) {
+          NewPartic(new Smoke(X, Y-H/2, random(-5, 5), random(-5, 5), 40, #393030, -0.5), true);
         }
-        if (attack==1) {
-          if (attacking%30==0) {
-            for (int i=0; i<1; i++) {
-              //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
-              //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
-              //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
-              //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
-              if(random(0,1)<0.5){
-              NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/2));
-              NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, 0));
-              }else{
-              NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/4));
-              NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/4*3));
+        downed=true;
+        Shield=0;
+      }
+      if (downed) {
+        if (Shield==1000) {
+          downed=false;
+          Cooldown=50;
+          attacking=0;
+        }
+        Shield+=2;
+        VY+=0.5;
+      } else {
+        if (Cooldown==0 && attacking<=0) {
+          attacking=300;
+          //attack=round(random(0, 3));
+        }
+        if (attacking>0) {
+          if (attack==0) {
+            if (attacking%30==0) {
+              for (int i=0; i<8; i++) {
+                //NewSPr(new SEletro(X,Y,3,PI/200,400,0,i*PI/4+attacking/20.0));//HARD
+                //NewSPr(new SEletro(X,Y,3,-PI/200,400,0,i*PI/4-attacking/20.0));//HARD
+                //NewSPr(new SEletro(X,Y,6,PI/200,400,0,i*PI/4+attacking/20.0));//HARD
+                //NewSPr(new SEletro(X,Y,6,-PI/200,400,0,i*PI/4-attacking/20.0));//HARD
+                NewSPr(new SEletro(X, Y-H/2, 3, PI/400, 400, 0, i*PI/4+attacking/15.0));
+              }
+            }
+            if ((attacking-15)%30==0) {
+              for (int i=0; i<8; i++) {
+                NewSPr(new SEletro(X, Y-H/2, 3, -PI/400, 400, 0, i*PI/4+attacking/15.0));
               }
             }
           }
-        }
-        if (attack==2) {
-          //if (attacking%5==0) {
-          //  for (int i=0; i<3; i++) {
-          //    NewSPr(new SEletro(X, Y-H/2, -6, random(-PI/400, PI/400), 400, 1200, random(-PI, PI)));
-          //  }
-          //}
-          //if (attacking%25==0) {
-          //    NewSPr(new Bross(play.X+random(-200,200),play.Y-12+random(-200,200),random(-2,2),random(-2,2),60,round(random(0,7))*PI/8));//HARD
-          //}
-          if (attacking%5==0) {
-            for (int i=0; i<2; i++) {
-              NewSPr(new SEletro(X, Y-H/2, -6, random(-PI/400, PI/400), 400, 1200, random(-PI, PI)));
+          if (attack==1) {
+            if (attacking%30==0) {
+              for (int i=0; i<1; i++) {
+                //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
+                //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
+                //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
+                //NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, round(random(0,7))*PI/8));//HARD
+                if (random(0, 1)<0.5) {
+                  NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/2));
+                  NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, 0));
+                } else {
+                  NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/4));
+                  NewSPr(new Bross(play.X, play.Y-12, 0, 0, 60, PI/4*3));
+                }
+              }
             }
           }
-        }
-        if (attack==3) {
-          if (attacking%30==0) {//TRUE 20
-            for (int i=0; i<4; i++) {
-              //NewSPr(new Bross(play.X+random(-200,200),play.Y-12+random(-200,200),random(-2,2),random(-2,2),60,round(random(0,7))*PI/8));//HARD
-              NewSPr(new Bross(play.X+random(-400, 400), play.Y-12+random(-400, 400), 0, 0, 60, round(random(0, 3))*PI/4));
+          if (attack==2) {
+            //if (attacking%5==0) {
+            //  for (int i=0; i<3; i++) {
+            //    NewSPr(new SEletro(X, Y-H/2, -6, random(-PI/400, PI/400), 400, 1200, random(-PI, PI)));
+            //  }
+            //}
+            //if (attacking%25==0) {
+            //    NewSPr(new Bross(play.X+random(-200,200),play.Y-12+random(-200,200),random(-2,2),random(-2,2),60,round(random(0,7))*PI/8));//HARD
+            //}
+            if (attacking%5==0) {
+              for (int i=0; i<2; i++) {
+                NewSPr(new SEletro(X, Y-H/2, -6, random(-PI/400, PI/400), 400, 1200, random(-PI, PI)));
+              }
             }
           }
+          if (attack==3) {
+            if (attacking%30==0) {//TRUE 20
+              for (int i=0; i<4; i++) {
+                //NewSPr(new Bross(play.X+random(-200,200),play.Y-12+random(-200,200),random(-2,2),random(-2,2),60,round(random(0,7))*PI/8));//HARD
+                NewSPr(new Bross(play.X+random(-400, 400), play.Y-12+random(-400, 400), 0, 0, 60, round(random(0, 3))*PI/4));
+              }
+            }
+          }
+          attacking--;
+          if (attacking<=0) {
+            Cooldown=300;
+            attack++;
+            if (attack==4) {
+              attack=0;
+            }
+          }
+        } else {
+          Cooldown--;
         }
-        attacking--;
-        if (attacking<=0) {
-          Cooldown=300;
-          attack++;
-          if(attack==4){attack=0;}
-        }
-      } else {
-        Cooldown--;
+        VX+=(0-X)/10;
+        VY+=(-500-Y)/10;
+        VX=VX/10*9;
+        VY=VY/10*9;
       }
-      VX+=(0-X)/10;
-      VY+=(-500-Y)/10;
-      VX=VX/10*9;
-      VY=VY/10*9;
-    }
     }
     Phys(W, H, false);
     X+=VX;
@@ -1327,15 +1333,15 @@ class Electron extends AI {
     }
     Animr.Anim(false, !downed);
     Animr.DIMG(X, Y, W, H, false, !downed, #FFFFFF);
-    if(!downed){
-      for(int i=0;i<4;i++){
+    if (!downed) {
+      for (int i=0; i<4; i++) {
         Animr.EIMG(X+cos(frameCount/60.0+PI/2*i)*50, Y+sin(frameCount/60.0+PI/2*i)*50-H/2, 21, 21, 0, attack, #FFFFFF);
       }
     }
     noStroke();
     fill(#7ECCF0, 75);
     circle(X, Y-H/2, 100);
-    arc(X, Y-H/2, 100,100,-PI/2,PI*Shield/500-PI/2);
+    arc(X, Y-H/2, 100, 100, -PI/2, PI*Shield/500-PI/2);
   }
   void HURT(int dmg)
   {
@@ -1367,6 +1373,971 @@ class Electron extends AI {
         AddPartic(4, X, Y, random(-8, 8), random(-8, 8), 50, #7ECCF0, true);
       }
     }
+  }
+}
+
+
+class Limbo extends AI {
+  Limbo(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  int Cooldown=600+(int)random(0, 600);
+  ;
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==0){
+      NewAI(X+random(-5,5),Y+random(-5,5),LimboSummoners[floor(random(0,LimboSummoners.length))],true);
+      Cooldown=600+(int)random(0, 600);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<180) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>180) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #4B2705, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    noStroke();
+    fill(#4B2705);
+    circle(X, Y-H/2, H);
+    stroke(color(155,0,155),255-Cooldown*0.5);
+    strokeWeight(3);
+    if(Cooldown<240){
+      line(X+cos( frameCount*1.0/Cooldown)*24,Y+sin( frameCount*1.0/Cooldown)*24-W,X-cos( frameCount*1.0/Cooldown)*24,Y-sin( frameCount*1.0/Cooldown)*24-W);
+      line(X+cos(-frameCount*1.0/Cooldown)*24,Y+sin(-frameCount*1.0/Cooldown)*24-W,X-cos(-frameCount*1.0/Cooldown)*24,Y-sin(-frameCount*1.0/Cooldown)*24-W);
+    }
+    strokeWeight(1);
+  }
+}
+
+class Lust extends AI {
+  Lust(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  int Cooldown=200+(int)random(0, 200);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==0){
+      NewSPr(new WindBall(X,Y,-cos(R)*3,-sin(R)*3));
+      Cooldown=200+(int)random(0, 200);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<175) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>175) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #D0CFD1, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    noStroke();
+    fill(#D0CFD1);
+    circle(X, Y-H/2, H);
+    stroke(color(155,0,155),255-Cooldown*0.5);
+  }
+}
+
+class Gluttony extends AI {
+  Gluttony(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  int Cooldown=100+(int)random(0, 100);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==0){
+      NewSPr(new IceBall(X,Y,-cos(R)*0.5,-sin(R)*0.5));
+      Cooldown=100+(int)random(0, 100);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<170) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>170) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #57DECD, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    noStroke();
+    fill(#57DECD);
+    circle(X, Y-H/2, H);
+    stroke(color(155,0,155),255-Cooldown*0.5);
+  }
+}
+
+class Greed extends AI {
+  Greed(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  int Cooldown=100+(int)random(0, 100);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==0){
+      for(int i=0;i<3;i++){
+        float Rand=random(-PI/20,PI/20)+atan2(Y-play.Y+50, X-play.X);
+        NewSPr(new Melting(X,Y,-cos(Rand)*5,-sin(Rand)*5));
+      }
+      Cooldown=100+(int)random(0, 100);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<165) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>165) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #FFE200, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    noStroke();
+    fill(#FFE200);
+    circle(X, Y-H/2, H);
+    stroke(color(155,0,155),255-Cooldown*0.5);
+  }
+}
+
+class Anger extends AI {
+  Anger(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  int Cooldown=200+(int)random(0, 200);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==0){
+      NewSPr(new Rage(X,Y,-cos(R)*5,-sin(R)*5));
+      Cooldown=200+(int)random(0, 200);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<160) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>160) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #176C0B, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    noStroke();
+    fill(#176C0B);
+    circle(X, Y-H/2, H);
+    stroke(color(155,0,155),255-Cooldown*0.5);
+  }
+}
+
+  class Heresy extends AI {
+  Heresy(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  int Cooldown=200+(int)random(0, 200);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==0){
+      NewSPr(new MiniFire(X,Y,0,0));
+      Cooldown=200+(int)random(0, 200);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<155) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>155) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #FF9008, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    noStroke();
+    fill(#FF9008);
+    circle(X, Y-H/2, H);
+    stroke(color(155,0,155),255-Cooldown*0.5);
+  }
+}
+
+class Violence extends AI {
+  Violence(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  int Cooldown=200+(int)random(0, 200);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown<45){
+      NewPartic(new Wind(X+random(-8, 8), Y-random(0, 16), random(-3, 3), random(-3, 3), 30, #FF0000), true);
+    }
+    if(Cooldown==0){
+      VX=-cos(R)*15;
+      VY=-sin(R)*15;
+      Cooldown=200+(int)random(0, 200);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<150) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>150) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -10, 10)+random(-0.5,0.5);
+    VY=constrain(VY, -10, 10)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #FF0000, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    Cont(W, H, 15);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    noStroke();
+    fill(#FF0000);
+    circle(X, Y-H/2, H);
+    stroke(color(255,0,0),255-Cooldown*0.5);
+  }
+}
+
+class Hatred extends AI {
+  Hatred(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=16;
+    H=32;
+    hurte=false;
+    HP=2147483647;
+    Animr = new SelfAnim(EAR.get("Hatred"));
+  }
+  int Cooldown=300;
+  float R=0;
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    if(Cooldown==80){
+      NewSPr(new hurtbox(X+cos(R)*1500,Y-H/2+sin(R)*1500,3000,25,R,40,70,5));
+    }
+    if(Cooldown==75){
+      NewSPr(new hurtbox(X+cos(R)*1500,Y-H/2+sin(R)*1500,3000,35,R,40,75,5));
+    }
+    if(Cooldown==70){
+      NewSPr(new hurtbox(X+cos(R)*1500,Y-H/2+sin(R)*1500,3000,45,R,40,80,15));
+    }
+    if(Cooldown<=0){
+      Cooldown=300;
+    }
+    if(Cooldown>120){
+      R=atan2(play.Y-12-Y+H/2, play.X-X);
+    }
+    Cooldown--;
+    //VX=constrain(VX, -2, 2)+random(-0.1,0.1);
+    //VY=constrain(VY, -2, 2)+random(-0.1,0.1);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #FF0000, 1), true);
+    }
+    //VY-=0.01;
+    Phys(W, H, true);
+    //X+=VX;
+    //Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    Animr.Anim(false, true);
+    Animr.DIMG(X, Y, W, H, false, true, #FFFFFF);
+    if (Cooldown>120 && Cooldown<300) {
+      stroke(#FF0000);
+      line(X,Y-H/2,X+cos( (Cooldown-120)/240.0+R)*3000,Y-H/2+sin( (Cooldown-120)/240.0+R)*3000);
+      line(X,Y-H/2,X+cos(-(Cooldown-120)/240.0+R)*3000,Y-H/2+sin(-(Cooldown-120)/240.0+R)*3000);
+      line(X,Y-H/2,X+cos(R)*3000,Y-H/2+sin(R)*3000);
+    }
+  }
+}
+
+class Fraud extends AI {
+  Fraud(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  int Cooldown=200+(int)random(0, 200);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==0){
+      NewPartic(new Line(play.X,play.Y,X,Y,60,#222222,5),true);
+      AThurt(10);
+      HP+=20;
+      Cooldown=200+(int)random(0, 200);
+      for (int B=0; B<5; B++) {
+        NewPartic(new VELLPoint(X, Y, random(-1, 1), random(-8, -2), 50, color(255, 0, 0)), true);
+      }
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<145) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>145) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #222222, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    Cont(W, H, 15);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    noStroke();
+    fill(#222222);
+    circle(X, Y-H/2, H);
+    stroke(color(255,0,0),255-Cooldown*0.5);
+  }
+  void HURT(int dmg)
+  {
+    if (!hurte) {
+      return;
+    }
+    HP-=dmg;
+    for (int B=0; B<5; B++) {
+      AddPartic(4, X, Y, random(-1, 1), random(-8, -2), 50, color(255, 0, 0), true);
+    }
+    if (play.regenera==0) {
+      if (dist(X, Y, play.X, play.Y)<=200 && play.HP>0) {
+        AddPartic(1, play.X+random(-5, 5), play.Y-12+random(-5, 5), X+random(-5, 5), Y-H/2+random(-5, 5), 60, color(255, 0, 0), true);
+        if (play.HP+dmg/2>100) {
+          play.HP=100;
+        } else {
+          play.HP+=dmg/2;
+        }
+      }
+    } else {
+      if (random(1, 100)<50 && play.HP>0) {
+        NewPR(X, Y-H/2, random(-5, 5), random(-5, 5), 10);
+      }
+    }
+  }
+}
+
+class Treachery extends AI {
+  Treachery(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  float LPX = 0;
+  float LPY = 0;
+  int Cooldown=200+(int)random(0, 200);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==30){
+      LPX=play.X;
+      LPY=play.Y;
+    }
+    if(Cooldown==0){
+      expd(LPX,LPY,128,30,0,true);
+      Cooldown=200+(int)random(0, 200);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<140) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>140) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #004444, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    Cont(W, H, 15);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    if(Cooldown<30){
+      stroke(#0BD8B4);
+      strokeWeight(3);
+      noFill();
+      circle(LPX,LPY,128);
+      circle(LPX,LPY,Cooldown*128/30);
+      if(Configs.get("DrawEffects")==1){
+        for(int i=0;i<8;i++){
+          float R = PI/4*i;
+          line(LPX+cos(R)*64,LPY+sin(R)*64,LPX+cos(R)*80,LPY+sin(R)*80);
+        }
+      }
+    }
+    noStroke();
+    fill(#0BD8B4);
+    circle(X, Y-H/2, H);
+    stroke(color(255,0,0),255-Cooldown*0.5);
+  }
+}
+
+class Zenith extends AI {
+  Zenith(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY+50;
+    M=nM;
+    W=50;
+    H=100;
+    HP=4000;
+    LX = new float[4];
+    LY = new float[4];
+    TX = new float[4];
+    TY = new float[4];
+    for(int i=0;i<4;i++){
+      float R=PI/4+PI/2*i;
+      LX[i]=cos(R)*500;
+      LY[i]=sin(R)*500;
+      TX[i]=cos(R)*500;
+      TY[i]=sin(R)*500;
+    }
+    Animr = new SelfAnim(EAR.get("Zenith"));
+    BOSSHP.append(HP);
+    BOSSID.append(ListAi.size());
+  }
+  float[] LX;
+  float[] LY;
+  float[] TX;
+  float[] TY;
+  int DeathTimer=0;
+  int AttackCooldown=0;
+  int Attack=0;
+  int lazerAce=0;
+  int lazerSpeed=0;
+  float lazerOff=0;
+  boolean ShootOffset=false;
+  float Spyral=0;
+  float SpyralOff=0;
+  int lastAttack=-1;
+  float Deathspiral=0;
+  Boolean enraged=false;
+  int timealive=0;
+  void math(int SID) {
+    //HP=0;//DEBUG
+    if (HP<=0) {
+      if(timealive>600){
+        HP=0;
+        DeathTimer++;
+        if(DeathTimer>120 && DeathTimer<600){
+          Deathspiral+=1;
+          if(DeathTimer%30==15 && DeathTimer>300){
+            for(int i=0;i<50;i++){
+              float R=i*PI/25+Deathspiral*PI/200;
+              NewSPr(new DeathShard(X,Y-50,R,10,0));
+            }
+          }
+          if(DeathTimer%30==0){
+            for(int i=0;i<50;i++){
+              float R=i*PI/25+Deathspiral*PI/100;
+              NewSPr(new DeathShard(X,Y-50,R,10,0));
+            }
+          }
+        }
+      }else{
+        HP=4000;
+        enraged=true;
+        NewPartic(new ShockWave(X,Y-50,0,0,120,#FFFFFF),true);
+      }
+    }
+    if(DeathTimer==660){
+      for(int i=0;i<80;i++){
+        float R=i*PI/40;
+        NewSPr(new Shard(X,Y-50,R,12,0));
+        NewSPr(new Shard(X,Y-50,R+PI/80/2,11,0));
+        NewSPr(new Shard(X,Y-50,R+PI/80,10,0));
+      }
+      kill.append(SID);
+      return;
+    }
+    float R=0;
+    if(play.HP>0 && HP>0){
+      R=atan2(play.Y+50-Y,play.X-X);
+    }else{
+      R=atan2(50-Y,-X);
+    }
+    if(AttackCooldown<-120 && HP>0){
+      lastAttack = Attack;
+      while(Attack==lastAttack){
+        Attack = floor(random(0,3));
+      }
+      //Attack=2;
+      if(Attack==0){
+        lazerAce=0;
+        lazerOff=atan2(Y-play.Y+50,X-play.X);
+        AttackCooldown=480;
+
+      }
+      if(Attack==1){
+        ShootOffset=true;
+        AttackCooldown=480;
+        for(int i=-2;i<3;i++){
+          float Rotate = i*PI/8+R;
+          NewPartic(new Line(X,Y-50,X+cos(Rotate)*2000,Y+sin(Rotate)*2000-50,120,#FF0000,4),true);
+        }
+      }
+      if(Attack==2){
+        Spyral=atan2(Y-play.Y+50,X-play.X);
+        AttackCooldown=480;
+        SpyralOff=0;
+      }
+    }
+    if(AttackCooldown>=0){
+    if(HP>0 && play.HP>0){
+      if(Attack==0){
+        if(enraged){        
+          float Rotate = lazerOff-PI;
+          if(AttackCooldown<480-100){
+            NewSPr(new hurtbox(X+cos(Rotate+PI/2)*100,Y-50+sin(Rotate+PI/2)*100,4000,35,Rotate,80,10,3));
+            NewSPr(new hurtbox(X+cos(Rotate-PI/2)*100,Y-50+sin(Rotate-PI/2)*100,4000,35,Rotate,80,10,3));
+            if(AttackCooldown%30==0){
+              if(AttackCooldown%60==0){
+                NewSPr(new DeathShard(X+cos(Rotate-PI/2)*25,Y-50+sin(Rotate-PI/2)*25,Rotate,12,0));
+                NewSPr(new DeathShard(X+cos(Rotate-PI/2)*50,Y-50+sin(Rotate-PI/2)*50,Rotate,12,0));
+                NewSPr(new DeathShard(X+cos(Rotate-PI/2)*75,Y-50+sin(Rotate-PI/2)*75,Rotate,12,0));
+              }else{
+                NewSPr(new DeathShard(X+cos(Rotate+PI/2)*25,Y-50+sin(Rotate+PI/2)*25,Rotate,12,0));
+                NewSPr(new DeathShard(X+cos(Rotate+PI/2)*50,Y-50+sin(Rotate+PI/2)*50,Rotate,12,0));
+                NewSPr(new DeathShard(X+cos(Rotate+PI/2)*75,Y-50+sin(Rotate+PI/2)*75,Rotate,12,0));
+              }
+            }
+          }else{
+            lazerOff=atan2(Y-play.Y-50,X-play.X);
+            NewPartic(new Line(X+cos(Rotate)*2000,Y+sin(Rotate)*2000-50,X-cos(Rotate)*2000,Y-sin(Rotate)*2000-50,120,#FF0000,4),true);
+          }
+        }else{
+          if(AttackCooldown>240){
+            lazerAce++;
+          }
+          if(AttackCooldown<240){
+            lazerAce--;
+          }
+          lazerSpeed+=lazerAce;
+          Float Rotate = lazerSpeed/500.0*PI/30.0+lazerOff;
+          NewSPr(new hurtbox(X+cos(Rotate)*1000,Y-50+sin(Rotate)*1000,2000,35,Rotate,30,10,3));
+          NewPartic(new Line(X-cos(Rotate)*2000,Y-sin(Rotate)*2000-50,X,Y-50,30,#FF0000,4),true);
+        }
+      }
+      if(Attack==1 && AttackCooldown%20==0 && AttackCooldown<360){
+        if(ShootOffset){
+          for(int i=(enraged?-4:-2);i<(enraged?5:3);i++){
+            NewSPr(new Shard(X,Y-50,R+i*PI/8,enraged?10:8,0));
+          }
+        }else{
+          for(int i=(enraged?-4:-2);i<(enraged?4:2);i++){
+            NewSPr(new Shard(X,Y-50,R+i*PI/8+PI/16,enraged?10:8,0));
+          }
+        }
+        ShootOffset=!ShootOffset;
+      }
+      if(Attack==2){
+        if(AttackCooldown<360){
+          SpyralOff+=PI/180;
+          NewSPr(new hurtbox(X,Y-50,1000,35,Spyral+SpyralOff+PI/4,30,10,3));
+          NewSPr(new hurtbox(X,Y-50,1000,35,Spyral+SpyralOff-PI/4,30,10,3));
+          NewSPr(new hurtbox(X+cos(Spyral-SpyralOff+PI/4)*750,Y-50+sin(Spyral-SpyralOff+PI/4)*750,500,35,Spyral-SpyralOff+PI/4,30,10,3));
+          NewSPr(new hurtbox(X+cos(Spyral-SpyralOff-PI/4)*750,Y-50+sin(Spyral-SpyralOff-PI/4)*750,500,35,Spyral-SpyralOff-PI/4,30,10,3));
+          NewSPr(new hurtbox(X+cos(Spyral-SpyralOff+PI/4*3)*750,Y-50+sin(Spyral-SpyralOff+PI/4*3)*750,500,35,Spyral-SpyralOff+PI/4*3,30,10,3));
+          NewSPr(new hurtbox(X+cos(Spyral-SpyralOff-PI/4*3)*750,Y-50+sin(Spyral-SpyralOff-PI/4*3)*750,500,35,Spyral-SpyralOff-PI/4*3,30,10,3));
+          if(enraged){
+            NewSPr(new hurtbox(X+cos(Spyral+SpyralOff+PI/4)*850,Y-50+sin(Spyral+SpyralOff+PI/4)*850,300,35,Spyral+SpyralOff+PI/4,30,10,3));
+            NewSPr(new hurtbox(X+cos(Spyral+SpyralOff-PI/4)*850,Y-50+sin(Spyral+SpyralOff-PI/4)*850,300,35,Spyral+SpyralOff-PI/4,30,10,3));
+            NewSPr(new hurtbox(X+cos(Spyral+SpyralOff+PI/4*3)*850,Y-50+sin(Spyral+SpyralOff+PI/4*3)*850,300,35,Spyral+SpyralOff+PI/4*3,30,10,3));
+            NewSPr(new hurtbox(X+cos(Spyral+SpyralOff-PI/4*3)*850,Y-50+sin(Spyral+SpyralOff-PI/4*3)*850,300,35,Spyral+SpyralOff-PI/4*3,30,10,3));
+            
+            NewSPr(new hurtbox(X,Y-50,600,35,Spyral-SpyralOff+PI/4,30,10,3));
+            NewSPr(new hurtbox(X,Y-50,600,35,Spyral-SpyralOff-PI/4,30,10,3));
+            
+            NewSPr(new hurtbox(X,Y-50,2000,35,Spyral-SpyralOff/8+PI/4,30,10,3));
+            NewSPr(new hurtbox(X,Y-50,2000,35,Spyral-SpyralOff/8-PI/4,30,10,3));
+          }
+        }else{
+          NewPartic(new Line(X+cos(Spyral+PI/4)*1000,Y+sin(Spyral+PI/4)*1000-50,X-cos(Spyral+PI/4)*1000,Y-sin(Spyral+PI/4)*1000-50,5,#FF0000,5),true);
+          NewPartic(new Line(X+cos(Spyral-PI/4)*1000,Y+sin(Spyral-PI/4)*1000-50,X-cos(Spyral-PI/4)*1000,Y-sin(Spyral-PI/4)*1000-50,5,#FF0000,5),true);
+          NewPartic(new Circle(X,Y-50,1000,2,#FF0000,5),true);
+          NewPartic(new Circle(X,Y-50,2000,2,#FF0000,5),true);
+        }
+      }
+    }
+    }
+    AttackCooldown--;
+    if(HP<2500 || enraged){
+      if(HP>0){
+        float Speed=0;
+        if(enraged){
+           Speed = map(HP,0,4000,14,6);
+        }else{
+           Speed = map(HP,0,2500,10,1);
+        }
+        if(Attack==2 && AttackCooldown<360 && AttackCooldown>0 || Attack==0 && enraged){
+          Speed*=enraged?0.0:0.6;
+        }
+        X+=cos(R)*Speed;
+        Y+=sin(R)*Speed;
+      }else{
+        X+=cos(R)*5;
+        Y+=sin(R)*5;
+      }
+      for(int i=0;i<4;i++){
+        if(enraged){
+          if (LX[i]+20>play.X-6 && LX[i]-20<play.X+6 && LY[i]+20>play.Y-24 && LY[i]-20<play.Y+0) {
+            AThurt(25);
+          }
+        }
+        LX[i]=TX[i]*0.1+LX[i]*0.9;
+        LY[i]=TY[i]*0.1+LY[i]*0.9;
+        float D = dist(TX[i],TY[i],X,Y);
+        if(D>500 || D<150){
+          float Ran;
+          if(enraged){
+            Ran = R+random(-PI/16,PI/16);
+          }else{
+            Ran = R+random(-PI/4,PI/4);
+          }
+          TX[i]=X+cos(Ran)*400;
+          TY[i]=Y+sin(Ran)*400;
+        }
+      }
+    }
+    Cont(W, H, 50);
+    timealive++;
+  }
+  void render() {
+    float R=atan2(play.Y+50-Y,play.X-X);
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    for(int i=0;i<4;i++){
+      float Rotate=atan2(LY[i]-Y+50,LX[i]-X);
+      for(int u=0;u<18;u++){
+        //circle(lerp(X,LX[i],u/10.0),lerp(Y-50,LY[i],u/10.0),8);
+        int INDEX = u%2==0?1:0;
+        Animr.EIMG(lerp(X,LX[i],u/18.0),lerp(Y-50,LY[i],u/18.0),32,32,Rotate,INDEX,#FFFFFF);
+      }
+      Animr.EIMG(LX[i],LY[i],40,40,0,2,enraged?#FF0000:#FFFFFF);
+      if(enraged){
+        stroke(#FF0000);
+        strokeWeight(4);
+        line(TX[i],TY[i],LX[i],LY[i]);
+        Animr.EIMG(TX[i],TY[i],40,40,0,2,color(#FF0000,200));
+      }
+    }
+    Animr.Anim(true, true);
+    if(HP>0){
+      Animr.DIMG(X, Y, W, H, true, true, enraged?#FF0000:#FFFFFF);
+    }else{
+      Animr.DIMG(X+random(-4,4), Y+random(-4,4), W, H, true, true, #FFFFFF);
+    }
+    noStroke();
+    fill(#FFFFFF);
+    if(HP>0){
+      circle(X+cos(R)*7, Y-H/2+sin(R)*7, 15);
+    }else{
+      circle(X+random(-4,4), Y+random(-4,4)-H/2, 15);
+    }
+  }
+  int HealHits=0;
+  void HURT(int dmg)
+  {
+    if (!hurte) {
+      return;
+    }
+    HealHits++;
+    if(enraged){dmg/=5;}
+    HP-=dmg;
+    for (int B=0; B<5; B++) {
+      AddPartic(4, X, Y, random(-1, 1), random(-8, -2), 50, color(255, 0, 0), true);
+    }
+    if(HealHits==2){
+      NewSPr(new Heal(X,Y-50,0));
+      HealHits=0;
+    }
+    if (play.regenera==0) {
+      if (dist(X, Y, play.X, play.Y)<=200 && play.HP>0) {
+        AddPartic(1, play.X+random(-5, 5), play.Y-12+random(-5, 5), X+random(-5, 5), Y-H/2+random(-5, 5), 60, color(255, 0, 0), true);
+        if (play.HP+dmg/4>100) {
+          play.HP=100;
+        } else {
+          play.HP+=dmg/4;
+        }
+      }
+    } else {
+      if (random(1, 100)<50 && play.HP>0) {
+        NewPR(X, Y-H/2, random(-5, 5), random(-5, 5), 10);
+      }
+    }
+  }
+}
+
+class Servant extends AI {
+  Servant(float nX, float nY, boolean nM) {
+    X=nX;
+    Y=nY;
+    M=nM;
+    W=8;
+    H=16;
+    HP=80;
+  }
+  float LPX = 0;
+  float LPY = 0;
+  int Cooldown=200+(int)random(0, 200);
+  void math(int SID) {
+    if (HP<=0) {
+      kill.append(SID);
+      return;
+    }
+    float R=atan2(Y-play.Y, X-play.X);
+    if(Cooldown==30){
+      LPX=play.X;
+      LPY=play.Y;
+    }
+    if(Cooldown==0){
+      expd(LPX,LPY,128,30,0,true);
+      Cooldown=200+(int)random(0, 200);
+    }
+    Cooldown--;
+    if (dist(X, Y, play.X, play.Y)<140) {
+      VX+=cos(R);
+      VY+=sin(R);
+    }
+    if (dist(X, Y, play.X, play.Y)>140) {
+      VX-=cos(R);
+      VY-=sin(R);
+    }
+    VX=constrain(VX, -2, 2)+random(-0.5,0.5);
+    VY=constrain(VY, -2, 2)+random(-0.5,0.5);
+    if(random(0,100)<20){
+      NewPartic(new GravPoint(X+random(-8, 8), Y-random(0, 16), 0, 0, 30, #004444, -1), true);
+    }
+    VY-=0.01;
+    Phys(W, H, true);
+    Cont(W, H, 15);
+    X+=VX;
+    Y+=VY;
+  }
+  void render() {
+    if (DebugDraw) {
+      stroke(0);
+      fill(255);
+      rect(X-W, Y-H, W*2, H);
+    }
+    if(Cooldown<30){
+      stroke(#0BD8B4);
+      strokeWeight(3);
+      noFill();
+      circle(LPX,LPY,128);
+      circle(LPX,LPY,Cooldown*128/30);
+      if(Configs.get("DrawEffects")==1){
+        for(int i=0;i<8;i++){
+          float R = PI/4*i;
+          line(LPX+cos(R)*64,LPY+sin(R)*64,LPX+cos(R)*80,LPY+sin(R)*80);
+        }
+      }
+    }
+    noStroke();
+    fill(#0BD8B4);
+    circle(X, Y-H/2, H);
+    stroke(color(255,0,0),255-Cooldown*0.5);
   }
 }
 
@@ -1622,7 +2593,7 @@ class AI {
   }
 }
 
-void NewAI(float X, float Y, String T, boolean M) {
+boolean NewAI(float X, float Y, String T, boolean M) {
   //Need to figure a better way of doin this
   switch(T) {//
   case "Bug":
@@ -1679,7 +2650,43 @@ void NewAI(float X, float Y, String T, boolean M) {
   case "Electron":
     ListAi.add(new Electron(X, Y, M));
     break;
+  case "Limbo":
+    ListAi.add(new Limbo(X, Y, M));
+    break;
+  case "Lust":
+    ListAi.add(new Lust(X, Y, M));
+    break;
+  case "Gluttony":
+    ListAi.add(new Gluttony(X, Y, M));
+    break;
+  case "Greed":
+    ListAi.add(new Greed(X, Y, M));
+    break;
+  case "Anger":
+    ListAi.add(new Anger(X, Y, M));
+    break;
+  case "Heresy":
+    ListAi.add(new Heresy(X, Y, M));
+    break;
+  case "Hatred":
+    ListAi.add(new Hatred(X, Y, M));
+    break;
+  case "Violence":
+    ListAi.add(new Violence(X, Y, M));
+    break;
+  case "Fraud":
+    ListAi.add(new Fraud(X, Y, M));
+    break;
+  case "Treachery":
+    ListAi.add(new Treachery(X, Y, M));
+    break;
+  case "Zenith":
+    ListAi.add(new Zenith(X, Y, M));
+    break;
+  default:
+    return false;
   }
+  return true;
 }
 
 float[] coll(float OX, float OY, float NX, float NY, boolean Ignore) {

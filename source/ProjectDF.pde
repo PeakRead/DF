@@ -1,4 +1,4 @@
-String Version = "V 6.0";
+String Version = "V 7.0";
 
 keyboard EYS;
 
@@ -8,6 +8,7 @@ void settings(){
 }
 
 PImage Secret;
+PShape MenuBackground;
 
 void setup(){
   if(args!=null){
@@ -93,6 +94,26 @@ void setup(){
   LW=width;
   LW=height;
   ErrorImg = SloadImage("/Misc/Error.png");
+  
+  Darken = loadShader("Misc/Darken.glsl");
+  LightX = new float[128];
+  LightY = new float[128];
+  LightActive = new boolean[128];
+  LightPower = new float[128];
+  Darken.set("Width",(float)700);
+  Darken.set("Height",(float)700);
+  Darken.set("X",LightX);
+  Darken.set("Y",LightY);
+  Darken.set("Active",LightActive);
+  Darken.set("Active",LightPower);
+  Darken.set("Power",LightPower);
+  
+  MenuBackground = loadPly("Misc/background.ply");
+  
+  Background=createGraphics(width,height,P3D);
+  
+  //dont remove this fixs the bluring
+  textSize(12);
 }
 
 void Start(String Map){
@@ -117,6 +138,13 @@ int TextCurr=0;
 boolean TextShow=false;
 int hurtmepleanty=0;
 float ZOOMER=1;
+PShader Darken;
+float[] LightX;
+float[] LightY;
+boolean[] LightActive;
+float[] LightPower;
+boolean DarkenActive = false;
+int GlobalPhysTimer=0;
 
 //make ent_timers and ent_textbox
 int toturialTimer=0;
@@ -127,6 +155,16 @@ void draw(){
     LW=width;
     LH=height;
     Background=createGraphics(width,height,P3D);
+    Darken.set("Width",(float)width);
+    Darken.set("Height",(float)height);
+    if(WALLs!=null){
+      for(int i=0;i<WALLs.length;i++){
+        if(WALLs[i].IsShader){
+          WALLs[i].shader.set("WIDTH",(float)width);
+          WALLs[i].shader.set("HEIGHT",(float)height);
+        }
+      }
+    }
   }
   //if(Configs.get("Fullscreen")==1){
   //  surface.setSize(displayWidth, displayHeight);
@@ -241,7 +279,23 @@ void draw(){
       toturialTimer++;
     }
   }else{
-    background(0);
+    if(MenuBackground!=null){
+      Background.beginDraw();
+      Background.background(0);
+      Background.ambientLight(100, 100, 100);
+      Background.directionalLight(155, 155, 155, -0.5, 0.5, -1);
+      //Background.ambientLight(255, 255, 255);
+      Background.camera(0,-121,0,0,999,0, 0,0,-1);
+      Background.perspective(PI/3.0,float(width)/float(height),1,100000);
+      Background.pushMatrix();
+      //Background.scale(1,1,-1);
+      Background.shape(MenuBackground);
+      Background.popMatrix();
+      Background.endDraw();
+      image(Background, 0, 0);
+    }else{
+      background(0);
+    }
     text(Version,0,10);
     Menu();
   }
@@ -260,9 +314,10 @@ void MAINLOOP(){
   //background(0);
   play.PO=atan2(mouseY-height/2+12,mouseX-width/2);
   if(EYS.getkey('p')){
-    //play.Force(cos(atan2(mouseY-height/2,mouseX-width/2))*3,sin(atan2(mouseY-height/2,mouseX-width/2))*3);
+    println("BREAK");
   }
   if(RunPhys){
+    GlobalPhysTimer++;
     if(play.HP>0){HWeaponMATH();}
     try{
       play.Phy();
@@ -272,6 +327,13 @@ void MAINLOOP(){
       PrintCon(e.toString());
       ErrorTimer=120;
     }
+    for(int i=0;i<128;i++){
+      LightActive[i]=false;
+    }
+    LightX[0] = play.X;
+    LightY[0] = play.Y;
+    LightActive[0] = true;
+    LightPower[0] = 1;
     AIMath();
     ProjMath();
     MathEffects();
@@ -279,6 +341,10 @@ void MAINLOOP(){
     Atrigger();
     propM();
     doorM();
+    Darken.set("X",LightX);
+    Darken.set("Y",LightY);
+    Darken.set("Active",LightActive);
+    Darken.set("Power",LightPower);
     for(int i=0;i<TX.length;i++){
       if(TT[i]==6){
         float vy=0;
@@ -304,10 +370,37 @@ void MAINLOOP(){
     tantmath();
   }
   //RENDER
+  ZOOMER=float(Configs.get("Zoom"))/100;
+  Darken.set("OffX",play.X*ZOOMER-width/2);
+  Darken.set("OffY",play.Y*ZOOMER-height/2);
+  Darken.set("Zoom",ZOOMER);
+  Darken.set("P",(float)0.004/ZOOMER);
+  for(int i=0;i<WALLs.length;i++){
+    if(WALLs[i].IsShader){
+      WALLs[i].shader.set("OFFX",-play.X*ZOOMER+width/2+WALLs[i].Offx);
+      WALLs[i].shader.set("OFFY",-play.Y*ZOOMER+height/2+WALLs[i].Offy);
+      WALLs[i].shader.set("SIZE",ZOOMER);
+      WALLs[i].shader.set("TIME",GlobalPhysTimer);
+    }
+  }
   //why and how do colors work on this shit
   //fuck obj my new best friend is ply
-  ZOOMER=float(Configs.get("Zoom"))/100;
-  if(BACEXIST){
+  background(0);
+  if(Mapinfo.IsBackTexture){
+    if(Mapinfo.IsShader){
+      shader(Mapinfo.Shader);
+    }
+    beginShape();
+    if(!Mapinfo.IsShader){
+      texture(Mapinfo.Texture);
+    }
+    vertex(0    ,0     ,0    ,0);
+    vertex(width,0     ,width,0);
+    vertex(width,height,width,height);
+    vertex(0    ,height,0    ,height);
+    endShape();
+  }
+  if(Mapinfo.IsBackModel && Mapinfo.Model!=null){
   Background.beginDraw();
   Background.background(0);
   Background.ambientLight(100, 100, 100);
@@ -317,12 +410,10 @@ void MAINLOOP(){
   Background.perspective(PI/3.0,float(width)/float(height),1,100000);
   Background.pushMatrix();
   //Background.scale(1,1,-1);
-  Background.shape(BACK);
+  Background.shape(Mapinfo.Model);
   Background.popMatrix();
   Background.endDraw();
   image(Background, 0, 0);
-  }else{
-  background(0);
   }
   pushMatrix();
   scale(ZOOMER);
@@ -337,7 +428,24 @@ void MAINLOOP(){
   //rect(Bac.width()+BacX,BacY,10000-Bac.width(),Bac.height());
   //Bac.ANR(BacX,BacY);
   //noFill();
-  shape(WORLD);
+  
+  for(int i=0;i<WALLs.length;i++){
+    if(WALLs[i].IsShader){
+      shader(WALLs[i].shader);
+    }
+    textureWrap(REPEAT);
+    beginShape();
+    if(!WALLs[i].IsShader){
+      texture(WALLs[i].img);
+    }
+    for(int u=0;u<WALLs[i].x.length;u++){
+      vertex(WALLs[i].x[u],WALLs[i].y[u],WALLs[i].x[u],WALLs[i].y[u]);
+    }
+    endShape();
+    if(WALLs[i].IsShader){
+      resetShader();
+    }
+  }
   
   propD();
   AIR();
@@ -382,8 +490,14 @@ void MAINLOOP(){
       text(ET[i],EX[i],EY[i]);
     }
   }
-  stroke(0);
   popMatrix();
+  if(DarkenActive){
+    noStroke();
+    shader(Darken);
+    rect(0,0,width,height);
+    resetShader();
+  }
+  stroke(0);
   for(int i=0;i<BOSSHP.size();i++){
     fill(100,100);
     rect(width/2-200,height-80-i*20,400,20);
