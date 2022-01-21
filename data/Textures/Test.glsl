@@ -6,6 +6,7 @@ uniform float HEIGHT;
 uniform float OFFX;
 uniform float OFFY;
 uniform float SIZE;
+//float SIZE=1.0; 
 
 float PI = 3.1413;
 float Dsize = 30.0;

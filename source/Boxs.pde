@@ -155,7 +155,6 @@ void UPDATE(){
         out = subset(out,0,readed);
         shit = concat(shit,out);
       }
-      println(sketchPath()+"/"+removefirst(tmp.getName()));
       //saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),shit);
     }
     opener.close();

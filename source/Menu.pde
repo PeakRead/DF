@@ -24,8 +24,14 @@ void MenuSetup() {
   menuUI = (UI[])append(menuUI, new ButtonText(20, -160+50,-1,1, 100, 40, "MAIN_MENU", "GotoOptions", "options"));
   menuUI = (UI[])append(menuUI, new ButtonText(20, -160+100,-1,1, 100, 40, "MAIN_MENU", "Quit", "Quit"));
   menuUI = (UI[])append(menuUI, new ButtonText(140, -160+100,-1,1, 100, 40, "MAIN_MENU", "UPDATE", "Update"));
+  menuUI = (UI[])append(menuUI, new ButtonText(140, -160+50,-1,1, 100, 40, "MAIN_MENU", "GotoPack", "Packs"));
   menuUI = (UI[])append(menuUI, new Image     (0,75,0,-1, 100, 40, "MAIN_MENU", "UPDATE", "Misc/Title.png"));
   
+  //PACKS
+
+  menuUI = (UI[])append(menuUI, new ButtonText(20,50,-1,-1, 100, 40, "PACKS", "GotoMainFromPack", "back"));
+  menuUI = (UI[])append(menuUI, new PACKS(20, 100,-1,-1, 300, 500, "PACKS", "nothing"));
+
   //saves//
   
   menuUI = (UI[])append(menuUI, new SaveButton(140, -160,-1,1, 100, 40, "MAIN_MENU", "nothing" , 10));
@@ -119,12 +125,19 @@ void RunGame() {
   tantrest();
   nextWave();
   MenuPaused=false;
+  RunPhys=true;
 }
 
 void GotoOptions() {
   MenuTurnOffAll();
   MenuTurnOn("OPTIONS_MENU");
   MenuTurnOn("Binds");
+  MenuSwap=true;
+}
+
+void GotoPack() {
+  MenuTurnOffAll();
+  MenuTurnOn("PACKS");
   MenuSwap=true;
 }
 
@@ -173,6 +186,21 @@ void GotoMain() {
     MenuTurnOn("MAIN_MENU");
     MenuSwap=true;
   }
+}
+
+void GotoMainFromPack() {
+  String[] Enabled = {};
+  for(int i=0;i<Packs.length;i++){
+    if(Packs[i].Enabled){
+      Enabled = append(Enabled,Packs[i].internalName);
+    }
+  }
+  saveStrings(sketchPath()+"/data/Packs/Enabled.txt",Enabled);
+  printArray(Enabled);
+  resetALLassets();
+  MenuTurnOffAll();
+  MenuTurnOn("MAIN_MENU");
+  MenuSwap=true;
 }
 
 void GotoBinds() {
@@ -495,6 +523,53 @@ class ButtonText extends UI {
     fill(#BFBFBF);
     text(Text, w/2, h/2);
     popMatrix();
+  }
+}
+
+class PACKS extends UI {
+  PACKS(float nx, float ny,int AllingW,int AllingH, float nw, float nh, String nCall, String nRun) {
+    x=nx;
+    y=ny;
+    this.AllingW=AllingW;
+    this.AllingH=AllingH;
+    w=nw;
+    h=nh;
+    Call=nCall;
+    Run=nRun;
+  }
+  int lookingat=0;
+  void Draw(int i) {
+    textAlign(LEFT, TOP);
+    stroke(#676767);
+    fill(#404040);
+    pushMatrix();
+    translate(x+getAliningW(),y+getAliningH());
+    rect(0, 0, 300, 500);
+    line(100,0,100,500);
+    for(int u=0;u<Packs.length;u++){
+      if(mouseX>=x+getAliningW() && mouseX<=x+getAliningW()+100 && mouseY>=y+getAliningH()+20*u && mouseY<=y+getAliningH()+20*(u+1)){
+        lookingat=u;
+      }
+      fill(#FFFFFF);
+      text(Packs[u].Name,2,2+20*u);
+      line(0,20*(u+1),100,20*(u+1));
+      fill(Packs[u].Enabled?#00FF00:#FF0000);
+      rect(81,20*u+1,18,18);
+    }
+    if(Packs.length>0){
+      fill(#FFFFFF);
+      text(Packs[lookingat].Name,102,2);
+      text(Packs[lookingat].Author,102,24);
+      text(Packs[lookingat].Desc,102,46,200,300);
+    }
+    popMatrix();
+  }
+  void Func(int i) {
+    for(int u=0;u<Packs.length;u++){
+      if(mouseX>=x+getAliningW() && mouseX<=x+getAliningW()+100 && mouseY>=y+getAliningH()+20*u && mouseY<=y+getAliningH()+20*(u+1)){
+        Packs[u].Enabled=!Packs[u].Enabled;
+      }
+    }
   }
 }
 

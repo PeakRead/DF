@@ -275,6 +275,16 @@ PImage SloadImage(String path){
   if(Secret!=null){
     return Secret;
   }
+  for(int i=0;i<Packs.length;i++){
+    if(!Packs[i].Enabled){continue;}
+    File IS = new File(sketchPath()+"/Data/Packs/"+Packs[i].internalName+"/"+path);
+    if(IS.exists()){
+      PImage img=loadImage(IS.getAbsolutePath());
+      if(img!=null){
+        return img;
+      }
+    }
+  }
   PImage img=loadImage(path);
   if(img!=null){
     return img;

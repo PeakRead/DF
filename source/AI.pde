@@ -1216,7 +1216,6 @@ class Electron extends AI {
   int attack=0;
   float attacking=0;
   void math(int SID) {
-    println(Gr);
     if (HP<=0) {
       NewPartic(new Explode(X, Y-H/2, 150, 0, 40, #EA0C13), true);
       NewPartic(new Explode(X, Y-H/2, 300, 0, 40, #EA0C13), true);

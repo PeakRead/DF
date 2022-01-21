@@ -89,7 +89,6 @@ void openMap(String MAP) {
     int num=BgetI(DATA, Header, 1);
     Header+=1;
     Mapinfo.IsBackModel = num==1;
-      println(Mapinfo.IsBackModel);
     if(num==1){
       StringSize=BgetI(DATA, Header, 2);
       Header+=2;
@@ -135,7 +134,6 @@ void openMap(String MAP) {
           Mapinfo.IsShader=true;
           Mapinfo.Shader.set("WIDTH",width);
           Mapinfo.Shader.set("HEIGHT",height);
-          print("yeah");
         }
       }else{
         Mapinfo.IsBackTexture=false;
@@ -308,7 +306,6 @@ class Wall {
       IsShader=true;
       shader.set("WIDTH",(float)width);
       shader.set("HEIGHT",(float)height);
-      print("yeah");
     }
     x = new float[0];
     y = new float[0];
@@ -547,7 +544,17 @@ class door {
 PShape loadPly(String filepath) {
   try{
   PShape obj;
-  String[] info = loadStrings(filepath);
+  String[] info=null;
+  for(int i=0;i<Packs.length;i++){
+    if(!Packs[i].Enabled){continue;}
+    File IS = new File(sketchPath()+"/Data/Packs/"+Packs[i].internalName+"/"+filepath);
+    if(IS.exists()){
+      info = loadStrings(IS.getAbsolutePath());
+    }
+  }
+  if(info==null){
+    info = loadStrings(filepath);
+  }
   if(info==null){
     PrintCon("error opening model");
     PrintCon("model is empty");

@@ -20,6 +20,7 @@ void PrintCon(String text){
 }
 
 void DrawConsole(){
+  textAlign(LEFT,TOP);
   noStroke();
   fill(#00FF00,200);
   rect(0,0,width,20*15);

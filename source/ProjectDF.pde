@@ -21,14 +21,7 @@ void setup(){
     }
   }
   JSONObject tmp = loadJSONObject("Misc/config.json");
-  tantrest();
-  setupKeys();
-  resetCon();
-  WeaponINIC();
-  EnemyAINIC();
-  ProAINIC();
-  MenuSetup();
-  PartINIC();
+  resetALLassets();
   Configs = new IntDict();
   
   Configs.set("DrawEffects", 1);
@@ -93,7 +86,6 @@ void setup(){
   background(0);
   LW=width;
   LW=height;
-  ErrorImg = SloadImage("/Misc/Error.png");
   
   Darken = loadShader("Misc/Darken.glsl");
   LightX = new float[128];
@@ -108,12 +100,26 @@ void setup(){
   Darken.set("Active",LightPower);
   Darken.set("Power",LightPower);
   
-  MenuBackground = loadPly("Misc/background.ply");
   
   Background=createGraphics(width,height,P3D);
   
   //dont remove this fixs the bluring
   textSize(12);
+}
+
+void resetALLassets(){
+  
+  loadPacks();
+  tantrest();
+  setupKeys();
+  resetCon();
+  WeaponINIC();
+  EnemyAINIC();
+  ProAINIC();
+  MenuSetup();
+  PartINIC();
+  ErrorImg = SloadImage("/Misc/Error.png");
+  MenuBackground = loadPly("Misc/background.ply");
 }
 
 void Start(String Map){
@@ -314,6 +320,7 @@ void MAINLOOP(){
   //background(0);
   play.PO=atan2(mouseY-height/2+12,mouseX-width/2);
   if(EYS.getkey('p')){
+    //DEBUGING
     println("BREAK");
   }
   if(RunPhys){

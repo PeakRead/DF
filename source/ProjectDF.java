@@ -40,14 +40,7 @@ public void setup(){
     }
   }
   JSONObject tmp = loadJSONObject("Misc/config.json");
-  tantrest();
-  setupKeys();
-  resetCon();
-  WeaponINIC();
-  EnemyAINIC();
-  ProAINIC();
-  MenuSetup();
-  PartINIC();
+  resetALLassets();
   Configs = new IntDict();
   
   Configs.set("DrawEffects", 1);
@@ -112,7 +105,6 @@ public void setup(){
   background(0);
   LW=width;
   LW=height;
-  ErrorImg = SloadImage("/Misc/Error.png");
   
   Darken = loadShader("Misc/Darken.glsl");
   LightX = new float[128];
@@ -127,12 +119,26 @@ public void setup(){
   Darken.set("Active",LightPower);
   Darken.set("Power",LightPower);
   
-  MenuBackground = loadPly("Misc/background.ply");
   
   Background=createGraphics(width,height,P3D);
   
   //dont remove this fixs the bluring
   textSize(12);
+}
+
+public void resetALLassets(){
+  
+  loadPacks();
+  tantrest();
+  setupKeys();
+  resetCon();
+  WeaponINIC();
+  EnemyAINIC();
+  ProAINIC();
+  MenuSetup();
+  PartINIC();
+  ErrorImg = SloadImage("/Misc/Error.png");
+  MenuBackground = loadPly("Misc/background.ply");
 }
 
 public void Start(String Map){
@@ -333,6 +339,7 @@ public void MAINLOOP(){
   //background(0);
   play.PO=atan2(mouseY-height/2+12,mouseX-width/2);
   if(EYS.getkey('p')){
+    //DEBUGING
     println("BREAK");
   }
   if(RunPhys){
@@ -1828,7 +1835,6 @@ class Electron extends AI {
   int attack=0;
   float attacking=0;
   public void math(int SID) {
-    println(Gr);
     if (HP<=0) {
       NewPartic(new Explode(X, Y-H/2, 150, 0, 40, 0xffEA0C13), true);
       NewPartic(new Explode(X, Y-H/2, 300, 0, 40, 0xffEA0C13), true);
@@ -3603,6 +3609,16 @@ public PImage SloadImage(String path){
   if(Secret!=null){
     return Secret;
   }
+  for(int i=0;i<Packs.length;i++){
+    if(!Packs[i].Enabled){continue;}
+    File IS = new File(sketchPath()+"/Data/Packs/"+Packs[i].internalName+"/"+path);
+    if(IS.exists()){
+      PImage img=loadImage(IS.getAbsolutePath());
+      if(img!=null){
+        return img;
+      }
+    }
+  }
   PImage img=loadImage(path);
   if(img!=null){
     return img;
@@ -3783,7 +3799,6 @@ public void UPDATE(){
         out = subset(out,0,readed);
         shit = concat(shit,out);
       }
-      println(sketchPath()+"/"+removefirst(tmp.getName()));
       //saveBytes(sketchPath()+"/"+removefirst(tmp.getName()),shit);
     }
     opener.close();
@@ -3831,6 +3846,7 @@ public void PrintCon(String text){
 }
 
 public void DrawConsole(){
+  textAlign(LEFT,TOP);
   noStroke();
   fill(0xff00FF00,200);
   rect(0,0,width,20*15);
@@ -4765,7 +4781,6 @@ public void openMap(String MAP) {
     int num=BgetI(DATA, Header, 1);
     Header+=1;
     Mapinfo.IsBackModel = num==1;
-      println(Mapinfo.IsBackModel);
     if(num==1){
       StringSize=BgetI(DATA, Header, 2);
       Header+=2;
@@ -4811,7 +4826,6 @@ public void openMap(String MAP) {
           Mapinfo.IsShader=true;
           Mapinfo.Shader.set("WIDTH",width);
           Mapinfo.Shader.set("HEIGHT",height);
-          print("yeah");
         }
       }else{
         Mapinfo.IsBackTexture=false;
@@ -4984,7 +4998,6 @@ class Wall {
       IsShader=true;
       shader.set("WIDTH",(float)width);
       shader.set("HEIGHT",(float)height);
-      print("yeah");
     }
     x = new float[0];
     y = new float[0];
@@ -5223,7 +5236,17 @@ class door {
 public PShape loadPly(String filepath) {
   try{
   PShape obj;
-  String[] info = loadStrings(filepath);
+  String[] info=null;
+  for(int i=0;i<Packs.length;i++){
+    if(!Packs[i].Enabled){continue;}
+    File IS = new File(sketchPath()+"/Data/Packs/"+Packs[i].internalName+"/"+filepath);
+    if(IS.exists()){
+      info = loadStrings(IS.getAbsolutePath());
+    }
+  }
+  if(info==null){
+    info = loadStrings(filepath);
+  }
   if(info==null){
     PrintCon("error opening model");
     PrintCon("model is empty");
@@ -5307,8 +5330,14 @@ public void MenuSetup() {
   menuUI = (UI[])append(menuUI, new ButtonText(20, -160+50,-1,1, 100, 40, "MAIN_MENU", "GotoOptions", "options"));
   menuUI = (UI[])append(menuUI, new ButtonText(20, -160+100,-1,1, 100, 40, "MAIN_MENU", "Quit", "Quit"));
   menuUI = (UI[])append(menuUI, new ButtonText(140, -160+100,-1,1, 100, 40, "MAIN_MENU", "UPDATE", "Update"));
+  menuUI = (UI[])append(menuUI, new ButtonText(140, -160+50,-1,1, 100, 40, "MAIN_MENU", "GotoPack", "Packs"));
   menuUI = (UI[])append(menuUI, new Image     (0,75,0,-1, 100, 40, "MAIN_MENU", "UPDATE", "Misc/Title.png"));
   
+  //PACKS
+
+  menuUI = (UI[])append(menuUI, new ButtonText(20,50,-1,-1, 100, 40, "PACKS", "GotoMainFromPack", "back"));
+  menuUI = (UI[])append(menuUI, new PACKS(20, 100,-1,-1, 300, 500, "PACKS", "nothing"));
+
   //saves//
   
   menuUI = (UI[])append(menuUI, new SaveButton(140, -160,-1,1, 100, 40, "MAIN_MENU", "nothing" , 10));
@@ -5402,12 +5431,19 @@ public void RunGame() {
   tantrest();
   nextWave();
   MenuPaused=false;
+  RunPhys=true;
 }
 
 public void GotoOptions() {
   MenuTurnOffAll();
   MenuTurnOn("OPTIONS_MENU");
   MenuTurnOn("Binds");
+  MenuSwap=true;
+}
+
+public void GotoPack() {
+  MenuTurnOffAll();
+  MenuTurnOn("PACKS");
   MenuSwap=true;
 }
 
@@ -5456,6 +5492,21 @@ public void GotoMain() {
     MenuTurnOn("MAIN_MENU");
     MenuSwap=true;
   }
+}
+
+public void GotoMainFromPack() {
+  String[] Enabled = {};
+  for(int i=0;i<Packs.length;i++){
+    if(Packs[i].Enabled){
+      Enabled = append(Enabled,Packs[i].internalName);
+    }
+  }
+  saveStrings(sketchPath()+"/data/Packs/Enabled.txt",Enabled);
+  printArray(Enabled);
+  resetALLassets();
+  MenuTurnOffAll();
+  MenuTurnOn("MAIN_MENU");
+  MenuSwap=true;
 }
 
 public void GotoBinds() {
@@ -5778,6 +5829,53 @@ class ButtonText extends UI {
     fill(0xffBFBFBF);
     text(Text, w/2, h/2);
     popMatrix();
+  }
+}
+
+class PACKS extends UI {
+  PACKS(float nx, float ny,int AllingW,int AllingH, float nw, float nh, String nCall, String nRun) {
+    x=nx;
+    y=ny;
+    this.AllingW=AllingW;
+    this.AllingH=AllingH;
+    w=nw;
+    h=nh;
+    Call=nCall;
+    Run=nRun;
+  }
+  int lookingat=0;
+  public void Draw(int i) {
+    textAlign(LEFT, TOP);
+    stroke(0xff676767);
+    fill(0xff404040);
+    pushMatrix();
+    translate(x+getAliningW(),y+getAliningH());
+    rect(0, 0, 300, 500);
+    line(100,0,100,500);
+    for(int u=0;u<Packs.length;u++){
+      if(mouseX>=x+getAliningW() && mouseX<=x+getAliningW()+100 && mouseY>=y+getAliningH()+20*u && mouseY<=y+getAliningH()+20*(u+1)){
+        lookingat=u;
+      }
+      fill(0xffFFFFFF);
+      text(Packs[u].Name,2,2+20*u);
+      line(0,20*(u+1),100,20*(u+1));
+      fill(Packs[u].Enabled?0xff00FF00:0xffFF0000);
+      rect(81,20*u+1,18,18);
+    }
+    if(Packs.length>0){
+      fill(0xffFFFFFF);
+      text(Packs[lookingat].Name,102,2);
+      text(Packs[lookingat].Author,102,24);
+      text(Packs[lookingat].Desc,102,46,200,300);
+    }
+    popMatrix();
+  }
+  public void Func(int i) {
+    for(int u=0;u<Packs.length;u++){
+      if(mouseX>=x+getAliningW() && mouseX<=x+getAliningW()+100 && mouseY>=y+getAliningH()+20*u && mouseY<=y+getAliningH()+20*(u+1)){
+        Packs[u].Enabled=!Packs[u].Enabled;
+      }
+    }
   }
 }
 
@@ -7396,6 +7494,54 @@ class ANIPR{
     return RFrames.length;
   }
 }
+public void loadPacks(){
+  String[] Enabled = loadStrings(sketchPath()+"/data/Packs/Enabled.txt");
+  Packs = new pack[0];
+  File PackFolder = new File(sketchPath()+"\\Data\\Packs");
+  File [] Packstoload = PackFolder.listFiles();
+  for(int i=0;i<Packstoload.length;i++){
+    File Pack = Packstoload[i];
+    if(!Pack.isFile()){
+      JSONObject Data = loadJSONObject(Pack.getPath()+"/Data.json");
+      String name;
+      String desc;
+      String author;
+      if(Data!=null){
+        name = Data.getString("name","unknown");
+        desc = Data.getString("desc","missing");
+        author = Data.getString("author","someone");
+      }else{
+        name="unknown";
+        desc="missing";
+        author="someone";
+      }
+      Packs = (pack[])append(Packs,new pack(name,Pack.getName(),desc,author,Pack.getPath()));
+      for(int u=0;u<Enabled.length;u++){
+        if(Enabled[u].equals(Pack.getName())){
+          Packs[Packs.length-1].Enabled=true;
+        }
+      }
+    }
+  }
+}
+
+pack[] Packs;
+
+class pack{
+  String Name;
+  String Desc;
+  String Author;
+  String internalName;
+  String Path;
+  boolean Enabled=false;
+  pack(String Name,String intername,String Desc,String Author,String Path){
+    this.Name = Name;
+    this.Desc = Desc;
+    this.Author= Author;
+    this.internalName=intername;
+    this.Path=Path;
+  }
+}
 class Player{
   float X;
   float Y;
@@ -7826,7 +7972,6 @@ public void tantmath(){
       exit();
     }
     Epilog++;
-    println(Epilog);
     return;
   }
   if(Blurer>0 && !waveEnd){
@@ -7873,7 +8018,6 @@ public void nextWave(){
     byte[] tmp = BsetI(round,1);
     out[0]=tmp[0];
     saveBytes("data/Misc/sav",out);
-    println(round);
     break;
     default:
     break;

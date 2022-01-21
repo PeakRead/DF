@@ -58,7 +58,6 @@ void tantmath(){
       exit();
     }
     Epilog++;
-    println(Epilog);
     return;
   }
   if(Blurer>0 && !waveEnd){
@@ -105,7 +104,6 @@ void nextWave(){
     byte[] tmp = BsetI(round,1);
     out[0]=tmp[0];
     saveBytes("data/Misc/sav",out);
-    println(round);
     break;
     default:
     break;
