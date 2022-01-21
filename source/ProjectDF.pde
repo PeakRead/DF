@@ -1,4 +1,4 @@
-String Version = "V 7.0";
+String Version = "V 7.1";
 
 keyboard EYS;
 
@@ -321,7 +321,7 @@ void MAINLOOP(){
   play.PO=atan2(mouseY-height/2+12,mouseX-width/2);
   if(EYS.getkey('p')){
     //DEBUGING
-    println("BREAK");
+    println("BREAK"); //<>//
   }
   if(RunPhys){
     GlobalPhysTimer++;
@@ -454,7 +454,7 @@ void MAINLOOP(){
     }
   }
   
-  propD();
+  propD(); //<>//
   AIR();
   PRR();
   DrawEffects();
