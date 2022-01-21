@@ -12,3 +12,17 @@ made in processing:
 basicaly java but i dont want to deal whit System.out.print i just want a print stuff
 
 gameplay is bad
+
+Warning
+
+this "program" uses an old form of java to run
+
+you have two options to run
+
+1 get the old java
+
+or
+
+2 get processing and move the data folder into the source folder and rename it to "ProjectDF"
+
+bye
